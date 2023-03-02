@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface PlayerDao {
 
     @Query("SELECT * FROM player_table ORDER BY player ASC")
-    fun getAlphabetizedWords(): Flow<List<Player>>
+    fun getAlphabetizedPlayers(): Flow<List<Player>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(player: Player)
