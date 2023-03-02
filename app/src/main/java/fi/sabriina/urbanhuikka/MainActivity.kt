@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.WindowInsets
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
