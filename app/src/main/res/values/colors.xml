@@ -12,4 +12,10 @@
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
+
+    <color name="main_blue">#579BB1</color>
+    <color name="main_orange">#FFB28B</color>
+    <color name="background">#ECE8DD</color>
+    <color name="dark_font">#0B132B</color>
+    <color name="light_font">#1C2541</color>
 </resources>

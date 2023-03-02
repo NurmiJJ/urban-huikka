@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Huikka</string>
-    
+
+    --Titles
+    <string name="new_game">Uusi peli</string>
+    <string name="continue_game">Jatka peliä</string>
+
+    <string name="ready">Valmis</string>
+
+    <string name="addPlayer">Lisää pelaaja</string>
+
 </resources>
