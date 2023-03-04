@@ -54,6 +54,9 @@ class SetPlayersActivity : AppCompatActivity() {
         playerViewModel.allPlayers.observe(this, Observer { players ->
             // Update the cached copy of the words in the adapter.
             players?.let { adapter.submitList(it) }
+            if (adapter.itemCount > 0) {
+                nextButton.isEnabled = true
+            }
         })
 
         playerInput.doOnTextChanged { text, start, before, count ->
