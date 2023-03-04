@@ -4,8 +4,9 @@ const val LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maur
 
 
 data class Card(
-    val title: String,
+    val title: String = "",
     val chapter: String = LOREM,
+    val addInfo: String = "",
     val points: Int = 1
 
 )
