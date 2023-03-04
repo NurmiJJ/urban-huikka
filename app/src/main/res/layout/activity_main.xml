@@ -6,18 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="159dp"
-        android:layout_height="315dp"
+    <fi.sabriina.urbanhuikka.CustomCard
+        android:id="@+id/cardView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="48dp"
         android:layout_marginEnd="24dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_round_x" />
-
+        app:layout_constraintTop_toBottomOf="@+id/view" />
 
     <View
         android:id="@+id/view"
@@ -29,9 +29,10 @@
 
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="200dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="16dp"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -42,19 +43,19 @@
             android:id="@+id/truthButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:layout_margin="20dp"
-            android:textSize="20sp"
-            android:text="Totuus" />
+            android:layout_weight="1"
+            android:text="Totuus"
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/dareButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:layout_margin="20dp"
-            android:textSize="20sp"
-            android:text="Tehtävä" />
+            android:layout_weight="1"
+            android:text="Tehtävä"
+            android:textSize="20sp" />
 
     </LinearLayout>
 
