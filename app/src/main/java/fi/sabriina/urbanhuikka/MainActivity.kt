@@ -3,9 +3,11 @@ package fi.sabriina.urbanhuikka
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -23,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var playerName : TextView
     private lateinit var cardView : CustomCard
 
+    private lateinit var selectionButtons : LinearLayout
     private lateinit var truthButton : Button
     private lateinit var dareButton : Button
 
@@ -42,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         truthButton = findViewById(R.id.truthButton)
         dareButton = findViewById(R.id.dareButton)
         cardView = findViewById(R.id.cardView)
+        selectionButtons = findViewById(R.id.selectionButtons)
 
         updateDatabase()
 
@@ -54,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         truthButton.setOnClickListener {
             val card = truthCardList.random()
             cardView.setCard(card)
+            //hideButtons()
         }
 
         dareButton.setOnClickListener {
@@ -68,6 +73,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun hideButtons(){
+        selectionButtons.isVisible = false
+    }
+
     private fun updateDatabase() {
         database.collection(TruthCollection)
             .addSnapshotListener { value, e ->
@@ -80,8 +89,6 @@ class MainActivity : AppCompatActivity() {
                 for (doc in value!!) {
                     val card : Card = doc.toObject(Card::class.java)
                     truthCardList.add(card)
-
-
                 }
             }
 
