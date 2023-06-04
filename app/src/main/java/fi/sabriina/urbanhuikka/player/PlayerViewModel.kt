@@ -26,6 +26,15 @@ class PlayerViewModel(private val repository: PlayerRepository) : ViewModel() {
     fun delete(player: Player) = viewModelScope.launch {
         repository.delete(player)
     }
+
+    fun updatePoints(player: Player, pointsToAdd: Int) {
+        val newPlayer = player.copy(currentPoints = player.currentPoints + pointsToAdd)
+        updatePlayer(newPlayer)
+    }
+
+    private fun updatePlayer(player: Player) = viewModelScope.launch {
+        repository.updatePlayer(player)
+    }
 }
 
 class PlayerViewModelFactory(private val repository: PlayerRepository) : ViewModelProvider.Factory {

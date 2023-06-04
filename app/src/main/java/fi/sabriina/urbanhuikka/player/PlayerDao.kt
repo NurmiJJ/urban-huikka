@@ -9,6 +9,9 @@ interface PlayerDao {
     @Query("SELECT * FROM player_table ORDER BY player ASC")
     fun getAlphabetizedPlayers(): Flow<List<Player>>
 
+    @Update
+    suspend fun updatePlayer(player: Player)
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(player: Player)
 

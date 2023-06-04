@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 // Annotates class to be a Room Database with a table (entity) of the Player class
-@Database(entities = arrayOf(Player::class), version = 1, exportSchema = false)
+@Database(entities = arrayOf(Player::class), version = 2, exportSchema = false)
 public abstract class PlayerRoomDatabase : RoomDatabase() {
 
     abstract fun playerDao(): PlayerDao
@@ -22,7 +22,7 @@ public abstract class PlayerRoomDatabase : RoomDatabase() {
             super.onCreate(db)
             INSTANCE?.let { database ->
                 scope.launch {
-                    var playerDao = database.playerDao()
+                    val playerDao = database.playerDao()
 
                     // Delete all content here.
                     playerDao.deleteAll()
@@ -53,6 +53,7 @@ public abstract class PlayerRoomDatabase : RoomDatabase() {
                     "player_database"
                 )
                     .addCallback(PlayerDatabaseCallback(scope))
+                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 // return instance

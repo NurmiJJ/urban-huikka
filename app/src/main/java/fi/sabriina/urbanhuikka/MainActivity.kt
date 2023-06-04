@@ -1,18 +1,24 @@
 package fi.sabriina.urbanhuikka
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.player.*
+import kotlinx.coroutines.launch
 
 const val TAG = "Huikkasofta"
 const val DareCollection = "DareCards"
@@ -35,6 +41,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var skipButton : Button
     private lateinit var completeButton : Button
 
+    private lateinit var leaderboardButton : ImageButton
+
     var truthCardList = mutableListOf<Card>()
     var dareCardList = mutableListOf<Card>()
 
@@ -56,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         dareButton = findViewById(R.id.dareButton)
         skipButton = findViewById(R.id.skipButton)
         completeButton = findViewById(R.id.completeButton)
-
+        leaderboardButton = findViewById(R.id.leaderboardButton)
 
         cardView = findViewById(R.id.cardView)
         selectionButtons = findViewById(R.id.selectionButtons)
@@ -65,13 +73,18 @@ class MainActivity : AppCompatActivity() {
         updateDatabase()
 
         playerViewModel.allPlayers.observe(this, Observer { players ->
+            if (playerList.size == 0) {
+                playerName.text = players[0].name
+            }
             playerList = players.toMutableList()
             players?.let { adapter.submitList(it) }
-            model.currentPlayer.value = 0
         })
 
         model.currentPlayer.observe(this) { playerNo ->
-            playerName.text = playerList[playerNo].name
+            if (playerList.size > 0) {
+                playerName.text = playerList[playerNo].name
+                Log.d("MATIAS", playerName.text.toString())
+            }
         }
 
 
@@ -89,6 +102,12 @@ class MainActivity : AppCompatActivity() {
 
         skipButton.setOnClickListener { cardSkipped() }
         completeButton.setOnClickListener { cardCompleted() }
+
+        leaderboardButton.setOnClickListener {
+            val intent = Intent(this@MainActivity, LeaderboardActivity::class.java)
+            startActivity(intent)
+        }
+
 
     }
 
@@ -147,22 +166,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun cardCompleted() {
+        addPoints()
         showTaskButtons()
         endTurn()
+
+        var currentNo = model.currentPlayer.value
+
+        Log.d("MATIAS", (currentNo!! + 0).toString())
     }
 
-    private fun endTurn() {
-        val currentNo = model.currentPlayer.value
+    private fun endTurn()  {
+        val currentNo = model.currentPlayer.value!!
 
-        if (currentNo != null) {
-            if (currentNo + 1 == playerList.size){
-                model.currentPlayer.value = 0
-            } else {
-                model.currentPlayer.value = currentNo + 1
-            }
+        if (currentNo + 1 < playerList.size){
+            model.currentPlayer.value = currentNo + 1
 
+        } else {
+            model.currentPlayer.value = 0
         }
     }
+    private fun addPoints() {
+        val currentNo = model.currentPlayer.value
+        val player = playerList[currentNo!!]
+
+        playerViewModel.updatePoints(player, 3)
+
+    }
+
 
 
 

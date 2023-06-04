@@ -2,6 +2,8 @@ package fi.sabriina.urbanhuikka
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import fi.sabriina.urbanhuikka.player.Player
+import kotlin.properties.ReadWriteProperty
 
 /**
  * ViewModel for showing selected options at Main UI
@@ -9,9 +11,8 @@ import androidx.lifecycle.ViewModel
 class StatusViewModel : ViewModel() {
 
     val currentPlayer: MutableLiveData<Int> by lazy {
-        MutableLiveData<Int>()
+        MutableLiveData<Int>(0)
     }
-    val liveScore: MutableLiveData<Map<Int, Int>> by lazy {
-        MutableLiveData<Map<Int, Int>>()
-    }
+
+
 }
