@@ -18,4 +18,7 @@
     <color name="background">#ECE8DD</color>
     <color name="dark_font">#0B132B</color>
     <color name="light_font">#1C2541</color>
+
+    <color name="skip">#FF0000</color>
+    <color name="complete">#00FF00</color>
 </resources>

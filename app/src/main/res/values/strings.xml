@@ -10,5 +10,9 @@
     <string name="ready">Valmis</string>
 
     <string name="addPlayer">Lisää pelaaja</string>
+    <string name="complete">Suorita</string>
+    <string name="skip">Skip</string>
+    <string name="dare">Tehtävä</string>
+    <string name="truth">Totuus</string>
 
 </resources>

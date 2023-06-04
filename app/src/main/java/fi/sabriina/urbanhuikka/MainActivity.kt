@@ -2,12 +2,12 @@ package fi.sabriina.urbanhuikka
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -25,12 +25,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var playerName : TextView
     private lateinit var cardView : CustomCard
 
+    private lateinit var selectionTaskButtons : LinearLayout
     private lateinit var selectionButtons : LinearLayout
+
+
     private lateinit var truthButton : Button
     private lateinit var dareButton : Button
 
+    private lateinit var skipButton : Button
+    private lateinit var completeButton : Button
+
     var truthCardList = mutableListOf<Card>()
     var dareCardList = mutableListOf<Card>()
+
+    private val model: StatusViewModel by viewModels()
 
 
     private val playerViewModel: PlayerViewModel by viewModels {
@@ -42,29 +50,45 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val adapter = PlayerListAdapter()
         playerName = findViewById(R.id.textViewPlayer)
+
+        //Buttons
         truthButton = findViewById(R.id.truthButton)
         dareButton = findViewById(R.id.dareButton)
+        skipButton = findViewById(R.id.skipButton)
+        completeButton = findViewById(R.id.completeButton)
+
+
         cardView = findViewById(R.id.cardView)
         selectionButtons = findViewById(R.id.selectionButtons)
+        selectionTaskButtons = findViewById(R.id.selectionTaskButtons)
 
         updateDatabase()
 
         playerViewModel.allPlayers.observe(this, Observer { players ->
             playerList = players.toMutableList()
             players?.let { adapter.submitList(it) }
-            playerName.text = playerList[0].name
+            model.currentPlayer.value = 0
         })
+
+        model.currentPlayer.observe(this) { playerNo ->
+            playerName.text = playerList[playerNo].name
+        }
+
 
         truthButton.setOnClickListener {
             val card = truthCardList.random()
             cardView.setCard(card)
-            //hideButtons()
+            hideTaskButtons()
         }
 
         dareButton.setOnClickListener {
             val card = dareCardList.random()
             cardView.setCard(card)
+            hideTaskButtons()
         }
+
+        skipButton.setOnClickListener { cardSkipped() }
+        completeButton.setOnClickListener { cardCompleted() }
 
     }
 
@@ -73,8 +97,17 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun hideButtons(){
-        selectionButtons.isVisible = false
+    private fun hideTaskButtons(){
+        selectionTaskButtons.visibility = View.INVISIBLE
+        selectionButtons.visibility = View.VISIBLE
+
+    }
+
+    private fun showTaskButtons(){
+        cardView.setBackside()
+        selectionTaskButtons.visibility = View.VISIBLE
+        selectionButtons.visibility = View.INVISIBLE
+
     }
 
     private fun updateDatabase() {
@@ -107,5 +140,30 @@ class MainActivity : AppCompatActivity() {
                 }
             }
     }
+
+    private fun cardSkipped() {
+        showTaskButtons()
+        endTurn()
+    }
+
+    private fun cardCompleted() {
+        showTaskButtons()
+        endTurn()
+    }
+
+    private fun endTurn() {
+        val currentNo = model.currentPlayer.value
+
+        if (currentNo != null) {
+            if (currentNo + 1 == playerList.size){
+                model.currentPlayer.value = 0
+            } else {
+                model.currentPlayer.value = currentNo + 1
+            }
+
+        }
+    }
+
+
 
 }
