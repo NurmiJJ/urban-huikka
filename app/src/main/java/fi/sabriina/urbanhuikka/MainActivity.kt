@@ -47,8 +47,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var leaderboardButton : ImageButton
 
-    var truthCardList = mutableListOf<Card>()
-    var dareCardList = mutableListOf<Card>()
+    private var truthCardList = mutableListOf<Card>()
+    private var dareCardList = mutableListOf<Card>()
+
+    private var truthIndex = 0
+    private var dareIndex = 0
 
     private val model: StatusViewModel by viewModels()
 
@@ -59,6 +62,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        truthCardList.shuffle()
+        dareCardList.shuffle()
+
         setContentView(R.layout.activity_main)
         val adapter = PlayerListAdapter()
         playerName = findViewById(R.id.textViewPlayer)
@@ -94,15 +101,17 @@ class MainActivity : AppCompatActivity() {
 
 
         truthButton.setOnClickListener {
-            val card = truthCardList.random()
+            val card = truthCardList[truthIndex]
             cardView.setCard(card)
             hideTaskButtons()
+            truthIndex++
         }
 
         dareButton.setOnClickListener {
-            val card = dareCardList.random()
+            val card = dareCardList[dareIndex]
             cardView.setCard(card)
             hideTaskButtons()
+            dareIndex++
         }
 
         skipButton.setOnClickListener { cardSkipped() }
@@ -164,7 +173,26 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    private fun reshuffleCards(deck: String) {
+        if (deck == "truth") {
+            truthCardList.shuffle()
+            truthIndex = 0
+            showOutOfCardsDialog()
+        }
+        else if (deck == "dare") {
+            dareCardList.shuffle()
+            dareIndex = 0
+            showOutOfCardsDialog()
+        }
+    }
+
     private fun cardSkipped() {
+        if (truthIndex == truthCardList.size) {
+            reshuffleCards("truth")
+        }
+        if (dareIndex == dareCardList.size) {
+            reshuffleCards("dare")
+        }
         val currentNo = model.currentPlayer.value!!
         val name = playerList[currentNo].name
         // Points from card
@@ -178,6 +206,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun cardCompleted() {
+        if (truthIndex == truthCardList.size) {
+            reshuffleCards("truth")
+        }
+        if (dareIndex == dareCardList.size) {
+            reshuffleCards("dare")
+        }
         addPoints()
         showTaskButtons()
         CoroutineScope(Dispatchers.Main).launch {
@@ -276,6 +310,31 @@ class MainActivity : AppCompatActivity() {
         dialog.setOnShowListener {
             CoroutineScope(Dispatchers.Main).launch {
                 delay(2000)
+                dialog.dismiss()
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun showOutOfCardsDialog(){
+        val title = TextView(this)
+        title.text = "Kortit loppuivat"
+        title.setBackgroundColor(Color.DKGRAY)
+        title.setPadding(10, 10, 10, 10)
+        title.gravity = Gravity.CENTER
+        title.setTextColor(Color.WHITE)
+        title.textSize = 30f
+
+
+        val dialog = AlertDialog.Builder(this)
+            .setMessage("Uusia kortteja ei enää ole, mutta voit jatkaa pelaamista vanhoilla korteilla.")
+            .create()
+
+        dialog.setCustomTitle(title)
+        dialog.setOnShowListener {
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(10000)
                 dialog.dismiss()
             }
         }
