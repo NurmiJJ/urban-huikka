@@ -42,7 +42,9 @@ class SetPlayersActivity : AppCompatActivity() {
         nextButton.setOnClickListener {
             val replyIntent = Intent()
             setResult(Activity.RESULT_OK, replyIntent)
-
+            for (player in adapter.currentList) {
+                playerViewModel.resetPlayerPoints(player)
+            }
             // Close the activity
             finish()
         }
