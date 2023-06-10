@@ -15,4 +15,6 @@
     <string name="dare">Tehtävä</string>
     <string name="truth">Totuus</string>
 
+    <string name="truthOrDate">"Totuus vai tehtävä?"</string>
+
 </resources>

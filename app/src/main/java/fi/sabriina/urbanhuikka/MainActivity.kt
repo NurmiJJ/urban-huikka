@@ -88,7 +88,8 @@ class MainActivity : AppCompatActivity() {
             if (playerList.size > 0) {
                 val name = playerList[playerNo].name
                 playerName.text = name
-                showNextPlayerDialog(name)
+
+                showDialog(this, name, getString(R.string.truthOrDate) )
             }
         }
 
@@ -169,8 +170,9 @@ class MainActivity : AppCompatActivity() {
         val name = playerList[currentNo].name
         // Points from card
         val points = 3
+
+        showDialog(this, name,"Ota $points huikkaa!")
         showTaskButtons()
-        showHuikkaDialog(name, points)
         CoroutineScope(Dispatchers.Main).launch {
             delay(3000)
             endTurn()
@@ -204,85 +206,8 @@ class MainActivity : AppCompatActivity() {
         val points = 3
 
         playerViewModel.updatePoints(player, points)
-        showPointsDialog(player.name, points)
+        showDialog(this, player.name,"Sait $points pistettä!" )
 
     }
-
-    private fun showPointsDialog(playerName: String, points: Int){
-        val title = TextView(this)
-        title.text = playerName
-        title.setBackgroundColor(Color.DKGRAY)
-        title.setPadding(10, 10, 10, 10)
-        title.gravity = Gravity.CENTER
-        title.setTextColor(Color.WHITE)
-        title.textSize = 30f
-
-
-        val dialog = AlertDialog.Builder(this)
-            .setMessage("Sait $points pistettä!")
-            .create()
-
-        dialog.setCustomTitle(title)
-        dialog.setOnShowListener {
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(2000)
-                dialog.dismiss()
-            }
-        }
-
-        dialog.show()
-    }
-
-    private fun showNextPlayerDialog(playerName: String){
-        val title = TextView(this)
-        title.text = playerName
-        title.setBackgroundColor(Color.DKGRAY)
-        title.setPadding(10, 10, 10, 10)
-        title.gravity = Gravity.CENTER
-        title.setTextColor(Color.WHITE)
-        title.textSize = 30f
-
-
-        val dialog = AlertDialog.Builder(this)
-            .setMessage("Totuus vai tehtävä?")
-            .create()
-
-        dialog.setCustomTitle(title)
-        dialog.setOnShowListener {
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(2000)
-                dialog.dismiss()
-            }
-        }
-
-        dialog.show()
-    }
-
-    private fun showHuikkaDialog(playerName: String, points: Int){
-        val title = TextView(this)
-        title.text = playerName
-        title.setBackgroundColor(Color.DKGRAY)
-        title.setPadding(10, 10, 10, 10)
-        title.gravity = Gravity.CENTER
-        title.setTextColor(Color.WHITE)
-        title.textSize = 30f
-
-
-        val dialog = AlertDialog.Builder(this)
-            .setMessage("Ota $points huikkaa!")
-            .create()
-
-        dialog.setCustomTitle(title)
-        dialog.setOnShowListener {
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(2000)
-                dialog.dismiss()
-            }
-        }
-
-        dialog.show()
-    }
-
-
 
 }
