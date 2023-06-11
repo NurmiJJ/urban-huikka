@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 // Annotates class to be a Room Database with a table (entity) of the Player class
-@Database(entities = arrayOf(Player::class), version = 2, exportSchema = false)
+@Database(entities = [Player::class, GameState::class], version = 2, exportSchema = false)
 public abstract class PlayerRoomDatabase : RoomDatabase() {
 
     abstract fun playerDao(): PlayerDao

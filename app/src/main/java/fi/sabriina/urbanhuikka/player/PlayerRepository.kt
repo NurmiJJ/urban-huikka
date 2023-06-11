@@ -1,7 +1,9 @@
 package fi.sabriina.urbanhuikka.player
 
 import androidx.annotation.WorkerThread
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
@@ -10,7 +12,6 @@ class PlayerRepository(private val playerDao: PlayerDao) {
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
     val allPlayers: Flow<List<Player>> = playerDao.getAlphabetizedPlayers()
-
 
 
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
@@ -28,6 +29,28 @@ class PlayerRepository(private val playerDao: PlayerDao) {
 
     suspend fun updatePlayer(player: Player) {
         playerDao.updatePlayer(player)
+    }
+
+    suspend fun insertGameState(gameState: GameState) {
+        playerDao.insertGameState(gameState)
+    }
+
+    suspend fun updateGameStatus(id: Int, status: String) {
+        return withContext(Dispatchers.IO) {
+            val game = playerDao.getGameById(id)
+            val newGame = game.copy(status = status)
+            playerDao.updateGameState(newGame)
+        }
+    }
+
+    suspend fun deleteGameState(gameState: GameState) {
+        playerDao.deleteGameState(gameState)
+    }
+
+    suspend fun getGameStatus(gameId: Int): String {
+        return withContext(Dispatchers.IO) {
+            playerDao.getGameStatus(gameId)
+        }
     }
 
 }

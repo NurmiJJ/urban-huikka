@@ -1,10 +1,12 @@
 package fi.sabriina.urbanhuikka.player
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
@@ -15,6 +17,9 @@ class PlayerViewModel(private val repository: PlayerRepository) : ViewModel() {
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
     val allPlayers: LiveData<List<Player>> = repository.allPlayers.asLiveData()
+    val gameStatus: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
 
     /**
      * Launching a new coroutine to insert the data in a non-blocking way
@@ -37,9 +42,29 @@ class PlayerViewModel(private val repository: PlayerRepository) : ViewModel() {
         updatePlayer(newPlayer)
     }
 
+    fun insertGameState(gameState: GameState) = viewModelScope.launch {
+        repository.insertGameState(gameState)
+    }
+
+    fun deleteGameState(gameState: GameState) = viewModelScope.launch {
+        repository.deleteGameState(gameState)
+    }
+
+    fun getGameStatus(gameId: Int) {
+        viewModelScope.launch {
+            gameStatus.postValue(repository.getGameStatus(gameId))
+        }
+    }
+
     private fun updatePlayer(player: Player) = viewModelScope.launch {
         repository.updatePlayer(player)
     }
+
+    fun updateGameStatus(id: Int, status: String) = viewModelScope.launch {
+        repository.updateGameStatus(id, status)
+    }
+
+
 }
 
 class PlayerViewModelFactory(private val repository: PlayerRepository) : ViewModelProvider.Factory {

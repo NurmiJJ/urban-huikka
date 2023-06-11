@@ -59,6 +59,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val gameStatusObserver = Observer<String> {status ->
+            Log.d("STATUS", status)
+            if (status == "INACTIVE") {
+                Log.d("STATUS", "Here")
+                truthCardList.shuffle()
+                dareCardList.shuffle()
+                playerViewModel.updateGameStatus(1, "ONGOING")
+            }
+        }
+
+        playerViewModel.gameStatus.observe(this, gameStatusObserver)
+
+        playerViewModel.getGameStatus(1)
+
         setContentView(R.layout.activity_main)
         val adapter = PlayerListAdapter()
         playerName = findViewById(R.id.textViewPlayer)
