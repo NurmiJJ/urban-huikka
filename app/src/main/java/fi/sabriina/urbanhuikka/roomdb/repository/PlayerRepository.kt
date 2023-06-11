@@ -1,9 +1,9 @@
-package fi.sabriina.urbanhuikka.player
+package fi.sabriina.urbanhuikka.roomdb.repository
 
 import androidx.annotation.WorkerThread
-import kotlinx.coroutines.Dispatchers
+import fi.sabriina.urbanhuikka.roomdb.Player
+import fi.sabriina.urbanhuikka.roomdb.dao.PlayerDao
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
@@ -29,28 +29,6 @@ class PlayerRepository(private val playerDao: PlayerDao) {
 
     suspend fun updatePlayer(player: Player) {
         playerDao.updatePlayer(player)
-    }
-
-    suspend fun insertGameState(gameState: GameState) {
-        playerDao.insertGameState(gameState)
-    }
-
-    suspend fun updateGameStatus(id: Int, status: String) {
-        return withContext(Dispatchers.IO) {
-            val game = playerDao.getGameById(id)
-            val newGame = game.copy(status = status)
-            playerDao.updateGameState(newGame)
-        }
-    }
-
-    suspend fun deleteGameState(gameState: GameState) {
-        playerDao.deleteGameState(gameState)
-    }
-
-    suspend fun getGameStatus(gameId: Int): String {
-        return withContext(Dispatchers.IO) {
-            playerDao.getGameStatus(gameId)
-        }
     }
 
 }

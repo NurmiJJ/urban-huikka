@@ -1,4 +1,4 @@
-package fi.sabriina.urbanhuikka.player
+package fi.sabriina.urbanhuikka.roomdb
 
 import android.view.LayoutInflater
 import android.view.View
