@@ -1,4 +1,4 @@
-package fi.sabriina.urbanhuikka.player
+package fi.sabriina.urbanhuikka.roomdb.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -6,7 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
+import fi.sabriina.urbanhuikka.roomdb.Player
+import fi.sabriina.urbanhuikka.roomdb.repository.PlayerRepository
 import kotlinx.coroutines.launch
 
 
@@ -42,29 +43,9 @@ class PlayerViewModel(private val repository: PlayerRepository) : ViewModel() {
         updatePlayer(newPlayer)
     }
 
-    fun insertGameState(gameState: GameState) = viewModelScope.launch {
-        repository.insertGameState(gameState)
-    }
-
-    fun deleteGameState(gameState: GameState) = viewModelScope.launch {
-        repository.deleteGameState(gameState)
-    }
-
-    fun getGameStatus(gameId: Int) {
-        viewModelScope.launch {
-            gameStatus.postValue(repository.getGameStatus(gameId))
-        }
-    }
-
     private fun updatePlayer(player: Player) = viewModelScope.launch {
         repository.updatePlayer(player)
     }
-
-    fun updateGameStatus(id: Int, status: String) = viewModelScope.launch {
-        repository.updateGameStatus(id, status)
-    }
-
-
 }
 
 class PlayerViewModelFactory(private val repository: PlayerRepository) : ViewModelProvider.Factory {

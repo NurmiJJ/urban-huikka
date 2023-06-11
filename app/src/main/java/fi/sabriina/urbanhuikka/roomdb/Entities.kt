@@ -1,4 +1,4 @@
-package fi.sabriina.urbanhuikka.player
+package fi.sabriina.urbanhuikka.roomdb
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
