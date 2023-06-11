@@ -20,4 +20,20 @@ interface PlayerDao {
 
     @Delete
     suspend fun deletePlayer(player: Player)
+
+    // Game state
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertGameState(gameState: GameState)
+
+    @Update
+    suspend fun updateGameState(gameState: GameState)
+
+    @Delete
+    suspend fun deleteGameState(gameState: GameState)
+
+    @Query("SELECT status FROM game_state WHERE id=:gameId")
+    fun getGameStatus(gameId: Int): String
+
+    @Query("SELECT * FROM game_state WHERE id=:gameId")
+    fun getGameById(gameId: Int): GameState
 }
