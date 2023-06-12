@@ -12,6 +12,7 @@ data class Player(@PrimaryKey @ColumnInfo(name = "player")
 
 @Entity(tableName = "game_state")
 data class GameState (
-    @PrimaryKey val id: Int,
-    @ColumnInfo(name = "status") val status: String
+    @PrimaryKey (autoGenerate = true) val id: Int,
+    @ColumnInfo(name = "status") var status: String,
+    @ColumnInfo(name = "timestamp") var timestamp: Long
 )

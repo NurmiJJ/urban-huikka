@@ -1,7 +1,6 @@
 package fi.sabriina.urbanhuikka.roomdb.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
@@ -18,9 +17,6 @@ class PlayerViewModel(private val repository: PlayerRepository) : ViewModel() {
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
     val allPlayers: LiveData<List<Player>> = repository.allPlayers.asLiveData()
-    val gameStatus: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
 
     /**
      * Launching a new coroutine to insert the data in a non-blocking way

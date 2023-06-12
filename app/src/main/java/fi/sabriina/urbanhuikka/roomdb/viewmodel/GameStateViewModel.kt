@@ -3,6 +3,7 @@ package fi.sabriina.urbanhuikka.roomdb.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.repository.GameStateRepository
@@ -10,9 +11,7 @@ import kotlinx.coroutines.launch
 
 class GameStateViewModel (private val repository: GameStateRepository): ViewModel() {
 
-    val gameStatus: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
+    var gameStatus: MutableLiveData<GameState> = repository.gameStatus.asLiveData() as MutableLiveData<GameState>
 
     fun insertGameState(gameState: GameState) = viewModelScope.launch {
         repository.insertGameState(gameState)
@@ -22,14 +21,8 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         repository.deleteGameState(gameState)
     }
 
-    fun getGameStatus(gameId: Int) {
-        viewModelScope.launch {
-            gameStatus.postValue(repository.getGameStatus(gameId))
-        }
-    }
-
-    fun updateGameStatus(id: Int, status: String) = viewModelScope.launch {
-        repository.updateGameStatus(id, status)
+    fun updateGameStatus( status: String) = viewModelScope.launch {
+        gameStatus.value?.status = status
     }
 }
 

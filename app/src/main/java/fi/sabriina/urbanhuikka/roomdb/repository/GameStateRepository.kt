@@ -3,19 +3,15 @@ package fi.sabriina.urbanhuikka.roomdb.repository
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.dao.GameStateDao
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class GameStateRepository(private val gameStateDao: GameStateDao) {
+
+
+    val gameStatus: Flow<GameState> = gameStateDao.getCurrentGame()
     suspend fun insertGameState(gameState: GameState) {
         gameStateDao.insertGameState(gameState)
-    }
-
-    suspend fun updateGameStatus(id: Int, status: String) {
-        return withContext(Dispatchers.IO) {
-            val game = gameStateDao.getGameById(id)
-            val newGame = game.copy(status = status)
-            gameStateDao.updateGameState(newGame)
-        }
     }
 
     suspend fun deleteGameState(gameState: GameState) {

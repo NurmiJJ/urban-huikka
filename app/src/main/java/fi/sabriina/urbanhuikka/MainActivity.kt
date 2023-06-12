@@ -69,17 +69,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val gameStatusObserver = Observer<String> {status ->
-            if (status == "STARTING") {
+        val gameStatusObserver = Observer<GameState> {gameState ->
+            if (gameState.status == "STARTING") {
+
                 truthCardList.shuffle()
                 dareCardList.shuffle()
-                gameStateViewModel.updateGameStatus(1, "ONGOING")
+                gameStateViewModel.updateGameStatus( "ONGOING")
             }
         }
 
         gameStateViewModel.gameStatus.observe(this, gameStatusObserver)
-
-        gameStateViewModel.getGameStatus(1)
 
         setContentView(R.layout.activity_main)
         val adapter = PlayerListAdapter()

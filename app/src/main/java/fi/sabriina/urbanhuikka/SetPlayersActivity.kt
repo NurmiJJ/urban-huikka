@@ -54,7 +54,8 @@ class SetPlayersActivity : AppCompatActivity() {
             for (player in adapter.currentList) {
                 playerViewModel.resetPlayerPoints(player)
             }
-            gameStateViewModel.insertGameState(GameState(1, "STARTING"))
+
+            gameStateViewModel.insertGameState(GameState( 0, "STARTING", System.currentTimeMillis()))
             // Close the activity
             finish()
         }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 // Annotates class to be a Room Database with a table (entity) of the Player class
-@Database(entities = [Player::class, GameState::class], version = 2, exportSchema = false)
+@Database(entities = [Player::class, GameState::class], version = 4, exportSchema = false)
 abstract class HuikkaDb : RoomDatabase() {
 
     abstract fun playerDao(): PlayerDao
@@ -30,8 +30,6 @@ abstract class HuikkaDb : RoomDatabase() {
                     // Delete all content here.
                     playerDao.deleteAll()
 
-                    val pelaaja = Player("Pekka")
-                    playerDao.insert(pelaaja)
                 }
             }
         }

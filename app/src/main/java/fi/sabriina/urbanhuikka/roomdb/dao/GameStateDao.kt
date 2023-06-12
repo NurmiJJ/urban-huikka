@@ -2,6 +2,7 @@ package fi.sabriina.urbanhuikka.roomdb.dao
 
 import androidx.room.*
 import fi.sabriina.urbanhuikka.roomdb.GameState
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GameStateDao {
@@ -19,4 +20,7 @@ interface GameStateDao {
 
     @Query("SELECT * FROM game_state WHERE id=:gameId")
     fun getGameById(gameId: Int): GameState
+
+    @Query("SELECT * FROM game_state ORDER BY timestamp DESC LIMIT 1")
+    fun getCurrentGame() : Flow<GameState>
 }
