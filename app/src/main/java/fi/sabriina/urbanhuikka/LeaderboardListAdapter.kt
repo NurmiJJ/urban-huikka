@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import fi.sabriina.urbanhuikka.player.Player
+import fi.sabriina.urbanhuikka.roomdb.Player
 
 class LeaderboardListAdapter : ListAdapter<Player, PlayerViewHolder>(PlayersComparator()) {
 

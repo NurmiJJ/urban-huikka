@@ -1,6 +1,7 @@
-package fi.sabriina.urbanhuikka.player
+package fi.sabriina.urbanhuikka.roomdb.dao
 
 import androidx.room.*
+import fi.sabriina.urbanhuikka.roomdb.Player
 import kotlinx.coroutines.flow.Flow
 
 @Dao

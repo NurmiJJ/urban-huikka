@@ -1,6 +1,8 @@
-package fi.sabriina.urbanhuikka.player
+package fi.sabriina.urbanhuikka.roomdb.repository
 
 import androidx.annotation.WorkerThread
+import fi.sabriina.urbanhuikka.roomdb.Player
+import fi.sabriina.urbanhuikka.roomdb.dao.PlayerDao
 import kotlinx.coroutines.flow.Flow
 
 // Declares the DAO as a private property in the constructor. Pass in the DAO
@@ -10,7 +12,6 @@ class PlayerRepository(private val playerDao: PlayerDao) {
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
     val allPlayers: Flow<List<Player>> = playerDao.getAlphabetizedPlayers()
-
 
 
     // By default Room runs suspend queries off the main thread, therefore, we don't need to

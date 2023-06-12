@@ -13,7 +13,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
-import fi.sabriina.urbanhuikka.player.*
+import fi.sabriina.urbanhuikka.roomdb.*
+import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
+import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
+import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModelFactory
+import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModel
+import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModelFactory
 
 
 class SetPlayersActivity : AppCompatActivity() {
@@ -21,10 +26,14 @@ class SetPlayersActivity : AppCompatActivity() {
     private lateinit var playerInput: TextInputEditText
     private lateinit var nextButton: Button
 
+    private val gameStateViewModel: GameStateViewModel by viewModels {
+        GameStateViewModelFactory((application as HuikkaApplication).gameStateRepository)
+    }
+
     private lateinit var adapter: PlayerListAdapter
 
     private val playerViewModel: PlayerViewModel by viewModels {
-        PlayerViewModelFactory((application as PlayersApplication).repository)
+        PlayerViewModelFactory((application as HuikkaApplication).playerRepository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +54,8 @@ class SetPlayersActivity : AppCompatActivity() {
             for (player in adapter.currentList) {
                 playerViewModel.resetPlayerPoints(player)
             }
+
+            gameStateViewModel.insertGameState(GameState( 0, "STARTING", System.currentTimeMillis()))
             // Close the activity
             finish()
         }

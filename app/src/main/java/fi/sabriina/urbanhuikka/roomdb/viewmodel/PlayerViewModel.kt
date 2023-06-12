@@ -1,10 +1,12 @@
-package fi.sabriina.urbanhuikka.player
+package fi.sabriina.urbanhuikka.roomdb.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import fi.sabriina.urbanhuikka.roomdb.Player
+import fi.sabriina.urbanhuikka.roomdb.repository.PlayerRepository
 import kotlinx.coroutines.launch
 
 

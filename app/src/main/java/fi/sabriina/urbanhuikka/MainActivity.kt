@@ -17,7 +17,12 @@ import androidx.lifecycle.Observer
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import fi.sabriina.urbanhuikka.card.Card
-import fi.sabriina.urbanhuikka.player.*
+import fi.sabriina.urbanhuikka.roomdb.*
+import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
+import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
+import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModelFactory
+import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModel
+import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -47,18 +52,34 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var leaderboardButton : ImageButton
 
-    var truthCardList = mutableListOf<Card>()
-    var dareCardList = mutableListOf<Card>()
+    private var truthCardList = mutableListOf<Card>()
+    private var dareCardList = mutableListOf<Card>()
 
     private val model: StatusViewModel by viewModels()
 
 
     private val playerViewModel: PlayerViewModel by viewModels {
-        PlayerViewModelFactory((application as PlayersApplication).repository)
+        PlayerViewModelFactory((application as HuikkaApplication).playerRepository)
+    }
+
+    private val gameStateViewModel: GameStateViewModel by viewModels {
+        GameStateViewModelFactory((application as HuikkaApplication).gameStateRepository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val gameStatusObserver = Observer<GameState> {gameState ->
+            if (gameState.status == "STARTING") {
+
+                truthCardList.shuffle()
+                dareCardList.shuffle()
+                gameStateViewModel.updateGameStatus( "ONGOING")
+            }
+        }
+
+        gameStateViewModel.gameStatus.observe(this, gameStatusObserver)
+
         setContentView(R.layout.activity_main)
         val adapter = PlayerListAdapter()
         playerName = findViewById(R.id.textViewPlayer)
