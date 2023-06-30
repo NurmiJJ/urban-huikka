@@ -16,5 +16,6 @@
     <string name="truth">Totuus</string>
 
     <string name="truthOrDate">"Totuus vai tehtävä?"</string>
+    <string name="continue_playing">"Jatka"</string>
 
 </resources>

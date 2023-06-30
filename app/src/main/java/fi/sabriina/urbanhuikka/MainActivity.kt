@@ -1,11 +1,9 @@
 package fi.sabriina.urbanhuikka
 
-import android.app.AlertDialog
 import android.content.Intent
-import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
@@ -13,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -23,10 +22,6 @@ import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModelFactory
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModel
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 const val TAG = "Huikkasofta"
@@ -66,8 +61,16 @@ class MainActivity : AppCompatActivity() {
         GameStateViewModelFactory((application as HuikkaApplication).gameStateRepository)
     }
 
+    private lateinit var drawableDrink : Drawable
+
+    private lateinit var splashScreenManager : SplashScreenManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        drawableDrink = ContextCompat.getDrawable(this, R.drawable.drink)!!
+
+        splashScreenManager = SplashScreenManager(this)
 
         val gameStatusObserver = Observer<GameState> {gameState ->
             if (gameState.status == "STARTING") {
@@ -97,23 +100,13 @@ class MainActivity : AppCompatActivity() {
 
         updateDatabase()
 
-        playerViewModel.allPlayers.observe(this, Observer { players ->
+        playerViewModel.allPlayers.observe(this) { players ->
             if (playerList.size == 0) {
                 playerName.text = players[0].name
             }
             playerList = players.toMutableList()
             players?.let { adapter.submitList(it) }
-        })
-
-        model.currentPlayer.observe(this) { playerNo ->
-            if (playerList.size > 0) {
-                val name = playerList[playerNo].name
-                playerName.text = name
-
-                showDialog(this, name, getString(R.string.truthOrDate) )
-            }
         }
-
 
         truthButton.setOnClickListener {
             val card = truthCardList.random()
@@ -187,27 +180,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun cardSkipped() {
-        val currentNo = model.currentPlayer.value!!
-        val name = playerList[currentNo].name
         // Points from card
         val points = 3
 
-        showDialog(this, name,"Ota $points huikkaa!")
+        splashScreenManager.showSplashScreen(getCurrentPlayer().name,"Ota $points huikkaa!", drawableDrink)
         showTaskButtons()
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(3000)
-            endTurn()
-        }
+        endTurn()
     }
 
     private fun cardCompleted() {
         addPoints()
+        endTurn()
         showTaskButtons()
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(3000)
-            endTurn()
-        }
-
     }
 
     private fun endTurn()  {
@@ -219,16 +203,21 @@ class MainActivity : AppCompatActivity() {
         } else {
             model.currentPlayer.value = 0
         }
+        val name = getCurrentPlayer().name
+        playerName.text = name
+        splashScreenManager.showSplashScreen(name,"Seuraavana vuorossa $name", drawableDrink)
     }
     private fun addPoints() {
-        val currentNo = model.currentPlayer.value
-        val player = playerList[currentNo!!]
+        val player = getCurrentPlayer()
         // Points from card
         val points = 3
 
         playerViewModel.updatePoints(player, points)
-        showDialog(this, player.name,"Sait $points pistettä!" )
-
+        splashScreenManager.showSplashScreen(player.name,"Sait $points pistettä!", drawableDrink)
     }
 
+    private fun getCurrentPlayer() : Player {
+        val currentPlayerIndex = model.currentPlayer.value
+        return playerList[currentPlayerIndex!!]
+    }
 }
