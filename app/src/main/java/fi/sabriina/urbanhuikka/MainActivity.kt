@@ -1,6 +1,7 @@
 package fi.sabriina.urbanhuikka
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -20,10 +22,6 @@ import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModelFactory
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModel
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 const val TAG = "Huikkasofta"
@@ -64,8 +62,16 @@ class MainActivity : AppCompatActivity() {
         GameStateViewModelFactory((application as HuikkaApplication).gameStateRepository)
     }
 
+    private lateinit var drawableDrink : Drawable
+
+    private lateinit var splashScreenManager : SplashScreenManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        drawableDrink = ContextCompat.getDrawable(this, R.drawable.drink)!!
+
+        splashScreenManager = SplashScreenManager(this)
 
         val gameStatusObserver = Observer<GameState> {gameState ->
             if (gameState.status == "STARTING") {
@@ -101,15 +107,6 @@ class MainActivity : AppCompatActivity() {
             }
             playerList = players.toMutableList()
             players?.let { adapter.submitList(it) }
-        }
-
-        model.currentPlayer.observe(this) { playerNo ->
-            if (playerList.size > 0) {
-                val name = playerList[playerNo].name
-                playerName.text = name
-
-                showCustomDialog(this, name, getString(R.string.truthOrDate) )
-            }
         }
 
         truthButton.setOnClickListener {
@@ -180,26 +177,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun cardSkipped() {
-        val currentNo = model.currentPlayer.value!!
-        val name = playerList[currentNo].name
         // Points from card
         val points = 3
 
-        showCustomDialog(this, name,"Ota $points huikkaa!")
+        splashScreenManager.showSplashScreen(getCurrentPlayer().name,"Ota $points huikkaa!", drawableDrink)
         showTaskButtons()
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(2500)
-            checkRemainingCards()
-        }
+        endTurn()
     }
 
     private fun cardCompleted() {
         addPoints()
+        checkRemainingCards()
+        endTurn()
         showTaskButtons()
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(2500)
-            checkRemainingCards()
-        }
     }
 
     private fun endTurn()  {
@@ -211,39 +201,37 @@ class MainActivity : AppCompatActivity() {
         } else {
             model.currentPlayer.value = 0
         }
+        val name = getCurrentPlayer().name
+        playerName.text = name
+        splashScreenManager.showSplashScreen(name,"Seuraavana vuorossa $name", drawableDrink)
     }
     private fun addPoints() {
-        val currentNo = model.currentPlayer.value
-        val player = playerList[currentNo!!]
+        val player = getCurrentPlayer()
         // Points from card
         val points = 3
 
         playerViewModel.updatePoints(player, points)
-        showCustomDialog(this, player.name,"Sait $points pistettä!" )
+        splashScreenManager.showSplashScreen(player.name,"Sait $points pistettä!", drawableDrink)
+    }
+
+    private fun getCurrentPlayer() : Player {
+        val currentPlayerIndex = model.currentPlayer.value
+        return playerList[currentPlayerIndex!!]
     }
 
     private fun checkRemainingCards() {
         if (truthCardIndex > truthCardList.size - 1) {
             truthCardIndex = 0
             truthCardList.shuffle()
-            showCustomDialog(this,"Sekoitetaan pakka","Totuuskortit pääsivät loppumaan. Voit jatkaa pelaamista, mutta uusia kortteja ei enää ole.", 7500)
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(8000)
-                endTurn()
-            }
+            splashScreenManager.showSplashScreen(getCurrentPlayer().name,"Totuuskortit pääsivät loppumaan. Voit jatkaa pelaamista, mutta uusia kortteja ei enää ole.", drawableDrink)
             return
         }
 
         if (dareCardIndex > dareCardList.size - 1) {
             dareCardIndex = 0
             dareCardList.shuffle()
-            showCustomDialog(this,"Sekoitetaan pakka","Tehtäväkortit pääsivät loppumaan. Voit jatkaa pelaamista, mutta uusia kortteja ei enää ole.", 7500)
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(8000)
-                endTurn()
-            }
+            splashScreenManager.showSplashScreen(getCurrentPlayer().name,"Tehtäväkortit pääsivät loppumaan. Voit jatkaa pelaamista, mutta uusia kortteja ei enää ole.", drawableDrink)
             return
         }
-        endTurn()
     }
 }
