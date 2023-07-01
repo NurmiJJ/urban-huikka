@@ -3,6 +3,7 @@ package fi.sabriina.urbanhuikka
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -52,6 +53,7 @@ class StartActivity : AppCompatActivity() {
 
         val gameStatusObserver = Observer<GameState> { gameState ->
             continueButton.isEnabled = gameState.status == "ONGOING"
+            Log.d("TEST", gameState.status)
         }
         gameStateViewModel.gameStatus.observe(this, gameStatusObserver)
     }

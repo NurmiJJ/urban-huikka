@@ -10,7 +10,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import fi.sabriina.urbanhuikka.card.Card
@@ -67,16 +66,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val gameStatusObserver = Observer<GameState> {gameState ->
+        gameStateViewModel.gameStatus.observe(this) {gameState ->
+            Log.d(TAG, gameState.status)
             if (gameState.status == "STARTING") {
-
                 truthCardList.shuffle()
                 dareCardList.shuffle()
                 gameStateViewModel.updateGameStatus("ONGOING")
+                Log.d(TAG, "if--lause" + gameState.status)
             }
         }
-
-        gameStateViewModel.gameStatus.observe(this, gameStatusObserver)
 
         setContentView(R.layout.activity_main)
         val adapter = PlayerListAdapter()
