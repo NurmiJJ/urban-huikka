@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var selectionTaskButtons : LinearLayout
     private lateinit var selectionButtons : LinearLayout
 
-
     private lateinit var truthButton : Button
     private lateinit var dareButton : Button
 
@@ -50,8 +49,10 @@ class MainActivity : AppCompatActivity() {
     private var truthCardList = mutableListOf<Card>()
     private var dareCardList = mutableListOf<Card>()
 
-    private val model: StatusViewModel by viewModels()
+    private var truthCardIndex = 0
+    private var dareCardIndex = 0
 
+    private val model: StatusViewModel by viewModels()
 
     private val playerViewModel: PlayerViewModel by viewModels {
         PlayerViewModelFactory((application as HuikkaApplication).playerRepository)
@@ -77,7 +78,7 @@ class MainActivity : AppCompatActivity() {
 
                 truthCardList.shuffle()
                 dareCardList.shuffle()
-                gameStateViewModel.updateGameStatus( "ONGOING")
+                gameStateViewModel.updateGameStatus("ONGOING")
             }
         }
 
@@ -109,15 +110,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         truthButton.setOnClickListener {
-            val card = truthCardList.random()
+            val card = truthCardList[truthCardIndex]
             cardView.setCard(card)
             hideTaskButtons()
+            truthCardIndex++
         }
 
         dareButton.setOnClickListener {
-            val card = dareCardList.random()
+            val card = dareCardList[dareCardIndex]
             cardView.setCard(card)
             hideTaskButtons()
+            dareCardIndex++
         }
 
         skipButton.setOnClickListener { cardSkipped() }
@@ -127,8 +130,6 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, LeaderboardActivity::class.java)
             startActivity(intent)
         }
-
-
     }
 
     override fun onStart() {
@@ -138,14 +139,12 @@ class MainActivity : AppCompatActivity() {
     private fun hideTaskButtons(){
         selectionTaskButtons.visibility = View.INVISIBLE
         selectionButtons.visibility = View.VISIBLE
-
     }
 
     private fun showTaskButtons(){
         cardView.setBackside()
         selectionTaskButtons.visibility = View.VISIBLE
         selectionButtons.visibility = View.INVISIBLE
-
     }
 
     private fun updateDatabase() {
@@ -173,8 +172,6 @@ class MainActivity : AppCompatActivity() {
                 for (doc in value!!) {
                     val card : Card = doc.toObject(Card::class.java)
                     dareCardList.add(card)
-
-
                 }
             }
     }
@@ -190,6 +187,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun cardCompleted() {
         addPoints()
+        checkRemainingCards()
         endTurn()
         showTaskButtons()
     }
@@ -219,5 +217,21 @@ class MainActivity : AppCompatActivity() {
     private fun getCurrentPlayer() : Player {
         val currentPlayerIndex = model.currentPlayer.value
         return playerList[currentPlayerIndex!!]
+    }
+
+    private fun checkRemainingCards() {
+        if (truthCardIndex > truthCardList.size - 1) {
+            truthCardIndex = 0
+            truthCardList.shuffle()
+            splashScreenManager.showSplashScreen(getCurrentPlayer().name,"Totuuskortit pääsivät loppumaan. Voit jatkaa pelaamista, mutta uusia kortteja ei enää ole.", drawableDrink)
+            return
+        }
+
+        if (dareCardIndex > dareCardList.size - 1) {
+            dareCardIndex = 0
+            dareCardList.shuffle()
+            splashScreenManager.showSplashScreen(getCurrentPlayer().name,"Tehtäväkortit pääsivät loppumaan. Voit jatkaa pelaamista, mutta uusia kortteja ei enää ole.", drawableDrink)
+            return
+        }
     }
 }
