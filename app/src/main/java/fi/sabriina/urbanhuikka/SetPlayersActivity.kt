@@ -3,6 +3,7 @@ package fi.sabriina.urbanhuikka
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -63,10 +64,13 @@ class SetPlayersActivity : AppCompatActivity() {
         playerViewModel.allPlayers.observe(this, Observer { players ->
             // Update the cached copy of the words in the adapter.
             players?.let { adapter.submitList(it) }
-            if (adapter.itemCount > 0) {
-                nextButton.isEnabled = true
-            }
         })
+
+        playerViewModel.selectedPlayers.observe(this) { selectedPlayers ->
+            nextButton.isEnabled = selectedPlayers.isNotEmpty()
+            Log.d("MATIAS", selectedPlayers.toString() )
+        }
+
 
         playerInput.doOnTextChanged { text, start, before, count ->
             fab.isEnabled = count != 0

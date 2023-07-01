@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
                 val name = playerList[playerNo].name
                 playerName.text = name
 
-                showDialog(this, name, getString(R.string.truthOrDate) )
+                showCustomDialog(this, name, getString(R.string.truthOrDate) )
             }
         }
 
@@ -185,7 +185,7 @@ class MainActivity : AppCompatActivity() {
         // Points from card
         val points = 3
 
-        showDialog(this, name,"Ota $points huikkaa!")
+        showCustomDialog(this, name,"Ota $points huikkaa!")
         showTaskButtons()
         CoroutineScope(Dispatchers.Main).launch {
             delay(2500)
@@ -219,14 +219,14 @@ class MainActivity : AppCompatActivity() {
         val points = 3
 
         playerViewModel.updatePoints(player, points)
-        showDialog(this, player.name,"Sait $points pistettä!" )
+        showCustomDialog(this, player.name,"Sait $points pistettä!" )
     }
 
     private fun checkRemainingCards() {
         if (truthCardIndex > truthCardList.size - 1) {
             truthCardIndex = 0
             truthCardList.shuffle()
-            showDialog(this,"Sekoitetaan pakka","Totuuskortit pääsivät loppumaan. Voit jatkaa pelaamista, mutta uusia kortteja ei enää ole.", 7500)
+            showCustomDialog(this,"Sekoitetaan pakka","Totuuskortit pääsivät loppumaan. Voit jatkaa pelaamista, mutta uusia kortteja ei enää ole.", 7500)
             CoroutineScope(Dispatchers.Main).launch {
                 delay(8000)
                 endTurn()
@@ -237,7 +237,7 @@ class MainActivity : AppCompatActivity() {
         if (dareCardIndex > dareCardList.size - 1) {
             dareCardIndex = 0
             dareCardList.shuffle()
-            showDialog(this,"Sekoitetaan pakka","Tehtäväkortit pääsivät loppumaan. Voit jatkaa pelaamista, mutta uusia kortteja ei enää ole.", 7500)
+            showCustomDialog(this,"Sekoitetaan pakka","Tehtäväkortit pääsivät loppumaan. Voit jatkaa pelaamista, mutta uusia kortteja ei enää ole.", 7500)
             CoroutineScope(Dispatchers.Main).launch {
                 delay(8000)
                 endTurn()

@@ -10,6 +10,9 @@ interface PlayerDao {
     @Query("SELECT * FROM player_table ORDER BY player ASC")
     fun getAlphabetizedPlayers(): Flow<List<Player>>
 
+    @Query("SELECT * FROM player_table WHERE selected=1 ORDER BY player ASC")
+    fun getSelectedPlayers(): Flow<List<Player>>
+
     @Update
     suspend fun updatePlayer(player: Player)
 

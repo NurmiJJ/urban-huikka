@@ -56,9 +56,9 @@ dependencies {
     // You'll probably have to update the version numbers in build.gradle (Project)
 
     // Room components
-    implementation "androidx.room:room-ktx:2.5.1"
-    kapt "androidx.room:room-compiler:2.5.1"
-    androidTestImplementation "androidx.room:room-testing:2.5.1"
+    implementation "androidx.room:room-ktx:2.5.2"
+    kapt "androidx.room:room-compiler:2.5.2"
+    androidTestImplementation "androidx.room:room-testing:2.5.2"
 
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
@@ -86,4 +86,6 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:31.2.3')
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx'
+
+    implementation 'com.google.android.material:material:1.9.0'
 }

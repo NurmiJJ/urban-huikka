@@ -5,9 +5,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "player_table")
-data class Player(@PrimaryKey @ColumnInfo(name = "player")
-                  val name: String,
-                  var currentPoints: Int = 0
+data class Player(@PrimaryKey
+                  @ColumnInfo(name = "player") val name: String,
+                  @ColumnInfo(name = "points") var currentPoints: Int = 0,
+                  @ColumnInfo(name = "selected") var selected: Boolean = false
 )
 
 @Entity(tableName = "game_state")
