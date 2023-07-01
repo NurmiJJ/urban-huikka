@@ -75,7 +75,6 @@ class MainActivity : AppCompatActivity() {
 
         val gameStatusObserver = Observer<GameState> {gameState ->
             if (gameState.status == "STARTING") {
-
                 truthCardList.shuffle()
                 dareCardList.shuffle()
                 gameStateViewModel.updateGameStatus("ONGOING")
@@ -155,7 +154,6 @@ class MainActivity : AppCompatActivity() {
                     return@addSnapshotListener
                 }
                 truthCardList.clear()
-                Log.d(TAG, "täällä ollaan")
                 for (doc in value!!) {
                     val card : Card = doc.toObject(Card::class.java)
                     truthCardList.add(card)

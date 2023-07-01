@@ -21,8 +21,11 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         repository.deleteGameState(gameState)
     }
 
-    fun updateGameStatus( status: String) = viewModelScope.launch {
-        gameStatus.value?.status = status
+    fun updateGameStatus(status: String) = viewModelScope.launch {
+        val gameStateObject = gameStatus.value?.copy(status = status)
+        if (gameStateObject != null) {
+            repository.updateGameState(gameStateObject)
+        }
     }
 }
 
