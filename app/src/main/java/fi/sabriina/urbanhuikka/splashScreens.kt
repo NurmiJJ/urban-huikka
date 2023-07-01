@@ -66,7 +66,7 @@ class SplashScreenManager(private val context: Context) {
         private val countdownTextView: TextView
 
         init {
-            val dialog = Dialog(context, android.R.style.Theme_Light_NoTitleBar_Fullscreen)
+            val dialog = Dialog(context, R.style.Theme_Huikka)
             dialog.setContentView(R.layout.splash_notification)
 
             playerName = dialog.findViewById(R.id.notifPlayerName)
