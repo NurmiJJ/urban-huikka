@@ -3,12 +3,10 @@ package fi.sabriina.urbanhuikka
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +18,9 @@ import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModelFactory
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModel
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class SetPlayersActivity : AppCompatActivity() {
@@ -42,13 +43,13 @@ class SetPlayersActivity : AppCompatActivity() {
         setContentView(R.layout.activity_set_players)
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview_leaderboard)
-        adapter = PlayerListAdapter()
+        nextButton = findViewById(R.id.buttonNext)
+        adapter = PlayerListAdapter(nextButton)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         playerInput = findViewById(R.id.textInputPlayer)
         fab = findViewById(R.id.floatingActionButton)
-        nextButton = findViewById(R.id.buttonNext)
         nextButton.setOnClickListener {
             val replyIntent = Intent()
             setResult(Activity.RESULT_OK, replyIntent)
@@ -56,29 +57,30 @@ class SetPlayersActivity : AppCompatActivity() {
                 playerViewModel.resetPlayerPoints(player)
             }
 
-            gameStateViewModel.insertGameState(GameState( 0, "STARTING", System.currentTimeMillis()))
+            gameStateViewModel.initializeDatabase()
+            CoroutineScope(Dispatchers.Main).launch {
+                gameStateViewModel.updateGameStatus("PLAYER_SELECT", System.currentTimeMillis())
+            }
+            for (player in adapter.getSelected()) {
+                gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
+            }
+
             // Close the activity
             finish()
         }
 
-        playerViewModel.allPlayers.observe(this, Observer { players ->
+        playerViewModel.allPlayers.observe(this) { players ->
             // Update the cached copy of the words in the adapter.
             players?.let { adapter.submitList(it) }
-        })
-
-        playerViewModel.selectedPlayers.observe(this) { selectedPlayers ->
-            nextButton.isEnabled = selectedPlayers.isNotEmpty()
-            Log.d("MATIAS", selectedPlayers.toString() )
         }
 
-
-        playerInput.doOnTextChanged { text, start, before, count ->
+        playerInput.doOnTextChanged { _, _, _, count ->
             fab.isEnabled = count != 0
         }
 
         fab.setOnClickListener {
             val name = playerInput.text.toString().replaceFirstChar { it.uppercase() }
-            playerViewModel.insert(Player(name))
+            playerViewModel.insert(Player(0,name))
             playerInput.text?.clear()
             nextButton.isEnabled = true
 
@@ -103,7 +105,7 @@ class SetPlayersActivity : AppCompatActivity() {
 
                 // this method is called when we swipe our item to right direction.
                 // on below line we are getting the item at a particular position.
-                val deletedCourse = adapter.getItemId(position)
+                adapter.getItemId(position)
 
                 val list = adapter.currentList
                 val pelaaja = list[position]

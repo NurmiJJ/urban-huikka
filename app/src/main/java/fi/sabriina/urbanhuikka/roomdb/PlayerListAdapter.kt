@@ -3,6 +3,7 @@ package fi.sabriina.urbanhuikka.roomdb
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
@@ -10,8 +11,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import fi.sabriina.urbanhuikka.R
 
-class PlayerListAdapter : ListAdapter<Player, PlayerViewHolder>(PlayersComparator()) {
-    var selectedPlayers = mutableListOf<Player>()
+class PlayerListAdapter(var nextButton: Button) : ListAdapter<Player, PlayerViewHolder>(PlayersComparator()) {
+    private var selectedPlayers = mutableListOf<Player>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
         return PlayerViewHolder.create(parent)
@@ -22,10 +23,14 @@ class PlayerListAdapter : ListAdapter<Player, PlayerViewHolder>(PlayersComparato
         holder.bind(current.name)
 
         holder.itemView.setOnClickListener{
+            holder.playerClicked()
             if (!selectedPlayers.remove(current)){
+                nextButton.isEnabled = true
                 selectedPlayers.add(current)
             }
-            holder.playerClicked(current)
+            if (selectedPlayers.isEmpty()) {
+                nextButton.isEnabled = false
+            }
         }
 
     }
@@ -40,17 +45,10 @@ class PlayerListAdapter : ListAdapter<Player, PlayerViewHolder>(PlayersComparato
 
         fun bind(text: String?) {
             playerItemView.text = text
-
         }
 
-        fun playerClicked(player: Player) {
-            // Is there better way to do this??
-            if (player.selected) {
-                playerSelectImage.visibility = View.INVISIBLE
-            } else {
-                playerSelectImage.visibility = View.VISIBLE
-            }
-            player.selected = !player.selected
+        fun playerClicked() {
+            playerSelectImage.visibility = if (playerSelectImage.visibility == View.VISIBLE) View.INVISIBLE else View.VISIBLE
         }
 
         companion object {
@@ -61,10 +59,6 @@ class PlayerListAdapter : ListAdapter<Player, PlayerViewHolder>(PlayersComparato
             }
         }
     }
-
-
-
-
 
     class PlayersComparator : DiffUtil.ItemCallback<Player>() {
         override fun areItemsTheSame(oldItem: Player, newItem: Player): Boolean {

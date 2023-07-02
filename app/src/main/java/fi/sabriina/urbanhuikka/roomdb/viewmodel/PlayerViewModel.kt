@@ -17,7 +17,6 @@ class PlayerViewModel(private val repository: PlayerRepository) : ViewModel() {
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
     val allPlayers: LiveData<List<Player>> = repository.allPlayers.asLiveData()
-    val selectedPlayers: LiveData<List<Player>> = repository.selectedPlayers.asLiveData()
 
     /**
      * Launching a new coroutine to insert the data in a non-blocking way

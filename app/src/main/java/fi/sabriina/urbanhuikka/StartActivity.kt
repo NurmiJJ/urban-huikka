@@ -8,11 +8,12 @@ import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class StartActivity : AppCompatActivity() {
 
@@ -23,6 +24,11 @@ class StartActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.checkInitialization()
+        }
+
         setContentView(R.layout.activity_start)
 
         continueButton = findViewById(R.id.continueGameButton)
@@ -44,17 +50,21 @@ class StartActivity : AppCompatActivity() {
         if (result.resultCode == Activity.RESULT_OK) {
             val intent = Intent(this@StartActivity, MainActivity::class.java)
             startActivity(intent)
-
         }
     }
 
     override fun onStart() {
         super.onStart()
 
-        val gameStatusObserver = Observer<GameState> { gameState ->
-            continueButton.isEnabled = gameState.status == "ONGOING"
-            Log.d("TEST", gameState.status)
+        CoroutineScope(Dispatchers.Main).launch {
+            val game = gameStateViewModel.getCurrentGame()
+            if (game.status == "ONGOING") {
+                continueButton.isEnabled = true
+                Log.d("Huikkasofta", "Found ongoing game, id: "+game.id)
+            }
+            else {
+                continueButton.isEnabled = false
+            }
         }
-        gameStateViewModel.gameStatus.observe(this, gameStatusObserver)
     }
 }
