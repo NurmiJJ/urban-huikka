@@ -17,5 +17,17 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/selectImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_check_white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewPlayerName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textViewPlayerName" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
