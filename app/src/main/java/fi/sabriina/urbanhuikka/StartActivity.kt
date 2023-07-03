@@ -39,7 +39,7 @@ class StartActivity : AppCompatActivity() {
 
         val newGameButton = findViewById<Button>(R.id.newGameButton)
         newGameButton.setOnClickListener {
-            val intent = Intent(this@StartActivity, SetPlayersActivity::class.java)
+            val intent = Intent(this@StartActivity, SelectPlayersActivity::class.java)
             resultLauncher.launch(intent)
         }
     }

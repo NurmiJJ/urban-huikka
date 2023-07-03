@@ -6,12 +6,10 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.textfield.TextInputEditText
 import fi.sabriina.urbanhuikka.roomdb.*
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
@@ -23,9 +21,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class SetPlayersActivity : AppCompatActivity() {
+class SelectPlayersActivity : AppCompatActivity() {
     private lateinit var fab: FloatingActionButton
-    private lateinit var playerInput: TextInputEditText
     private lateinit var nextButton: Button
 
     private val gameStateViewModel: GameStateViewModel by viewModels {
@@ -40,7 +37,7 @@ class SetPlayersActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_set_players)
+        setContentView(R.layout.activity_select_players)
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview_leaderboard)
         nextButton = findViewById(R.id.buttonNext)
@@ -48,7 +45,6 @@ class SetPlayersActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        playerInput = findViewById(R.id.textInputPlayer)
         fab = findViewById(R.id.floatingActionButton)
         nextButton.setOnClickListener {
             val replyIntent = Intent()
@@ -74,16 +70,10 @@ class SetPlayersActivity : AppCompatActivity() {
             players?.let { adapter.submitList(it) }
         }
 
-        playerInput.doOnTextChanged { _, _, _, count ->
-            fab.isEnabled = count != 0
-        }
 
         fab.setOnClickListener {
-            val name = playerInput.text.toString().replaceFirstChar { it.uppercase() }
-            playerViewModel.insert(Player(0,name))
-            playerInput.text?.clear()
-            nextButton.isEnabled = true
-
+            val intent = Intent(this@SelectPlayersActivity, AddPlayerActivity::class.java)
+            startActivity(intent)
         }
 
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {

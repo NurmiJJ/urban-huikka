@@ -8,6 +8,7 @@
     <string name="continue_game">Jatka peliä</string>
 
     <string name="ready">Valmis</string>
+    <string name="start_game">Aloita peli</string>
 
     <string name="addPlayer">Lisää pelaaja</string>
     <string name="complete">Suorita</string>
@@ -17,5 +18,6 @@
 
     <string name="truthOrDate">"Totuus vai tehtävä?"</string>
     <string name="continue_playing">"Jatka"</string>
+    <string name="name">Nimi</string>
 
 </resources>
