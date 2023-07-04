@@ -28,12 +28,10 @@ class LeaderboardListAdapter : ListAdapter<Player, PlayerViewHolder>(PlayersComp
 class PlayerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val playerItemView: TextView = itemView.findViewById(R.id.playerName)
     private val pointsItemView: TextView = itemView.findViewById(R.id.points)
-    private val rankItemView: TextView = itemView.findViewById(R.id.rank)
 
     fun bind(player: Player) {
         playerItemView.text = player.name
         pointsItemView.text = player.currentPoints.toString()
-        rankItemView.text = (adapterPosition + 1).toString()
 
     }
 
