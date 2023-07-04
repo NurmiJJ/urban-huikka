@@ -9,13 +9,18 @@ import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModel
 import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModelFactory
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
+import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
+import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LeaderboardActivity : AppCompatActivity() {
 
     private lateinit var adapter: LeaderboardListAdapter
 
-    private val model: PlayerViewModel by viewModels {
-        PlayerViewModelFactory((application as HuikkaApplication).playerRepository)
+    private val gameStateViewModel: GameStateViewModel by viewModels {
+        GameStateViewModelFactory((application as HuikkaApplication).gameStateRepository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,9 +32,12 @@ class LeaderboardActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        model.allPlayers.observe(this) { players ->
+        CoroutineScope(Dispatchers.Main).launch {
+            val players = gameStateViewModel.getPlayers()
+
             val sortedlist: List<Player> = players.sortedWith(compareBy({it.currentPoints}, {it.name})).reversed()
             sortedlist.let { adapter.submitList(it) }
+
         }
     }
 }
