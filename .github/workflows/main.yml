@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-      name: Checkout code files
+      name: Checkout the code
     - name: Create token file
       run: cat /home/runner/work/urban-huikka/urban-huikka/app/google-services.json | base64
     - name: Insert token
@@ -26,5 +26,25 @@ jobs:
     - name: Upload Lint report
       uses: actions/upload-artifact@v3
       with:
-        name: index.html
+        name: lint_report
         path: app/build/reports/lint-results-debug.html
+
+  unit-test:
+    needs: [lint]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      name: Checkout the code
+    - name: Create token file
+      run: cat /home/runner/work/urban-huikka/urban-huikka/app/google-services.json | base64
+    - name: Insert token
+      env:
+        DATA: ${{ secrets.GOOGLE_SERVICES }}
+      run: echo $DATA > /home/runner/work/urban-huikka/urban-huikka/app/google-services.json
+    - name: Unit tests
+      run: ./gradlew test
+    - name: Upload test report
+      uses: actions/upload-artifact@v3
+      with:
+        name: unit_test_report
+        path: app/build/reports/tests/testDebugUnitTest/
