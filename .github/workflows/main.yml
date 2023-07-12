@@ -5,16 +5,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-
+  lint:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-
-    - name: Run a one-line script
-      run: echo Hello, world!
-    - name: Run a multi-line script
-      run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+      name: Checkout code files
+    - name: Create token file
+      run: cat /home/runner/work/urban-huikka/urban-huikka/app/google-services.json | base64
+    - name: Insert token
+      env:
+        DATA: ${{ secrets.GOOGLE_SERVICES }}
+      run: echo $DATA > /home/runner/work/urban-huikka/urban-huikka/app/google-services.json
+    - uses: actions/setup-java@v3
+      name: Configure Java version
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    - name: Run Lint
+      run: ./gradlew lintDebug
+    - name: Upload Lint report
+      uses: actions/upload-artifact@v3
+      with:
+        name: index.html
+        path: app/build/reports/lint-results-debug.html
