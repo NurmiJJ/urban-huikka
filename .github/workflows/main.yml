@@ -5,8 +5,29 @@ on:
   workflow_dispatch:
 
 jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+      - name: Insert token
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICES }}
+        run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
+      - uses: actions/setup-java@v3
+        name: Set up JDK
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Run build with Gradle Wrapper
+        run: ./gradlew build
+
   lint:
     name: Lint
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -14,9 +35,9 @@ jobs:
       - name: Insert token
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES }}
-        run: echo $DATA > /home/runner/work/urban-huikka/urban-huikka/app/google-services.json
+        run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
       - uses: actions/setup-java@v3
-        name: Configure Java version
+        name: Set up JDK
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -38,7 +59,7 @@ jobs:
       - name: Insert token
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES }}
-        run: echo $DATA > /home/runner/work/urban-huikka/urban-huikka/app/google-services.json
+        run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
       - uses: actions/setup-java@v3
         name: Configure Java version
         with:
@@ -55,14 +76,14 @@ jobs:
   instrumentation-test:
     needs: [unit-test]
     name: Instrumentation tests
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
         name: Checkout the code
       - name: Insert token
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES }}
-        run: echo $DATA > /home/runner/work/urban-huikka/urban-huikka/app/google-services.json
+        run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
       - uses: actions/setup-java@v3
         name: Configure Java version
         with:
@@ -72,6 +93,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 33
+          target: google_apis
           script: ./gradlew connectedCheck
       - name: Upload test report
         uses: actions/upload-artifact@v3
@@ -89,7 +111,7 @@ jobs:
       - name: Insert token
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES }}
-        run: echo $DATA > /home/runner/work/urban-huikka/urban-huikka/app/google-services.json
+        run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
       - uses: actions/setup-java@v3
         name: Configure Java version
         with:
