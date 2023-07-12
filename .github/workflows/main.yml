@@ -40,7 +40,7 @@ jobs:
           DATA: ${{ secrets.GOOGLE_SERVICES }}
         run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
       - uses: actions/setup-java@v3
-        name: Configure Java version
+        name: Set up JDK
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -65,7 +65,7 @@ jobs:
           DATA: ${{ secrets.GOOGLE_SERVICES }}
         run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
       - uses: actions/setup-java@v3
-        name: Configure Java version
+        name: Set up JDK
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -95,7 +95,7 @@ jobs:
           DATA: ${{ secrets.GOOGLE_SERVICES }}
         run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
       - uses: actions/setup-java@v3
-        name: Configure Java version
+        name: Set up JDK
         with:
           distribution: 'temurin'
           java-version: '17'
