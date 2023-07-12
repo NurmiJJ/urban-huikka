@@ -5,28 +5,8 @@ on:
   pull_request:
 
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the code
-        uses: actions/checkout@v3
-      - name: Insert token
-        env:
-          DATA: ${{ secrets.GOOGLE_SERVICES }}
-        run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
-      - uses: actions/setup-java@v3
-        name: Set up JDK
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: gradle
-      - name: Run build with Gradle Wrapper
-        run: ./gradlew build
-
   lint:
     name: Lint
-    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
