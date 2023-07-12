@@ -20,12 +20,9 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build
+          cache: gradle
+      - name: Run build with Gradle Wrapper
+        run: ./gradlew build
 
   lint:
     name: Lint
@@ -43,10 +40,9 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: gradle
       - name: Run Lint
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: lintDebug
+        run: ./gradlew lintDebug
       - name: Upload Lint report
         uses: actions/upload-artifact@v3
         with:
@@ -69,10 +65,9 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: gradle
       - name: Unit tests
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: test
+        run: ./gradlew test
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
@@ -95,11 +90,13 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: gradle
       - name: Run espresso tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 33
           target: google_apis
+          arch: x86_64
           script: ./gradlew connectedCheck
       - name: Upload test report
         uses: actions/upload-artifact@v3
@@ -123,10 +120,9 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: gradle
       - name: Build debug APK
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: assembleDebug --stacktrace
+        run: ./gradlew assembleDebug --stacktrace
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
