@@ -22,8 +22,10 @@ jobs:
           java-version: '17'
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
-      - name: Run build with Gradle Wrapper
-        run: ./gradlew build
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
 
   lint:
     name: Lint
@@ -42,7 +44,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Run Lint
-        run: ./gradlew lintDebug
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: lintDebug
       - name: Upload Lint report
         uses: actions/upload-artifact@v3
         with:
@@ -66,7 +70,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Unit tests
-        run: ./gradlew test
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: test
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
@@ -118,7 +124,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Build debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assembleDebug --stacktrace
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
