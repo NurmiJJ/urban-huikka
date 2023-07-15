@@ -68,17 +68,15 @@ jobs:
           java-version: '17'
       - name: Set up PATH
         run: |
-          echo "$PATH"
           echo "/home/github-runner/Android/Sdk/platform-tools:/home/github-runner/Android/Sdk/emulator" >> $GITHUB_PATH
+          echo "$PATH"
+      - name: Start emulator
+        run: |
+          /home/github-runner/Android/Sdk/emulator/emulator -avd Pixel_3a_API_34 -no-audio -no-window -no-accel -no-snapshot-save -verbose &
+      - name: Wait for emulator
+        run: adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
       - name: Run instrumented tests
-        uses: reactivecircus/android-emulator-runner@v2.28.0
-        with:
-          api-level: 33
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -noaudio -no-boot-anim
-          script: ./gradlew connectedAndroidTest
+        run: ./gradlew connectedAndroidTest
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
