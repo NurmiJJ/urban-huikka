@@ -60,7 +60,6 @@ class SelectPlayersActivity : AppCompatActivity() {
             for (player in adapter.getSelected()) {
                 gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
             }
-
             // Close the activity
             finish()
         }

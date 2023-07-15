@@ -4,12 +4,10 @@ import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.roomdb.dao.GameStateDao
-import kotlinx.coroutines.flow.Flow
 
 
 class GameStateRepository(private val gameStateDao: GameStateDao) {
 
-    val currentPlayerIndex: Flow<Int> = gameStateDao.getCurrentPlayerIndex()
     suspend fun insertGameState(gameState: GameState) {
         gameStateDao.insertGameState(gameState)
     }
@@ -31,6 +29,10 @@ class GameStateRepository(private val gameStateDao: GameStateDao) {
 
     suspend fun getPlayers(): List<Player> {
         return gameStateDao.getPlayers()
+    }
+
+    suspend fun getCurrentPlayerIndex(): Int {
+        return gameStateDao.getCurrentPlayerIndex()
     }
 
     suspend fun deleteAllGames() {
