@@ -68,13 +68,17 @@ jobs:
           java-version: '17'
       - name: Set up PATH
         run: |
-          echo "~/Android/Sdk/platform-tools:~/Android/Sdk/emulator" >> $GITHUB_PATH
-      - name: Launch emulator
-        run: emulator -avd test_emulator -no-audio -no-window -no-boot-anim -gpu swiftshader_indirect &
-      - name: Wait for emulator to boot
-        run: adb wait-for-device
+          echo "$PATH"
+          echo "/home/github-runner/Android/Sdk/platform-tools:/home/github-runner/Android/Sdk/emulator" >> $GITHUB_PATH
       - name: Run instrumented tests
-        run: ./gradlew connectedAndroidTest
+        uses: reactivecircus/android-emulator-runner@v2.28.0
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -noaudio -no-boot-anim
+          script: ./gradlew connectedAndroidTest
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
