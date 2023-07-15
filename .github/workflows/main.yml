@@ -57,26 +57,28 @@ jobs:
           path: app/build/reports/tests/testDebugUnitTest/
 
   instrumentation-test:
-    needs: [unit-test]
+    needs: [unit-test, lint]
     name: Instrumentation tests
-    runs-on: self-hosted
+    runs-on: macos-latest
     steps:
+      - uses: actions/checkout@v3
+        name: Checkout the code
+      - name: Insert token
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICES }}
+        run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
       - uses: actions/setup-java@v3
         name: Set up JDK 17
         with:
           distribution: 'temurin'
           java-version: '17'
-      - name: Set up PATH
-        run: |
-          echo "/home/github-runner/Android/Sdk/platform-tools:/home/github-runner/Android/Sdk/emulator" >> $GITHUB_PATH
-          echo "$PATH"
-      - name: Start emulator
-        run: |
-          /home/github-runner/Android/Sdk/emulator/emulator -avd Pixel_3a_API_34 -no-audio -no-window -no-accel -no-snapshot-save -verbose &
-      - name: Wait for emulator
-        run: adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
-      - name: Run instrumented tests
-        run: ./gradlew connectedAndroidTest
+      - name: Run instrumentation tests
+        uses: reactivecircus/android-emulator-runner@v2.28.0
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          script: ./gradlew connectedAndroidTest
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
