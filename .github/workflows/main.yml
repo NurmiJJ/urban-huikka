@@ -66,10 +66,15 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      - name: Start Android emulator
-        run: ~/Android/Sdk/emulator/emulator -no-window -avd Pixel_3a_API_34_extension_level_7_x86_64
+      - name: Set up PATH
+        run: echo "PATH=\$PATH:\$ANDROID_HOME/platform-tools" >> $GITHUB_ENV
       - name: Run instrumented tests
-        run: ./gradlew connectedAndroidTest
+        uses: reactivecircus/android-emulator-runner@v2.28.0
+        with:
+          api-level: 33
+          target: google_apis
+          avd-name: Pixel_3a_API_34_extension_level_7_x86_64
+          script: bash ~/instrumentation_test.sh
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
