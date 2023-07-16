@@ -97,12 +97,12 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     }
 
     private fun checkRemainingCards() {
-        if (truthCardIndex > truthCardList.size - 1) {
+        if (truthCardIndex == truthCardList.size - 1) {
             truthCardIndex = 0
             truthCardList.shuffle()
         }
 
-        if (dareCardIndex > dareCardList.size - 1) {
+        if (dareCardIndex == dareCardList.size - 1) {
             dareCardIndex = 0
             dareCardList.shuffle()
         }
@@ -122,9 +122,11 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
 
     fun getNextCard(deck: String) : Card? {
         if (deck == "truth") {
+            truthCardIndex += 1
             return truthCardList[truthCardIndex]
         }
         if (deck == "dare") {
+            dareCardIndex += 1
             return dareCardList[dareCardIndex]
         }
         return null
