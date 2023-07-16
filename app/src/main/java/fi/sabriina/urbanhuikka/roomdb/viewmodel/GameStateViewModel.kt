@@ -28,7 +28,6 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     private var truthCardIndex = 0
     private var dareCardIndex = 0
 
-
     private var currentPlayerIndex = 0
     private var _currentPlayer = MutableLiveData<Player>()
     var currentPlayer: LiveData<Player> = _currentPlayer
@@ -42,7 +41,7 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
 
     suspend fun checkInitialization() {
         val count = repository.checkInitialization()
-        if (count != 1 || getCurrentGame().status != "INITIALIZED" && getCurrentGame().status != "ONGOING" ) {
+        if (count != 1 || (getCurrentGame().status != "INITIALIZED" && getCurrentGame().status != "ONGOING") ) {
             initializeDatabase()
         }
     }
@@ -146,6 +145,13 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
 
     suspend fun getCurrentGame() : GameState {
         return repository.getCurrentGame()
+    }
+
+    suspend fun isGameOngoing(): Boolean {
+        if (getCurrentGame().status == "ONGOING") {
+            return true
+        }
+        return false
     }
 
     fun updateGameStatus(status: String, timestamp: Long?) = viewModelScope.launch {

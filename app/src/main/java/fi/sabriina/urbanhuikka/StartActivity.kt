@@ -57,10 +57,9 @@ class StartActivity : AppCompatActivity() {
         super.onStart()
 
         CoroutineScope(Dispatchers.Main).launch {
-            val game = gameStateViewModel.getCurrentGame()
-            if (game.status == "ONGOING") {
+            if (gameStateViewModel.isGameOngoing()) {
                 continueButton.isEnabled = true
-                Log.d("Huikkasofta", "Found ongoing game, id: "+game.id)
+                Log.d("Huikkasofta", "Found ongoing game")
             }
             else {
                 continueButton.isEnabled = false

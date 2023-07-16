@@ -49,9 +49,6 @@ class SelectPlayersActivity : AppCompatActivity() {
         nextButton.setOnClickListener {
             val replyIntent = Intent()
             setResult(Activity.RESULT_OK, replyIntent)
-            for (player in adapter.currentList) {
-                playerViewModel.resetPlayerPoints(player)
-            }
 
             gameStateViewModel.initializeDatabase()
             CoroutineScope(Dispatchers.Main).launch {
@@ -97,7 +94,7 @@ class SelectPlayersActivity : AppCompatActivity() {
                 adapter.getItemId(position)
 
                 val list = adapter.currentList
-                val pelaaja = list[position]
+                val player = list[position]
 
                 if (adapter.currentList.size == 1){
                     nextButton.isEnabled = false
@@ -105,7 +102,7 @@ class SelectPlayersActivity : AppCompatActivity() {
 
                 // this method is called when item is swiped.
                 // below line is to remove item from our array list.
-                playerViewModel.delete(pelaaja)
+                playerViewModel.delete(player)
             }
             // at last we are adding this
             // to our recycler view.
