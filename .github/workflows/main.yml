@@ -33,14 +33,9 @@ jobs:
       - name: Run Lint
         run: ./gradlew lintDebug
         continue-on-error: true
-      - name: Test Report
-        uses: phoenix-actions/test-reporting@v8
-        id: test-report
-        if: success() || failure()
-        with:
-          name: Lint
-          path: app/build/reports/lint-results-debug.xml
-          reporter: java-junit
+      - name: Test report
+        uses: asadmansr/android-test-report-action@v1.2.0
+        if: ${{ always() }}
 
   unit-test:
     needs: [build]
@@ -55,6 +50,9 @@ jobs:
       - name: Unit tests
         run: ./gradlew test
         continue-on-error: true
+      - name: Test report
+        uses: asadmansr/android-test-report-action@v1.2.0
+        if: ${{ always() }}
 
   instrumentation-test:
     needs: [unit-test, lint]
@@ -80,11 +78,9 @@ jobs:
           arch: x86_64
           script: ./gradlew connectedAndroidTest
         continue-on-error: true
-      - name: Upload test report
-        uses: actions/upload-artifact@v3
-        with:
-          name: unit_test_report
-          path: app/build/reports/tests/testDebugUnitTest/
+      - name: Test report
+        uses: asadmansr/android-test-report-action@v1.2.0
+        if: ${{ always() }}
           
   package:
     needs: [instrumentation-test]
@@ -103,4 +99,3 @@ jobs:
         with:
           name: urban-huikka.apk
           path: app/build/outputs/apk/debug/app-debug.apk
-        continue-on-error: true
