@@ -33,9 +33,11 @@ jobs:
       - name: Run Lint
         run: ./gradlew lintDebug
         continue-on-error: true
-      - name: Test report
-        uses: asadmansr/android-test-report-action@v1.2.0
-        if: ${{ always() }}
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: lint_report
+          path: app/build/reports/lint-results-debug.html
 
   unit-test:
     needs: [build]
@@ -50,9 +52,11 @@ jobs:
       - name: Unit tests
         run: ./gradlew test
         continue-on-error: true
-      - name: Test report
-        uses: asadmansr/android-test-report-action@v1.2.0
-        if: ${{ always() }}
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit_test_report
+          path: app/build/reports/tests/testDebugUnitTest/
 
   instrumentation-test:
     needs: [unit-test, lint]
@@ -78,9 +82,11 @@ jobs:
           arch: x86_64
           script: ./gradlew connectedAndroidTest
         continue-on-error: true
-      - name: Test report
-        uses: asadmansr/android-test-report-action@v1.2.0
-        if: ${{ always() }}
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: instrumentation_test_report
+          path: app/build/reports/androidTests/connected/
           
   package:
     needs: [instrumentation-test]
