@@ -39,7 +39,7 @@ jobs:
         if: success() || failure()
         with:
           name: Lint
-          path: app/build/reports/lint-results-debug.html
+          path: app/build/reports/lint-results-debug.xml
           reporter: java-junit
 
   unit-test:
