@@ -36,6 +36,10 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    testOptions.unitTests {
+        includeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -91,10 +95,16 @@ dependencies {
 
     androidTestImplementation "androidx.test:runner:1.5.2"
     androidTestImplementation "androidx.test:rules:1.5.0"
-    // Optional -- UI testing with Espresso
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
     // Optional -- UI testing with UI Automator
     androidTestImplementation "androidx.test.uiautomator:uiautomator:2.2.0"
     // Optional -- UI testing with Compose
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.4.3"
+    // AndroidX Test - JVM testing
+    testImplementation "androidx.test.ext:junit-ktx:1.1.5"
+
+    testImplementation "androidx.test:core-ktx:1.5.0"
+
+    testImplementation "org.robolectric:robolectric:4.10.3"
+    testImplementation "com.google.truth:truth:1.1.5"
+    androidTestImplementation "com.google.truth:truth:1.1.5"
 }

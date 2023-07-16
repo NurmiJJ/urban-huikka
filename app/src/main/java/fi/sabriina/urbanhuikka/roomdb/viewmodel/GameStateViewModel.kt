@@ -34,13 +34,13 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
 
     fun initializeDatabase() {
         deleteAllGames()
-        deleteAllPlayersFromGames()
+        deleteAllPlayersFromScoreboard()
         insertGameState(GameState(0,"INITIALIZED",0))
         Log.d("Huikkasofta", "Initialized database")
     }
 
     suspend fun checkInitialization() {
-        val count = repository.checkInitialization()
+        val count = repository.getGameCount()
         if (count != 1 || (getCurrentGame().status != "INITIALIZED" && getCurrentGame().status != "ONGOING") ) {
             initializeDatabase()
         }
@@ -109,7 +109,6 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     }
 
     private fun shuffleCards(deck: String) {
-
         if (deck == "truth") {
             truthCardIndex = 0
             truthCardList.shuffle()
@@ -185,8 +184,8 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         repository.deleteAllGames()
     }
 
-    private fun deleteAllPlayersFromGames() = viewModelScope.launch {
-        repository.deleteAllPlayersFromGames()
+    private fun deleteAllPlayersFromScoreboard() = viewModelScope.launch {
+        repository.deleteAllPlayersFromScoreboard()
     }
 }
 

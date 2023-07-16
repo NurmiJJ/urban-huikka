@@ -23,8 +23,8 @@ class GameStateRepository(private val gameStateDao: GameStateDao) {
     suspend fun getCurrentGame() : GameState {
         return gameStateDao.getCurrentGame()
     }
-    suspend fun checkInitialization() : Int {
-        return gameStateDao.checkInitialization()
+    suspend fun getGameCount() : Int {
+        return gameStateDao.getGameCount()
     }
 
     suspend fun getPlayers(): List<Player> {
@@ -39,7 +39,7 @@ class GameStateRepository(private val gameStateDao: GameStateDao) {
         gameStateDao.deleteAllGames()
     }
 
-    suspend fun deleteAllPlayersFromGames() {
-        gameStateDao.deleteAllPlayersFromGames()
+    suspend fun deleteAllPlayersFromScoreboard() {
+        gameStateDao.deleteAllPlayersFromScoreboard()
     }
 }

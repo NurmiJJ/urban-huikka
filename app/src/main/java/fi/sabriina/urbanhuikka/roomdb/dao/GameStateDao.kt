@@ -17,13 +17,13 @@ interface GameStateDao {
     suspend fun updateGameState(gameState: GameState)
 
     @Query("SELECT COUNT(id) FROM game_state")
-    suspend fun checkInitialization() : Int
+    suspend fun getGameCount() : Int
 
     @Query("DELETE FROM game_state")
     suspend fun deleteAllGames()
 
     @Query("DELETE FROM scoreboard")
-    suspend fun deleteAllPlayersFromGames()
+    suspend fun deleteAllPlayersFromScoreboard()
 
     @Query("SELECT * FROM game_state LIMIT 1")
     suspend fun getCurrentGame() : GameState
