@@ -1,4 +1,4 @@
-package fi.sabriina.urbanhuikka.roomdb.viewmodel
+package fi.sabriina.urbanhuikka.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -13,7 +13,7 @@ import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.Player
-import fi.sabriina.urbanhuikka.roomdb.repository.GameStateRepository
+import fi.sabriina.urbanhuikka.repository.GameStateRepository
 import kotlinx.coroutines.launch
 
 const val DareCollection = "DareCards"
@@ -97,12 +97,12 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     }
 
     private fun checkRemainingCards() {
-        if (truthCardIndex > truthCardList.size - 1) {
+        if (truthCardIndex == truthCardList.size - 1) {
             truthCardIndex = 0
             truthCardList.shuffle()
         }
 
-        if (dareCardIndex > dareCardList.size - 1) {
+        if (dareCardIndex == dareCardList.size - 1) {
             dareCardIndex = 0
             dareCardList.shuffle()
         }
@@ -121,9 +121,11 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
 
     fun getNextCard(deck: String) : Card? {
         if (deck == "truth") {
+            truthCardIndex += 1
             return truthCardList[truthCardIndex]
         }
         if (deck == "dare") {
+            dareCardIndex += 1
             return dareCardList[dareCardIndex]
         }
         return null
