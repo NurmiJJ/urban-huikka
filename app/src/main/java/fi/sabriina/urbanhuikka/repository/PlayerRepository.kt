@@ -1,4 +1,4 @@
-package fi.sabriina.urbanhuikka.roomdb.repository
+package fi.sabriina.urbanhuikka.repository
 
 import androidx.annotation.WorkerThread
 import fi.sabriina.urbanhuikka.roomdb.Player

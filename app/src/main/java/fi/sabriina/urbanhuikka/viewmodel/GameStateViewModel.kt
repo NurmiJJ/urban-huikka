@@ -1,4 +1,4 @@
-package fi.sabriina.urbanhuikka.roomdb.viewmodel
+package fi.sabriina.urbanhuikka.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -13,7 +13,7 @@ import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.Player
-import fi.sabriina.urbanhuikka.roomdb.repository.GameStateRepository
+import fi.sabriina.urbanhuikka.repository.GameStateRepository
 import kotlinx.coroutines.launch
 
 const val DareCollection = "DareCards"
@@ -40,7 +40,7 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     }
 
     suspend fun checkInitialization() {
-        val count = repository.checkInitialization()
+        val count = repository.getGameCount()
         if (count != 1 || (getCurrentGame().status != "INITIALIZED" && getCurrentGame().status != "ONGOING") ) {
             initializeDatabase()
         }
@@ -186,7 +186,7 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     }
 
     private fun deleteAllPlayersFromGames() = viewModelScope.launch {
-        repository.deleteAllPlayersFromGames()
+        repository.deleteAllPlayersFromScoreboard()
     }
 }
 

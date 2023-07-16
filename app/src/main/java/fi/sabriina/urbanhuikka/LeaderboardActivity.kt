@@ -6,11 +6,9 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fi.sabriina.urbanhuikka.roomdb.Player
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModel
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModelFactory
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModelFactory
+import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModel
+import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

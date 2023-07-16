@@ -8,8 +8,8 @@ import androidx.core.widget.doOnTextChanged
 import com.google.android.material.textfield.TextInputEditText
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
 import fi.sabriina.urbanhuikka.roomdb.Player
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModel
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModelFactory
+import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModel
+import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModelFactory
 
 class AddPlayerActivity : AppCompatActivity() {
 

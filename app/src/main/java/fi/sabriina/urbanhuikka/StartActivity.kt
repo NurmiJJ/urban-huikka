@@ -9,8 +9,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModelFactory
+import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModel
+import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
