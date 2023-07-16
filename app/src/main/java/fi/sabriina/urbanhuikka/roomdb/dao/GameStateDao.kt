@@ -4,7 +4,6 @@ import androidx.room.*
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.Player
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GameStateDao {
@@ -30,7 +29,7 @@ interface GameStateDao {
     suspend fun getCurrentGame() : GameState
 
     @Query("SELECT currentPlayerIndex FROM game_state")
-    fun getCurrentPlayerIndex() : Flow<Int>
+    suspend fun getCurrentPlayerIndex() : Int
 
     @Query("SELECT player_table.* FROM player_table INNER JOIN scoreboard ON player_table.id = scoreboard.playerId")
     suspend fun getPlayers(): List<Player>

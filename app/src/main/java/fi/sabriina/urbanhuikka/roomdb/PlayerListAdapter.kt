@@ -28,7 +28,7 @@ class PlayerListAdapter(var nextButton: Button) : ListAdapter<Player, PlayerView
                 nextButton.isEnabled = true
                 selectedPlayers.add(current)
             }
-            if (selectedPlayers.isEmpty()) {
+            if (selectedPlayers.size <= 1) {
                 nextButton.isEnabled = false
             }
         }
