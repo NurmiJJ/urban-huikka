@@ -31,6 +31,14 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
         return gameStateDao.getPlayers()
     }
 
+    override suspend fun getPlayerScore(playerId: Int) : Int {
+        return gameStateDao.getPlayerScore(playerId)
+    }
+
+    override suspend fun updatePlayerScore(playerId: Int, score: Int) {
+        gameStateDao.updatePlayerScore(playerId, score)
+    }
+
     override suspend fun getCurrentPlayerIndex(): Int {
         return gameStateDao.getCurrentPlayerIndex()
     }

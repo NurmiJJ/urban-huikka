@@ -49,11 +49,11 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     fun startGame() = viewModelScope.launch {
         updateDatabase()
         playerList = getPlayers()
+        Log.d(TAG,"Players: $playerList")
         updateGameStatus("ONGOING", null)
         shuffleCards("truth")
         shuffleCards("dare")
         _currentPlayer.value = playerList[currentPlayerIndex]
-        Log.d("Huikkasofta", "startGame()")
     }
 
     suspend fun getPlayers() : List<Player> {
@@ -92,8 +92,8 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
                 }
                 Log.d("Huikkasofta", "Added $counter dare cards")
             }
-        Log.d("Huikkasofta", truthCardList.toString())
-        Log.d("Huikkasofta", dareCardList.toString())
+        Log.d(TAG, truthCardList.toString())
+        Log.d(TAG, dareCardList.toString())
     }
 
     private fun checkRemainingCards() {
@@ -137,8 +137,10 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         updateCurrentPlayer()
     }
 
-    fun addPoints(amount: Int) {
-        //TODO: Add points to scoreboard
+    suspend fun addPoints(playerId: Int = playerList[currentPlayerIndex].id, amount: Int) {
+        var score = repository.getPlayerScore(playerId)
+        score += amount
+        repository.updatePlayerScore(playerId, score)
     }
 
     private fun insertGameState(gameState: GameState) = viewModelScope.launch {
@@ -163,7 +165,7 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
             getCurrentGame().copy(status = status)
         }
         repository.updateGameState(gameStateObject)
-        Log.d("Huikkasofta", "Updated game status to: $status")
+        Log.d(TAG, "Updated game status to: $status")
     }
 
     fun insertPlayerToScoreboard(scoreboardEntry: ScoreboardEntry) = viewModelScope.launch {

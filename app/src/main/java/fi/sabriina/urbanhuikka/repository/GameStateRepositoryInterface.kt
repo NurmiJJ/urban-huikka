@@ -23,4 +23,8 @@ interface GameStateRepositoryInterface {
     suspend fun deleteAllGames()
 
     suspend fun deleteAllPlayersFromScoreboard()
+
+    suspend fun getPlayerScore(playerId: Int) : Int
+
+    suspend fun updatePlayerScore(playerId: Int, score: Int)
 }

@@ -16,6 +16,12 @@ interface GameStateDao {
     @Update
     suspend fun updateGameState(gameState: GameState)
 
+    @Query("SELECT score FROM scoreboard WHERE playerId = :playerId")
+    suspend fun getPlayerScore(playerId: Int) : Int
+
+    @Query("UPDATE scoreboard SET score = :score WHERE playerId = :playerId")
+    suspend fun updatePlayerScore(playerId: Int, score: Int)
+
     @Query("SELECT COUNT(id) FROM game_state")
     suspend fun getGameCount() : Int
 
