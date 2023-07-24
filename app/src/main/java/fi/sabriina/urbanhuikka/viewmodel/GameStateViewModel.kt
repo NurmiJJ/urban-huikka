@@ -14,6 +14,7 @@ import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.repository.GameStateRepository
+import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 import kotlinx.coroutines.launch
 
 const val DareCollection = "DareCards"
@@ -141,6 +142,10 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         var score = repository.getPlayerScore(playerId)
         score += amount
         repository.updatePlayerScore(playerId, score)
+    }
+
+    suspend fun getAllScores() : List<PlayerAndScore> {
+        return repository.getAllScores()
     }
 
     private fun insertGameState(gameState: GameState) = viewModelScope.launch {

@@ -3,6 +3,7 @@ package fi.sabriina.urbanhuikka.repository
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.Player
+import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 import fi.sabriina.urbanhuikka.roomdb.dao.GameStateDao
 
 
@@ -37,6 +38,10 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
 
     override suspend fun updatePlayerScore(playerId: Int, score: Int) {
         gameStateDao.updatePlayerScore(playerId, score)
+    }
+
+    override suspend fun getAllScores(): List<PlayerAndScore> {
+        return gameStateDao.getAllScores()
     }
 
     override suspend fun getCurrentPlayerIndex(): Int {
