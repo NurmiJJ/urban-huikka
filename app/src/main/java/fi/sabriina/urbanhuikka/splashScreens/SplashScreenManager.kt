@@ -160,4 +160,49 @@ class SplashScreenManager(private val context: Context) {
             dialog.show()
         }
     }
+
+    fun showConfirmDialog(message: String, icon: Drawable?, callback: (Boolean) -> Unit) {
+        val dialog = ConfirmDialog(message, icon)
+        dialog.show { callback(confirmed) }
+    }
+
+    private inner class ConfirmDialog(dialogMessage: String, dialogIcon: Drawable?) {
+        private var dialog: Dialog
+        private val okButton: Button
+        private val cancelButton: Button
+        private val content: TextView
+        private val icon: ImageView
+
+        init {
+            val dialog = Dialog(context, R.style.Theme_Huikka)
+            dialog.setContentView(R.layout.confirm_dialog)
+
+            okButton = dialog.findViewById(R.id.okButton)
+            cancelButton = dialog.findViewById(R.id.cancelButton)
+            content = dialog.findViewById(R.id.notifContent)
+            icon = dialog.findViewById(R.id.notifIcon)
+
+            okButton.setOnClickListener {
+                notificationQueue.clear()
+                currentNotification = null
+                confirmed = true
+                dialog.dismiss()
+            }
+
+            cancelButton.setOnClickListener {
+                confirmed = false
+                dialog.dismiss()
+            }
+
+            content.text = dialogMessage
+            icon.setImageDrawable(dialogIcon)
+
+            this.dialog = dialog
+        }
+
+        fun show(onDismiss: () -> Unit) {
+            dialog.setOnDismissListener { onDismiss.invoke() }
+            dialog.show()
+        }
+    }
 }
