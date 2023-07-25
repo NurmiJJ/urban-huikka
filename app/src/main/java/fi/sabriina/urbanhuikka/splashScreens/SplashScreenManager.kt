@@ -161,12 +161,12 @@ class SplashScreenManager(private val context: Context) {
         }
     }
 
-    fun showConfirmDialog(message: String, icon: Drawable?, callback: (Boolean) -> Unit) {
-        val dialog = ConfirmDialog(message, icon)
+    fun showConfirmDialog(message: String, icon: Drawable?, okText: String, cancelText: String, callback: (Boolean) -> Unit) {
+        val dialog = ConfirmDialog(message, icon, okText, cancelText)
         dialog.show { callback(confirmed) }
     }
 
-    private inner class ConfirmDialog(dialogMessage: String, dialogIcon: Drawable?) {
+    private inner class ConfirmDialog(dialogMessage: String, dialogIcon: Drawable?, okText: String, cancelText: String) {
         private var dialog: Dialog
         private val okButton: Button
         private val cancelButton: Button
@@ -182,6 +182,7 @@ class SplashScreenManager(private val context: Context) {
             content = dialog.findViewById(R.id.notifContent)
             icon = dialog.findViewById(R.id.notifIcon)
 
+            okButton.text = okText
             okButton.setOnClickListener {
                 notificationQueue.clear()
                 currentNotification = null
@@ -189,6 +190,7 @@ class SplashScreenManager(private val context: Context) {
                 dialog.dismiss()
             }
 
+            cancelButton.text = cancelText
             cancelButton.setOnClickListener {
                 confirmed = false
                 dialog.dismiss()

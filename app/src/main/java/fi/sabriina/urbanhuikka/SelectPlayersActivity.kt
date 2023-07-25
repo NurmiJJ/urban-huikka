@@ -6,12 +6,14 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fi.sabriina.urbanhuikka.roomdb.*
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
+import fi.sabriina.urbanhuikka.splashScreens.SplashScreenManager
 import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModel
 import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModelFactory
 import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModel
@@ -35,30 +37,37 @@ class SelectPlayersActivity : AppCompatActivity() {
         PlayerViewModelFactory((application as HuikkaApplication).playerRepository)
     }
 
+    private lateinit var splashScreenManager : SplashScreenManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_players)
 
+        splashScreenManager = SplashScreenManager(this)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview_leaderboard)
         nextButton = findViewById(R.id.buttonNext)
         adapter = PlayerListAdapter(nextButton)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
-
         fab = findViewById(R.id.floatingActionButton)
-        nextButton.setOnClickListener {
-            val replyIntent = Intent()
-            setResult(Activity.RESULT_OK, replyIntent)
 
-            gameStateViewModel.initializeDatabase()
+        nextButton.setOnClickListener {
+            val icon = ContextCompat.getDrawable(this, com.google.android.material.R.drawable.mtrl_ic_error)
             CoroutineScope(Dispatchers.Main).launch {
-                gameStateViewModel.updateGameStatus("PLAYER_SELECT", System.currentTimeMillis())
+                if (gameStateViewModel.getCurrentGame().status == "ONGOING") {
+                    splashScreenManager.showConfirmDialog("Uuden pelin aloittaminen korvaa edellisen keskeneräisen pelin", icon, getString(R.string.continue_), getString(R.string.cancel)) { confirmed ->
+                        if (confirmed) {
+                            startGame()
+                        }
+                        else {
+                            finish()
+                        }
+                    }
+                }
+                else {
+                    startGame()
+                }
             }
-            for (player in adapter.getSelected()) {
-                gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
-            }
-            // Close the activity
-            finish()
         }
 
         playerViewModel.allPlayers.observe(this) { players ->
@@ -109,4 +118,15 @@ class SelectPlayersActivity : AppCompatActivity() {
         }).attachToRecyclerView(recyclerView)
     }
 
+    private fun startGame() {
+        val replyIntent = Intent()
+        setResult(Activity.RESULT_OK, replyIntent)
+
+        gameStateViewModel.initializeDatabase()
+        gameStateViewModel.updateGameStatus("PLAYER_SELECT", System.currentTimeMillis())
+        for (player in adapter.getSelected()) {
+            gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
+        }
+        finish()
+    }
 }
