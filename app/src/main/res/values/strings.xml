@@ -19,5 +19,7 @@
     <string name="truthOrDate">"Totuus vai tehtävä?"</string>
     <string name="continue_playing">"Jatka"</string>
     <string name="name">Nimi</string>
-
+    <string name="yes">Kyllä</string>
+    <string name="no">Ei</string>
+    <string name="save_and_quit">Tallenna ja palaa päävalikkoon</string>
 </resources>
