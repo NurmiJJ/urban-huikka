@@ -127,7 +127,7 @@ class SelectPlayersActivity : AppCompatActivity() {
         setResult(Activity.RESULT_OK, replyIntent)
 
         gameStateViewModel.initializeDatabase()
-        gameStateViewModel.updateGameStatus("PLAYER_SELECT", System.currentTimeMillis())
+        gameStateViewModel.updateGameStatus("PLAYER_SELECT")
         for (player in adapter.getSelected()) {
             gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
         }
