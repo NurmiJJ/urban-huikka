@@ -4,6 +4,7 @@ import androidx.room.*
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.Player
+import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 
 @Dao
 interface GameStateDao {
@@ -13,8 +14,20 @@ interface GameStateDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPlayerToScoreboard(scoreboardEntry: ScoreboardEntry)
 
-    @Update
-    suspend fun updateGameState(gameState: GameState)
+    @Query("UPDATE game_state SET status = :status")
+    suspend fun updateGameStatus(status: String)
+
+    @Query("UPDATE game_state SET currentPlayerIndex = :index")
+    suspend fun updateCurrentPlayerIndex(index: Int)
+
+    @Query("SELECT score FROM scoreboard WHERE playerId = :playerId")
+    suspend fun getPlayerScore(playerId: Int) : Int
+
+    @Query("SELECT player_table.*, scoreboard.score FROM scoreboard INNER JOIN player_table ON player_table.id = scoreboard.playerId")
+    suspend fun getAllScores() : List<PlayerAndScore>
+
+    @Query("UPDATE scoreboard SET score = :score WHERE playerId = :playerId")
+    suspend fun updatePlayerScore(playerId: Int, score: Int)
 
     @Query("SELECT COUNT(id) FROM game_state")
     suspend fun getGameCount() : Int

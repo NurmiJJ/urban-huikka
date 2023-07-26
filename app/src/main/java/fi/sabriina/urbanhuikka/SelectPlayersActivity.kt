@@ -67,6 +67,10 @@ class SelectPlayersActivity : AppCompatActivity() {
                 else {
                     startGame()
                 }
+                gameStateViewModel.updateGameStatus("PLAYER_SELECT")
+            }
+            for (player in adapter.getSelected()) {
+                gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
             }
         }
 

@@ -2,6 +2,7 @@ package fi.sabriina.urbanhuikka.repository
 
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.Player
+import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 
 interface GameStateRepositoryInterface {
@@ -10,7 +11,7 @@ interface GameStateRepositoryInterface {
 
     suspend fun insertPlayerToScoreboard(scoreboardEntry: ScoreboardEntry)
 
-    suspend fun updateGameState(gameState: GameState)
+    suspend fun updateGameState(status: String)
 
     suspend fun getCurrentGame() : GameState
 
@@ -23,4 +24,12 @@ interface GameStateRepositoryInterface {
     suspend fun deleteAllGames()
 
     suspend fun deleteAllPlayersFromScoreboard()
+
+    suspend fun updateCurrentPlayerIndex(index: Int)
+
+    suspend fun getPlayerScore(playerId: Int) : Int
+
+    suspend fun updatePlayerScore(playerId: Int, score: Int)
+
+    suspend fun getAllScores() : List<PlayerAndScore>
 }

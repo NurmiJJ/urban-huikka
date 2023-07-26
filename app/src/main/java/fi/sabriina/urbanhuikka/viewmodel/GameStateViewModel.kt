@@ -14,6 +14,7 @@ import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.repository.GameStateRepository
+import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 import kotlinx.coroutines.launch
 
 const val DareCollection = "DareCards"
@@ -49,11 +50,10 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     fun startGame() = viewModelScope.launch {
         updateDatabase()
         playerList = getPlayers()
-        updateGameStatus("ONGOING", null)
+        updateGameStatus("ONGOING")
         shuffleCards("truth")
         shuffleCards("dare")
         _currentPlayer.value = playerList[currentPlayerIndex]
-        Log.d("Huikkasofta", "startGame()")
     }
 
     suspend fun getPlayers() : List<Player> {
@@ -92,8 +92,8 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
                 }
                 Log.d("Huikkasofta", "Added $counter dare cards")
             }
-        Log.d("Huikkasofta", truthCardList.toString())
-        Log.d("Huikkasofta", dareCardList.toString())
+        Log.d(TAG, truthCardList.toString())
+        Log.d(TAG, dareCardList.toString())
     }
 
     private fun checkRemainingCards() {
@@ -137,8 +137,14 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         updateCurrentPlayer()
     }
 
-    fun addPoints(amount: Int) {
-        //TODO: Add points to scoreboard
+    suspend fun addPoints(playerId: Int = playerList[currentPlayerIndex].id, amount: Int) {
+        var score = repository.getPlayerScore(playerId)
+        score += amount
+        repository.updatePlayerScore(playerId, score)
+    }
+
+    suspend fun getAllScores() : List<PlayerAndScore> {
+        return repository.getAllScores()
     }
 
     private fun insertGameState(gameState: GameState) = viewModelScope.launch {
@@ -156,14 +162,10 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         return false
     }
 
-    fun updateGameStatus(status: String, timestamp: Long?) = viewModelScope.launch {
-        val gameStateObject: GameState = if (timestamp != null) {
-            getCurrentGame().copy(status = status, timestamp = timestamp)
-        } else {
-            getCurrentGame().copy(status = status)
-        }
-        repository.updateGameState(gameStateObject)
-        Log.d("Huikkasofta", "Updated game status to: $status")
+    fun updateGameStatus(status: String) = viewModelScope.launch {
+        repository.updateGameState(status)
+
+        Log.d(TAG, "Updated game status to: $status")
     }
 
     fun insertPlayerToScoreboard(scoreboardEntry: ScoreboardEntry) = viewModelScope.launch {
@@ -171,15 +173,13 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     }
 
     private fun updateCurrentPlayer() = viewModelScope.launch {
-        val gameStateObject = getCurrentGame()
         if (currentPlayerIndex < playerList.size - 1) {
-            repository.updateGameState(gameStateObject.copy(currentPlayerIndex = currentPlayerIndex + 1))
             currentPlayerIndex += 1
         }
         else {
-            repository.updateGameState(gameStateObject.copy(currentPlayerIndex = 0))
             currentPlayerIndex = 0
         }
+        repository.updateCurrentPlayerIndex(currentPlayerIndex)
         _currentPlayer.value = playerList[currentPlayerIndex]
     }
 

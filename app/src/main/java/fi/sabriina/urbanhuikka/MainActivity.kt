@@ -135,9 +135,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun cardCompleted() {
-        gameStateViewModel.addPoints(currentCard!!.points)
-        splashScreenManager.showSplashScreen(currentPlayer.name,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
-        endTurn()
+        CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.addPoints(amount=currentCard!!.points)
+            splashScreenManager.showSplashScreen(currentPlayer.name,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
+            endTurn()
+        }
     }
 
     private fun endTurn()  {
