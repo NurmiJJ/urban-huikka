@@ -14,6 +14,7 @@ import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.repository.GameStateRepository
+import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 import kotlinx.coroutines.launch
 
 const val DareCollection = "DareCards"
@@ -53,7 +54,6 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         shuffleCards("truth")
         shuffleCards("dare")
         _currentPlayer.value = playerList[currentPlayerIndex]
-        Log.d("Huikkasofta", "startGame()")
     }
 
     suspend fun getPlayers() : List<Player> {
@@ -92,8 +92,8 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
                 }
                 Log.d("Huikkasofta", "Added $counter dare cards")
             }
-        Log.d("Huikkasofta", truthCardList.toString())
-        Log.d("Huikkasofta", dareCardList.toString())
+        Log.d(TAG, truthCardList.toString())
+        Log.d(TAG, dareCardList.toString())
     }
 
     private fun checkRemainingCards() {
@@ -137,8 +137,14 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         updateCurrentPlayer()
     }
 
-    fun addPoints(amount: Int) {
-        //TODO: Add points to scoreboard
+    suspend fun addPoints(playerId: Int = playerList[currentPlayerIndex].id, amount: Int) {
+        var score = repository.getPlayerScore(playerId)
+        score += amount
+        repository.updatePlayerScore(playerId, score)
+    }
+
+    suspend fun getAllScores() : List<PlayerAndScore> {
+        return repository.getAllScores()
     }
 
     private fun insertGameState(gameState: GameState) = viewModelScope.launch {
@@ -158,6 +164,7 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
 
     fun updateGameStatus(status: String) = viewModelScope.launch {
         repository.updateGameState(status)
+
         Log.d(TAG, "Updated game status to: $status")
     }
 
