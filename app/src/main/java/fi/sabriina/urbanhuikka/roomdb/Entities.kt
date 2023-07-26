@@ -16,7 +16,6 @@ data class Player(
 data class GameState (
     @PrimaryKey (autoGenerate = true) @ColumnInfo(name = "id") val id: Int,
     @ColumnInfo(name = "status") var status: String,
-    @ColumnInfo(name = "timestamp") var timestamp: Long,
     @ColumnInfo(name = "currentPlayerIndex") var currentPlayerIndex: Int = 0
 )
 

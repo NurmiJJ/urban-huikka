@@ -17,8 +17,12 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
         gameStateDao.insertPlayerToScoreboard(scoreboardEntry)
     }
 
-    override suspend fun updateGameState(gameState: GameState) {
-        gameStateDao.updateGameState(gameState)
+    override suspend fun updateGameState(status: String) {
+        gameStateDao.updateGameStatus(status)
+    }
+
+    override suspend fun updateCurrentPlayerIndex(index: Int) {
+        gameStateDao.updateCurrentPlayerIndex(index)
     }
 
     override suspend fun getCurrentGame() : GameState {

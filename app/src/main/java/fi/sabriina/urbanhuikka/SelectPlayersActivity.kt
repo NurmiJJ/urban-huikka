@@ -52,7 +52,7 @@ class SelectPlayersActivity : AppCompatActivity() {
 
             gameStateViewModel.initializeDatabase()
             CoroutineScope(Dispatchers.Main).launch {
-                gameStateViewModel.updateGameStatus("PLAYER_SELECT", System.currentTimeMillis())
+                gameStateViewModel.updateGameStatus("PLAYER_SELECT")
             }
             for (player in adapter.getSelected()) {
                 gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))

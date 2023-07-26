@@ -14,8 +14,11 @@ interface GameStateDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPlayerToScoreboard(scoreboardEntry: ScoreboardEntry)
 
-    @Update
-    suspend fun updateGameState(gameState: GameState)
+    @Query("UPDATE game_state SET status = :status")
+    suspend fun updateGameStatus(status: String)
+
+    @Query("UPDATE game_state SET currentPlayerIndex = :index")
+    suspend fun updateCurrentPlayerIndex(index: Int)
 
     @Query("SELECT score FROM scoreboard WHERE playerId = :playerId")
     suspend fun getPlayerScore(playerId: Int) : Int

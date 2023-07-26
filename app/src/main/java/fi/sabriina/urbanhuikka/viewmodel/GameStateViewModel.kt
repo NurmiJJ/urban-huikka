@@ -50,8 +50,7 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     fun startGame() = viewModelScope.launch {
         updateDatabase()
         playerList = getPlayers()
-        Log.d(TAG,"Players: $playerList")
-        updateGameStatus("ONGOING", null)
+        updateGameStatus("ONGOING")
         shuffleCards("truth")
         shuffleCards("dare")
         _currentPlayer.value = playerList[currentPlayerIndex]
@@ -163,13 +162,9 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         return false
     }
 
-    fun updateGameStatus(status: String, timestamp: Long?) = viewModelScope.launch {
-        val gameStateObject: GameState = if (timestamp != null) {
-            getCurrentGame().copy(status = status, timestamp = timestamp)
-        } else {
-            getCurrentGame().copy(status = status)
-        }
-        repository.updateGameState(gameStateObject)
+    fun updateGameStatus(status: String) = viewModelScope.launch {
+        repository.updateGameState(status)
+
         Log.d(TAG, "Updated game status to: $status")
     }
 
@@ -178,15 +173,13 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     }
 
     private fun updateCurrentPlayer() = viewModelScope.launch {
-        val gameStateObject = getCurrentGame()
         if (currentPlayerIndex < playerList.size - 1) {
-            repository.updateGameState(gameStateObject.copy(currentPlayerIndex = currentPlayerIndex + 1))
             currentPlayerIndex += 1
         }
         else {
-            repository.updateGameState(gameStateObject.copy(currentPlayerIndex = 0))
             currentPlayerIndex = 0
         }
+        repository.updateCurrentPlayerIndex(currentPlayerIndex)
         _currentPlayer.value = playerList[currentPlayerIndex]
     }
 
