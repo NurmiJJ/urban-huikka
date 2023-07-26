@@ -56,7 +56,7 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         _currentPlayer.value = playerList[currentPlayerIndex]
     }
 
-    suspend fun getPlayers() : List<Player> {
+    private suspend fun getPlayers() : List<Player> {
         return repository.getPlayers()
     }
 

@@ -49,7 +49,7 @@ class StartActivity : AppCompatActivity() {
             resultLauncher.launch(intent)
         }
 
-        val icon = ContextCompat.getDrawable(this, R.drawable.ic_round_x)
+        val icon = ContextCompat.getDrawable(this, R.drawable.ic_round_x)!!
         onBackPressedDispatcher.addCallback(this) {
             splashScreenManager.showConfirmDialog(getString(R.string.quit_confirm), icon, getString(R.string.yes), getString(R.string.no)) { confirmed ->
                 if (confirmed) {

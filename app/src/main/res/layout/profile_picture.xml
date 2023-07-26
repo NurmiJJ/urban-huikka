@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/imageOptionView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:layout_margin="4dp"
+        android:clickable="true"
+        android:contentDescription="@string/profile_picture"
+        android:padding="8dp"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:id="@+id/checkmarkImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_check_white"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+</FrameLayout>

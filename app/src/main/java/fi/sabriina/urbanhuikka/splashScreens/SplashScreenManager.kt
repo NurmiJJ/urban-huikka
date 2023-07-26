@@ -16,9 +16,10 @@ class SplashScreenManager(private val context: Context) {
     private var isShowingNotification = false
     private var confirmed = false
 
-    fun showSplashScreen(player: String, dialogMessage: String, dialogIcon: Drawable?, dialogDelay: Long = 5000) {
+    fun showSplashScreen(playerName: String, playerPicture: Drawable, dialogMessage: String, dialogIcon: Drawable, dialogDelay: Long = 5000) {
         val notification = mapOf(
-            "player" to player,
+            "playerName" to playerName,
+            "playerPicture" to playerPicture,
             "dialogMessage" to dialogMessage,
             "dialogIcon" to dialogIcon,
             "dialogDelay" to dialogDelay
@@ -45,15 +46,19 @@ class SplashScreenManager(private val context: Context) {
         if (isShowingNotification) {
             val nextNotif = notificationQueue.removeFirst()
             currentNotification?.updateNotification(
-                nextNotif["player"] as String,
-                nextNotif["dialogMessage"] as String, nextNotif["dialogIcon"] as Drawable?,
+                nextNotif["playerName"] as String,
+                nextNotif["playerPicture"] as Drawable,
+                nextNotif["dialogMessage"] as String,
+                nextNotif["dialogIcon"] as Drawable,
             )
         }
         else {
             val nextNotif = notificationQueue.removeFirst()
             currentNotification = SplashNotification(
-                nextNotif["player"] as String,
-                nextNotif["dialogMessage"] as String, nextNotif["dialogIcon"] as Drawable?,
+                nextNotif["playerName"] as String,
+                nextNotif["playerPicture"] as Drawable,
+                nextNotif["dialogMessage"] as String,
+                nextNotif["dialogIcon"] as Drawable,
                 nextNotif["dialogDelay"] as Long
             )
             isShowingNotification = true
@@ -62,10 +67,11 @@ class SplashScreenManager(private val context: Context) {
         currentNotification!!.show()
     }
 
-    private inner class SplashNotification(player: String, dialogMessage: String, dialogIcon: Drawable?, dialogDelay: Long) {
+    private inner class SplashNotification(pName: String, pPicture: Drawable, dialogMessage: String, dialogIcon: Drawable, dialogDelay: Long) {
         private var dialog: Dialog
         private var countdownTimer: CountDownTimer
         private val playerName: TextView
+        private val playerPicture: ImageView
         private val content: TextView
         private val icon: ImageView
         private val dismissButton: Button
@@ -76,6 +82,7 @@ class SplashScreenManager(private val context: Context) {
             dialog.setContentView(R.layout.splash_notification)
 
             playerName = dialog.findViewById(R.id.notifPlayerName)
+            playerPicture = dialog.findViewById(R.id.playerPicture)
             content = dialog.findViewById(R.id.notifContent)
             icon = dialog.findViewById(R.id.notifIcon)
             dismissButton = dialog.findViewById(R.id.notifDismissButton)
@@ -92,7 +99,8 @@ class SplashScreenManager(private val context: Context) {
                 }
             }
 
-            playerName.text = player
+            playerName.text = pName
+            playerPicture.setImageDrawable(pPicture)
             content.text = dialogMessage
             icon.setImageDrawable(dialogIcon)
 
@@ -108,8 +116,9 @@ class SplashScreenManager(private val context: Context) {
             dialog.show()
         }
 
-        fun updateNotification(player: String, dialogMessage: String, dialogIcon: Drawable?) {
-            playerName.text = player
+        fun updateNotification(pName: String, pPicture: Drawable, dialogMessage: String, dialogIcon: Drawable) {
+            playerName.text = pName
+            playerPicture.setImageDrawable(pPicture)
             content.text = dialogMessage
             icon.setImageDrawable(dialogIcon)
         }
@@ -161,12 +170,12 @@ class SplashScreenManager(private val context: Context) {
         }
     }
 
-    fun showConfirmDialog(message: String, icon: Drawable?, okText: String, cancelText: String, callback: (Boolean) -> Unit) {
+    fun showConfirmDialog(message: String, icon: Drawable, okText: String, cancelText: String, callback: (Boolean) -> Unit) {
         val dialog = ConfirmDialog(message, icon, okText, cancelText)
         dialog.show { callback(confirmed) }
     }
 
-    private inner class ConfirmDialog(dialogMessage: String, dialogIcon: Drawable?, okText: String, cancelText: String) {
+    private inner class ConfirmDialog(dialogMessage: String, dialogIcon: Drawable, okText: String, cancelText: String) {
         private var dialog: Dialog
         private val okButton: Button
         private val cancelButton: Button

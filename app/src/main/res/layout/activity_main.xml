@@ -128,4 +128,14 @@
         app:layout_constraintEnd_toStartOf="@+id/buttonSettings"
         app:layout_constraintTop_toTopOf="@+id/buttonSettings" />
 
+    <ImageView
+        android:id="@+id/playerPicture"
+        android:layout_width="52dp"
+        android:layout_height="47dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewPlayer"
+        app:layout_constraintEnd_toStartOf="@+id/textViewPlayer"
+        app:layout_constraintTop_toTopOf="@+id/textViewPlayer"
+        tools:srcCompat="@tools:sample/avatars" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
