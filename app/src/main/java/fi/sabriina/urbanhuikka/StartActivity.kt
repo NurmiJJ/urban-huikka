@@ -3,12 +3,14 @@ package fi.sabriina.urbanhuikka
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
+import fi.sabriina.urbanhuikka.splashScreens.SplashScreenManager
 import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModel
 import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModelFactory
 import kotlinx.coroutines.CoroutineScope
@@ -22,6 +24,9 @@ class StartActivity : AppCompatActivity() {
     private val gameStateViewModel: GameStateViewModel by viewModels {
         GameStateViewModelFactory((application as HuikkaApplication).gameStateRepository)
     }
+
+    private lateinit var splashScreenManager : SplashScreenManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -31,6 +36,7 @@ class StartActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_start)
 
+        splashScreenManager = SplashScreenManager(this)
         continueButton = findViewById(R.id.continueGameButton)
         continueButton.setOnClickListener {
             val intent = Intent(this@StartActivity, MainActivity::class.java)
@@ -41,6 +47,15 @@ class StartActivity : AppCompatActivity() {
         newGameButton.setOnClickListener {
             val intent = Intent(this@StartActivity, SelectPlayersActivity::class.java)
             resultLauncher.launch(intent)
+        }
+
+        val icon = ContextCompat.getDrawable(this, R.drawable.ic_round_x)
+        onBackPressedDispatcher.addCallback(this) {
+            splashScreenManager.showConfirmDialog(getString(R.string.quit_confirm), icon, getString(R.string.yes), getString(R.string.no)) { confirmed ->
+                if (confirmed) {
+                    finish()
+                }
+            }
         }
     }
 
@@ -57,13 +72,7 @@ class StartActivity : AppCompatActivity() {
         super.onStart()
 
         CoroutineScope(Dispatchers.Main).launch {
-            if (gameStateViewModel.isGameOngoing()) {
-                continueButton.isEnabled = true
-                Log.d("Huikkasofta", "Found ongoing game")
-            }
-            else {
-                continueButton.isEnabled = false
-            }
+            continueButton.isEnabled = gameStateViewModel.isGameOngoing()
         }
     }
 }

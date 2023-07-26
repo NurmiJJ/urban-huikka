@@ -8,12 +8,14 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.roomdb.*
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
+import fi.sabriina.urbanhuikka.splashScreens.SplashScreenManager
 import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModel
 import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModelFactory
 import kotlinx.coroutines.CoroutineScope
@@ -97,6 +99,14 @@ class MainActivity : AppCompatActivity() {
             currentPlayer = player
             playerName.text = currentPlayer.name
             splashScreenManager.showSplashScreen(currentPlayer.name,"Seuraavana vuorossa ${currentPlayer.name}", drawableDrink)
+        }
+
+        onBackPressedDispatcher.addCallback(this) {
+            splashScreenManager.showPauseDialog { confirmed ->
+                if (confirmed) {
+                    finish()
+                }
+            }
         }
     }
 
