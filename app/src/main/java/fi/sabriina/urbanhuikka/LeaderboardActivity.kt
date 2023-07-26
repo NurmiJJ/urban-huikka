@@ -5,12 +5,10 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import fi.sabriina.urbanhuikka.roomdb.Player
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModel
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModelFactory
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModelFactory
+import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
+import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModel
+import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,11 +31,9 @@ class LeaderboardActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         CoroutineScope(Dispatchers.Main).launch {
-            val players = gameStateViewModel.getPlayers()
-
-            val sortedlist: List<Player> = players.sortedWith(compareBy({it.currentPoints}, {it.name})).reversed()
-            sortedlist.let { adapter.submitList(it) }
-
+            val scores = gameStateViewModel.getAllScores()
+            val sortedList: List<PlayerAndScore> = scores.sortedWith(compareBy({it.score}, {it.player.name})).reversed()
+            adapter.submitList(sortedList)
         }
     }
 }

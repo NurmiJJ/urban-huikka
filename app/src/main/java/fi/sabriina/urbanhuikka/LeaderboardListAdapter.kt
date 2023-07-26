@@ -7,17 +7,17 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import fi.sabriina.urbanhuikka.roomdb.Player
+import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 
-class LeaderboardListAdapter : ListAdapter<Player, PlayerViewHolder>(PlayersComparator()) {
+class LeaderboardListAdapter : ListAdapter<PlayerAndScore, PlayerViewHolder>(PlayerScoreComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
         return PlayerViewHolder.create(parent)
     }
 
     override fun onBindViewHolder(holder: PlayerViewHolder, position: Int) {
-        val current = getItem(position)
-        holder.bind(current)
+        val result = getItem(position)
+        holder.bind(result)
 
         holder.itemView.setOnClickListener{
         }
@@ -29,9 +29,9 @@ class PlayerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val playerItemView: TextView = itemView.findViewById(R.id.playerName)
     private val pointsItemView: TextView = itemView.findViewById(R.id.points)
 
-    fun bind(player: Player) {
-        playerItemView.text = player.name
-        pointsItemView.text = player.currentPoints.toString()
+    fun bind(result: PlayerAndScore) {
+        playerItemView.text = result.player.name
+        pointsItemView.text = result.score.toString()
 
     }
 
@@ -44,15 +44,13 @@ class PlayerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 }
 
-
-
-class PlayersComparator : DiffUtil.ItemCallback<Player>() {
-    override fun areItemsTheSame(oldItem: Player, newItem: Player): Boolean {
-        return oldItem === newItem
+class PlayerScoreComparator : DiffUtil.ItemCallback<PlayerAndScore>() {
+    override fun areItemsTheSame(oldItem: PlayerAndScore, newItem: PlayerAndScore): Boolean {
+        return oldItem.player.id == newItem.player.id
     }
 
-    override fun areContentsTheSame(oldItem: Player, newItem: Player): Boolean {
-        return oldItem.name == newItem.name
+    override fun areContentsTheSame(oldItem: PlayerAndScore, newItem: PlayerAndScore): Boolean {
+        return oldItem == newItem
     }
 }
 

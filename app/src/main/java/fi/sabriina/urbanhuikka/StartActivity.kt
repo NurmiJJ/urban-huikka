@@ -9,8 +9,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModelFactory
+import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModel
+import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,10 +57,9 @@ class StartActivity : AppCompatActivity() {
         super.onStart()
 
         CoroutineScope(Dispatchers.Main).launch {
-            val game = gameStateViewModel.getCurrentGame()
-            if (game.status == "ONGOING") {
+            if (gameStateViewModel.isGameOngoing()) {
                 continueButton.isEnabled = true
-                Log.d("Huikkasofta", "Found ongoing game, id: "+game.id)
+                Log.d("Huikkasofta", "Found ongoing game")
             }
             else {
                 continueButton.isEnabled = false

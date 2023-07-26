@@ -1,8 +1,8 @@
 package fi.sabriina.urbanhuikka.roomdb
 
 import android.app.Application
-import fi.sabriina.urbanhuikka.roomdb.repository.GameStateRepository
-import fi.sabriina.urbanhuikka.roomdb.repository.PlayerRepository
+import fi.sabriina.urbanhuikka.repository.GameStateRepository
+import fi.sabriina.urbanhuikka.repository.PlayerRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 

@@ -3,7 +3,6 @@ package fi.sabriina.urbanhuikka
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
@@ -12,28 +11,22 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.roomdb.*
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModel
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.GameStateViewModelFactory
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModel
-import fi.sabriina.urbanhuikka.roomdb.viewmodel.PlayerViewModelFactory
+import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModel
+import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
 const val TAG = "Huikkasofta"
-const val DareCollection = "DareCards"
-const val TruthCollection = "TruthCards"
+const val TRUTH_DECK = "truth"
+const val DARE_DECK = "dare"
 
 class MainActivity : AppCompatActivity() {
 
-    private val database = Firebase.firestore
-    private var playerList = listOf<Player>()
     private lateinit var playerName : TextView
     private lateinit var cardView : CustomCard
 
@@ -48,38 +41,20 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var leaderboardButton : ImageButton
 
-    private var truthCardList = mutableListOf<Card>()
-    private var dareCardList = mutableListOf<Card>()
-
-    private var truthCardIndex = 0
-    private var dareCardIndex = 0
-    private var currentPlayerIndex = 0
-
-    private val playerViewModel: PlayerViewModel by viewModels {
-        PlayerViewModelFactory((application as HuikkaApplication).playerRepository)
-    }
+    private lateinit var drawableDrink : Drawable
+    private lateinit var splashScreenManager : SplashScreenManager
+    private lateinit var currentPlayer: Player
+    private var currentCard: Card? = null
 
     private val gameStateViewModel: GameStateViewModel by viewModels {
         GameStateViewModelFactory((application as HuikkaApplication).gameStateRepository)
     }
-
-    private lateinit var drawableDrink : Drawable
-    private lateinit var splashScreenManager : SplashScreenManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         drawableDrink = ContextCompat.getDrawable(this, R.drawable.drink)!!
         splashScreenManager = SplashScreenManager(this)
-
-        CoroutineScope(Dispatchers.Main).launch {
-            val gameStatus = gameStateViewModel.getCurrentGame().status
-            if (gameStatus == "PLAYER_SELECT") {
-                truthCardList.shuffle()
-                dareCardList.shuffle()
-                gameStateViewModel.updateGameStatus("ONGOING", null)
-            }
-        }
 
         setContentView(R.layout.activity_main)
         playerName = findViewById(R.id.textViewPlayer)
@@ -95,34 +70,12 @@ class MainActivity : AppCompatActivity() {
         selectionButtons = findViewById(R.id.selectionButtons)
         selectionTaskButtons = findViewById(R.id.selectionTaskButtons)
 
-        updateDatabase()
-
-        CoroutineScope(Dispatchers.Main).launch {
-            playerList = gameStateViewModel.getPlayers()
-            playerName.text = playerList[0].name
-        }
-
-        gameStateViewModel.currentPlayerIndex.observe(this) { playerNo ->
-            currentPlayerIndex = playerNo
-            if (playerList.isNotEmpty()) {
-                val name = getCurrentPlayer().name
-                playerName.text = name
-                splashScreenManager.showSplashScreen(name,"Seuraavana vuorossa $name", drawableDrink)
-            }
-        }
-
         truthButton.setOnClickListener {
-            val card = truthCardList[truthCardIndex]
-            cardView.setCard(card)
-            hideTaskButtons()
-            truthCardIndex++
+            drawCard(TRUTH_DECK)
         }
 
         dareButton.setOnClickListener {
-            val card = dareCardList[dareCardIndex]
-            cardView.setCard(card)
-            hideTaskButtons()
-            dareCardIndex++
+            drawCard(DARE_DECK)
         }
 
         skipButton.setOnClickListener { cardSkipped() }
@@ -131,6 +84,27 @@ class MainActivity : AppCompatActivity() {
         leaderboardButton.setOnClickListener {
             val intent = Intent(this@MainActivity, LeaderboardActivity::class.java)
             startActivity(intent)
+        }
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val gameStatus = gameStateViewModel.getCurrentGame().status
+            if (gameStatus == "PLAYER_SELECT") {
+                gameStateViewModel.startGame()
+            }
+        }
+
+        gameStateViewModel.currentPlayer.observe(this) { player ->
+            currentPlayer = player
+            playerName.text = currentPlayer.name
+            splashScreenManager.showSplashScreen(currentPlayer.name,"Seuraavana vuorossa ${currentPlayer.name}", drawableDrink)
+        }
+    }
+
+    private fun drawCard(deck: String) {
+        currentCard = gameStateViewModel.getNextCard(deck)
+        if (currentCard != null) {
+            cardView.setCard(currentCard!!)
+            hideTaskButtons()
         }
     }
 
@@ -145,80 +119,21 @@ class MainActivity : AppCompatActivity() {
         selectionButtons.visibility = View.INVISIBLE
     }
 
-    private fun updateDatabase() {
-        database.collection(TruthCollection)
-            .addSnapshotListener { value, e ->
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
-                    return@addSnapshotListener
-                }
-                truthCardList.clear()
-                for (doc in value!!) {
-                    val card : Card = doc.toObject(Card::class.java)
-                    truthCardList.add(card)
-                }
-            }
-
-        database.collection(DareCollection)
-            .addSnapshotListener { value, e ->
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
-                    return@addSnapshotListener
-                }
-                dareCardList.clear()
-                for (doc in value!!) {
-                    val card : Card = doc.toObject(Card::class.java)
-                    dareCardList.add(card)
-                }
-            }
-    }
-
     private fun cardSkipped() {
-        // Points from card
-        val points = 3
-
-        splashScreenManager.showSplashScreen(getCurrentPlayer().name,"Ota $points huikkaa!", drawableDrink)
-        checkRemainingCards()
+        splashScreenManager.showSplashScreen(currentPlayer.name,"Ota ${currentCard!!.points} huikkaa!", drawableDrink)
         endTurn()
-        showTaskButtons()
     }
 
     private fun cardCompleted() {
-        addPoints()
-        checkRemainingCards()
-        endTurn()
-        showTaskButtons()
+        CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.addPoints(amount=currentCard!!.points)
+            splashScreenManager.showSplashScreen(currentPlayer.name,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
+            endTurn()
+        }
     }
 
     private fun endTurn()  {
-        gameStateViewModel.updateCurrentPlayerIndex()
-    }
-    private fun addPoints() {
-        val player = getCurrentPlayer()
-        // Points from card
-        val points = 3
-
-        playerViewModel.updatePoints(player, points)
-        splashScreenManager.showSplashScreen(player.name,"Sait $points pistettä!", drawableDrink)
-    }
-
-    private fun getCurrentPlayer() : Player {
-            return playerList[currentPlayerIndex]
-    }
-
-    private fun checkRemainingCards() {
-        if (truthCardIndex > truthCardList.size - 1) {
-            truthCardIndex = 0
-            truthCardList.shuffle()
-            splashScreenManager.showSplashScreen(getCurrentPlayer().name,"Totuuskortit pääsivät loppumaan. Voit jatkaa pelaamista, mutta uusia kortteja ei enää ole.", drawableDrink)
-            return
-        }
-
-        if (dareCardIndex > dareCardList.size - 1) {
-            dareCardIndex = 0
-            dareCardList.shuffle()
-            splashScreenManager.showSplashScreen(getCurrentPlayer().name,"Tehtäväkortit pääsivät loppumaan. Voit jatkaa pelaamista, mutta uusia kortteja ei enää ole.", drawableDrink)
-            return
-        }
+        gameStateViewModel.endTurn()
+        showTaskButtons()
     }
 }

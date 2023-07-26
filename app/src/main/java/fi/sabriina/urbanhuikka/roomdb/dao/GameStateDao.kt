@@ -4,7 +4,7 @@ import androidx.room.*
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.Player
-import kotlinx.coroutines.flow.Flow
+import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 
 @Dao
 interface GameStateDao {
@@ -17,20 +17,29 @@ interface GameStateDao {
     @Update
     suspend fun updateGameState(gameState: GameState)
 
+    @Query("SELECT score FROM scoreboard WHERE playerId = :playerId")
+    suspend fun getPlayerScore(playerId: Int) : Int
+
+    @Query("SELECT player_table.*, scoreboard.score FROM scoreboard INNER JOIN player_table ON player_table.id = scoreboard.playerId")
+    suspend fun getAllScores() : List<PlayerAndScore>
+
+    @Query("UPDATE scoreboard SET score = :score WHERE playerId = :playerId")
+    suspend fun updatePlayerScore(playerId: Int, score: Int)
+
     @Query("SELECT COUNT(id) FROM game_state")
-    suspend fun checkInitialization() : Int
+    suspend fun getGameCount() : Int
 
     @Query("DELETE FROM game_state")
     suspend fun deleteAllGames()
 
     @Query("DELETE FROM scoreboard")
-    suspend fun deleteAllPlayersFromGames()
+    suspend fun deleteAllPlayersFromScoreboard()
 
     @Query("SELECT * FROM game_state LIMIT 1")
     suspend fun getCurrentGame() : GameState
 
     @Query("SELECT currentPlayerIndex FROM game_state")
-    fun getCurrentPlayerIndex() : Flow<Int>
+    suspend fun getCurrentPlayerIndex() : Int
 
     @Query("SELECT player_table.* FROM player_table INNER JOIN scoreboard ON player_table.id = scoreboard.playerId")
     suspend fun getPlayers(): List<Player>
