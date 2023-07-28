@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             val gameStatus = gameStateViewModel.getCurrentGame().status
-            if (gameStatus == "PLAYER_SELECT") {
+            if (gameStatus in arrayOf("PLAYER_SELECT", "ONGOING")) {
                 gameStateViewModel.startGame()
             }
         }
