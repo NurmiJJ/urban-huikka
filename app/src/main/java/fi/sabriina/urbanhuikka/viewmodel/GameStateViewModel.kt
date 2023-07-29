@@ -53,7 +53,8 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         updateGameStatus("ONGOING")
         shuffleCards("truth")
         shuffleCards("dare")
-        _currentPlayer.value = playerList[repository.getCurrentPlayerIndex()]
+        currentPlayerIndex = repository.getCurrentPlayerIndex()
+        _currentPlayer.value = playerList[currentPlayerIndex]
     }
 
     private suspend fun getPlayers() : List<Player> {
