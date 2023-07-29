@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -20,7 +21,7 @@ class PlayerListAdapter(var nextButton: Button) : ListAdapter<Player, PlayerView
 
     override fun onBindViewHolder(holder: PlayerViewHolder, position: Int) {
         val current = getItem(position)
-        holder.bind(current.name)
+        holder.bind(current.name, current.pictureResId)
 
         holder.itemView.setOnClickListener{
             holder.playerClicked()
@@ -41,10 +42,13 @@ class PlayerListAdapter(var nextButton: Button) : ListAdapter<Player, PlayerView
 
     class PlayerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val playerItemView: TextView = itemView.findViewById(R.id.textViewPlayerName)
+        private val playerProfilePicture : ImageView = itemView.findViewById(R.id.profilePicture)
         private val playerSelectImage : ImageView = itemView.findViewById(R.id.selectImageView)
 
-        fun bind(text: String?) {
+        fun bind(text: String?, pictureResId: Int) {
             playerItemView.text = text
+            val drawable = ContextCompat.getDrawable(itemView.context, pictureResId)!!
+            playerProfilePicture.setImageDrawable(drawable)
         }
 
         fun playerClicked() {

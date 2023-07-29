@@ -20,18 +20,23 @@ import fi.sabriina.urbanhuikka.card.Card
     }
      fun setCard(card: Card){
          val titleView = findViewById<TextView>(R.id.textViewHeader)
-         val chapterView = findViewById<TextView>(R.id.textViewChapter)
+         val descriptionView = findViewById<TextView>(R.id.textViewDescription)
+         val pointsView = findViewById<TextView>(R.id.textViewPoints)
 
          titleView.text = card.category
-         chapterView.text = card.description
+         descriptionView.text = card.description
+         val points = "Pisteet: ${card.points}"
+         pointsView.text = points
      }
 
      fun setBackside(){
          val titleView = findViewById<TextView>(R.id.textViewHeader)
-         val chapterView = findViewById<TextView>(R.id.textViewChapter)
+         val descriptionView = findViewById<TextView>(R.id.textViewDescription)
+         val pointsView = findViewById<TextView>(R.id.textViewPoints)
 
          titleView.text = null
-         chapterView.text = null
+         descriptionView.text = null
+         pointsView.text = null
      }
 
     // Setup views
