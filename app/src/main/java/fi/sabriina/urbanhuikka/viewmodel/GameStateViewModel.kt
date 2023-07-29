@@ -157,7 +157,7 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     }
 
     suspend fun checkSavedGameExists(): Boolean {
-        if (getCurrentGame().status == "ONGOING") {
+        if (getCurrentGame().status == "SAVED") {
             return true
         }
         return false

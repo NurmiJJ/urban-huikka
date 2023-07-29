@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             val gameStatus = gameStateViewModel.getCurrentGame().status
-            if (gameStatus in arrayOf("PLAYER_SELECT", "ONGOING")) {
+            if (gameStatus in arrayOf("PLAYER_SELECT", "SAVED")) {
                 gameStateViewModel.startGame()
             }
         }
@@ -104,10 +104,16 @@ class MainActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this) {
             splashScreenManager.showPauseDialog { confirmed ->
                 if (confirmed) {
+                    gameStateViewModel.updateGameStatus("SAVED")
                     finish()
                 }
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        gameStateViewModel.updateGameStatus("SAVED")
     }
 
     private fun drawCard(deck: String) {
