@@ -72,7 +72,7 @@ class StartActivity : AppCompatActivity() {
         super.onStart()
 
         CoroutineScope(Dispatchers.Main).launch {
-            continueButton.isEnabled = gameStateViewModel.isGameOngoing()
+            continueButton.isEnabled = gameStateViewModel.checkSavedGameExists()
         }
     }
 }
