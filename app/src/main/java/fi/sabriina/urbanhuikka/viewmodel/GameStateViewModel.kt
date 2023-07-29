@@ -6,24 +6,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import fi.sabriina.urbanhuikka.TAG
 import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.repository.GameStateRepository
+import fi.sabriina.urbanhuikka.repository.GameStateRepositoryInterface
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 import kotlinx.coroutines.launch
 
 const val DareCollection = "DareCards"
 const val TruthCollection = "TruthCards"
 
-class GameStateViewModel (private val repository: GameStateRepository): ViewModel() {
-    private val database = Firebase.firestore
-    private var truthCardList = mutableListOf<Card>()
-    private var dareCardList = mutableListOf<Card>()
+class GameStateViewModel (private val repository: GameStateRepositoryInterface): ViewModel() {
+    private var truthCards = mutableListOf<Card>()
+    private var dareCards = mutableListOf<Card>()
     private var playerList = listOf<Player>()
 
     private var truthCardIndex = 0
@@ -37,7 +35,6 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         deleteAllGames()
         deleteAllPlayersFromScoreboard()
         insertGameState(GameState(0,"INITIALIZED",0))
-        Log.d("Huikkasofta", "Initialized database")
     }
 
     suspend fun checkInitialization() {
@@ -55,6 +52,7 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         shuffleCards("dare")
         currentPlayerIndex = repository.getCurrentPlayerIndex()
         _currentPlayer.value = playerList[currentPlayerIndex]
+        Log.d("Huikkasofta", "startGame()")
     }
 
     private suspend fun getPlayers() : List<Player> {
@@ -62,72 +60,43 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
     }
 
     private fun updateDatabase() {
-        database.collection(TruthCollection)
-            .addSnapshotListener { value, e ->
-                var counter = 0
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
-                    return@addSnapshotListener
-                }
-                truthCardList.clear()
-                for (doc in value!!) {
-                    val card: Card = doc.toObject(Card::class.java)
-                    truthCardList.add(card)
-                    counter += 1
-                }
-                Log.d("Huikkasofta", "Added $counter truth cards")
-            }
+        val (truthCardList, dareCardList) = repository.updateDatabase()
+        truthCards = truthCardList
+        dareCards = dareCardList
 
-        database.collection(DareCollection)
-            .addSnapshotListener { value, e ->
-                var counter = 0
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
-                    return@addSnapshotListener
-                }
-                dareCardList.clear()
-                for (doc in value!!) {
-                    val card : Card = doc.toObject(Card::class.java)
-                    dareCardList.add(card)
-                    counter += 1
-                }
-                Log.d("Huikkasofta", "Added $counter dare cards")
-            }
-        Log.d(TAG, truthCardList.toString())
-        Log.d(TAG, dareCardList.toString())
     }
 
     private fun checkRemainingCards() {
-        if (truthCardIndex == truthCardList.size - 1) {
+        if (truthCardIndex == truthCards.size - 1) {
             truthCardIndex = 0
-            truthCardList.shuffle()
+            truthCards.shuffle()
         }
 
-        if (dareCardIndex == dareCardList.size - 1) {
+        if (dareCardIndex == dareCards.size - 1) {
             dareCardIndex = 0
-            dareCardList.shuffle()
+            dareCards.shuffle()
         }
     }
 
     private fun shuffleCards(deck: String) {
         if (deck == "truth") {
             truthCardIndex = 0
-            truthCardList.shuffle()
+            truthCards.shuffle()
         }
         else if (deck == "dare") {
             dareCardIndex = 0
-            dareCardList.shuffle()
+            dareCards.shuffle()
         }
     }
 
     fun getNextCard(deck: String) : Card? {
         if (deck == "truth") {
             truthCardIndex += 1
-            return truthCardList[truthCardIndex]
+            return truthCards[truthCardIndex]
         }
         if (deck == "dare") {
             dareCardIndex += 1
-            return dareCardList[dareCardIndex]
+            return dareCards[dareCardIndex]
         }
         return null
     }

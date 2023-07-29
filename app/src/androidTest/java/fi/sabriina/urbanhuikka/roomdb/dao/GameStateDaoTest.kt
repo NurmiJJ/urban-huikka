@@ -53,7 +53,7 @@ class GameStateDaoTest {
     @Test
     fun updateGameState() = runTest {
         dao.insertGameState(GameState(0,"INITIALIZED",0))
-        dao.updateGameState(dao.getCurrentGame().copy(status = "ONGOING"))
+        dao.updateGameStatus("ONGOING")
         val currentGame = dao.getCurrentGame()
         assertThat(currentGame.status).isEqualTo("ONGOING")
     }
@@ -76,12 +76,12 @@ class GameStateDaoTest {
     @Test
     fun insertPlayerToScoreboard() = runTest {
         dao.insertPlayerToScoreboard(ScoreboardEntry(0,1,3))
-        // TODO: Get player scores from scoreboard
+        assertThat(dao.getPlayerScore(1)).isEqualTo(3)
     }
 
     @Test
     fun deleteAllPlayersFromScoreboard() = runTest {
         dao.deleteAllPlayersFromScoreboard()
-        // TODO: Get player scores from scoreboard
+        assertThat(dao.getAllScores()).isEmpty()
     }
 }
