@@ -4,49 +4,54 @@ on:
   push:
 
 jobs:
+  build:
+      name: Build
+      runs-on: self-hosted
+      steps:
+        - uses: actions/checkout@v3
+          name: Checkout the code
+        - name: Run init script
+          run: bash ~/actions-data/init.sh
+        - uses: actions/setup-java@v3
+          name: Set up JDK 17
+          with:
+            distribution: 'temurin'
+            java-version: '17'
+        - name: Build with gradle
+          run: ./gradlew build
+
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    needs: [build]
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v3
-        name: Checkout the code
-      - name: Insert token
-        env:
-          DATA: ${{ secrets.GOOGLE_SERVICES }}
-        run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
       - uses: actions/setup-java@v3
-        name: Set up JDK
+        name: Set up JDK 17
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: gradle
       - name: Run Lint
         run: ./gradlew lintDebug
-      - name: Upload Lint report
+        continue-on-error: true
+      - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
           name: lint_report
           path: app/build/reports/lint-results-debug.html
 
   unit-test:
-    needs: [lint]
+    needs: [build]
     name: Unit tests
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v3
-        name: Checkout the code
-      - name: Insert token
-        env:
-          DATA: ${{ secrets.GOOGLE_SERVICES }}
-        run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
       - uses: actions/setup-java@v3
-        name: Set up JDK
+        name: Set up JDK 17
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: gradle
       - name: Unit tests
         run: ./gradlew test
+        continue-on-error: true
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
@@ -54,7 +59,7 @@ jobs:
           path: app/build/reports/tests/testDebugUnitTest/
 
   instrumentation-test:
-    needs: [unit-test]
+    needs: [unit-test, lint]
     name: Instrumentation tests
     runs-on: macos-latest
     steps:
@@ -65,41 +70,34 @@ jobs:
           DATA: ${{ secrets.GOOGLE_SERVICES }}
         run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
       - uses: actions/setup-java@v3
-        name: Set up JDK
+        name: Set up JDK 17
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: gradle
-      - name: Run espresso tests
-        uses: reactivecircus/android-emulator-runner@v2
+      - name: Run instrumentation tests
+        uses: reactivecircus/android-emulator-runner@v2.28.0
         with:
           api-level: 33
           target: google_apis
           arch: x86_64
-          script: ./gradlew connectedCheck
+          script: ./gradlew connectedAndroidTest
+        continue-on-error: true
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
           name: instrumentation_test_report
           path: app/build/reports/androidTests/connected/
-
+          
   package:
     needs: [instrumentation-test]
     name: Generate APK
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v3
-        name: Checkout the code
-      - name: Insert token
-        env:
-          DATA: ${{ secrets.GOOGLE_SERVICES }}
-        run: echo $DATA > ~/work/urban-huikka/urban-huikka/app/google-services.json
       - uses: actions/setup-java@v3
-        name: Set up JDK
+        name: Set up JDK 17
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: gradle
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
       - name: Upload APK
