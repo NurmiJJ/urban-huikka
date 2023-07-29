@@ -42,7 +42,7 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
 
     suspend fun checkInitialization() {
         val count = repository.getGameCount()
-        if (count != 1 || (getCurrentGame().status != "INITIALIZED" && getCurrentGame().status != "ONGOING") ) {
+        if (count != 1 || getCurrentGame().status !in arrayOf("INITIALIZED", "ONGOING", "SAVED"))  {
             initializeDatabase()
         }
     }
@@ -53,6 +53,7 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         updateGameStatus("ONGOING")
         shuffleCards("truth")
         shuffleCards("dare")
+        currentPlayerIndex = repository.getCurrentPlayerIndex()
         _currentPlayer.value = playerList[currentPlayerIndex]
     }
 
@@ -155,8 +156,8 @@ class GameStateViewModel (private val repository: GameStateRepository): ViewMode
         return repository.getCurrentGame()
     }
 
-    suspend fun isGameOngoing(): Boolean {
-        if (getCurrentGame().status == "ONGOING") {
+    suspend fun checkSavedGameExists(): Boolean {
+        if (getCurrentGame().status == "SAVED") {
             return true
         }
         return false
