@@ -52,7 +52,7 @@ class SelectPlayersActivity : AppCompatActivity() {
         fab = findViewById(R.id.floatingActionButton)
 
         nextButton.setOnClickListener {
-            val icon = ContextCompat.getDrawable(this, com.google.android.material.R.drawable.mtrl_ic_error)
+            val icon = ContextCompat.getDrawable(this, com.google.android.material.R.drawable.mtrl_ic_error)!!
             CoroutineScope(Dispatchers.Main).launch {
                 if (gameStateViewModel.checkSavedGameExists()) {
                     splashScreenManager.showConfirmDialog("Uuden pelin aloittaminen korvaa edellisen keskeneräisen pelin", icon, getString(R.string.continue_), getString(R.string.cancel)) { confirmed ->

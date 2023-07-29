@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -27,6 +26,17 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/textViewPlayerName"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textViewPlayerName" />
+
+    <ImageView
+        android:id="@+id/profilePicture"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="12dp"
+        android:background="@android:color/transparent"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewPlayerName"
+        app:layout_constraintStart_toStartOf="@+id/textViewPlayerName"
         app:layout_constraintTop_toTopOf="@+id/textViewPlayerName" />
 
 

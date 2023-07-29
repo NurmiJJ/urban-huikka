@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.addCallback
@@ -30,6 +31,7 @@ const val DARE_DECK = "dare"
 class MainActivity : AppCompatActivity() {
 
     private lateinit var playerName : TextView
+    private lateinit var playerPicture : ImageView
     private lateinit var cardView : CustomCard
 
     private lateinit var selectionTaskButtons : LinearLayout
@@ -46,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawableDrink : Drawable
     private lateinit var splashScreenManager : SplashScreenManager
     private lateinit var currentPlayer: Player
+    private lateinit var currentPlayerPicture : Drawable
     private var currentCard: Card? = null
 
     private val gameStateViewModel: GameStateViewModel by viewModels {
@@ -60,6 +63,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
         playerName = findViewById(R.id.textViewPlayer)
+        playerPicture = findViewById(R.id.playerPicture)
 
         //Buttons
         truthButton = findViewById(R.id.truthButton)
@@ -98,7 +102,11 @@ class MainActivity : AppCompatActivity() {
         gameStateViewModel.currentPlayer.observe(this) { player ->
             currentPlayer = player
             playerName.text = currentPlayer.name
-            splashScreenManager.showSplashScreen(currentPlayer.name,"Seuraavana vuorossa ${currentPlayer.name}", drawableDrink)
+
+            currentPlayerPicture = ContextCompat.getDrawable(this, currentPlayer.pictureResId)!!
+            playerPicture.setImageDrawable(currentPlayerPicture)
+
+            splashScreenManager.showSplashScreen(currentPlayer.name,currentPlayerPicture,"Seuraavana vuorossa ${currentPlayer.name}", drawableDrink)
         }
 
         onBackPressedDispatcher.addCallback(this) {
@@ -111,9 +119,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        splashScreenManager.dismissAllSplashScreens()
+        
+    }
+        
     override fun onStop() {
         super.onStop()
         gameStateViewModel.updateGameStatus("SAVED")
+
     }
 
     private fun drawCard(deck: String) {
@@ -136,14 +153,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun cardSkipped() {
-        splashScreenManager.showSplashScreen(currentPlayer.name,"Ota ${currentCard!!.points} huikkaa!", drawableDrink)
+        splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Ota ${currentCard!!.points} huikkaa!", drawableDrink)
         endTurn()
     }
 
     private fun cardCompleted() {
         CoroutineScope(Dispatchers.Main).launch {
             gameStateViewModel.addPoints(amount=currentCard!!.points)
-            splashScreenManager.showSplashScreen(currentPlayer.name,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
+            splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
             endTurn()
         }
     }
