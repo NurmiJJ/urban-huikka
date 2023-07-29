@@ -30,6 +30,11 @@ class SplashScreenManager(private val context: Context) {
         }
     }
 
+    fun dismissAllSplashScreens() {
+        notificationQueue.clear()
+        currentNotification?.dismiss()
+    }
+
     private fun handleNextNotification() {
         if (notificationQueue.isEmpty()) {
             isShowingNotification = false

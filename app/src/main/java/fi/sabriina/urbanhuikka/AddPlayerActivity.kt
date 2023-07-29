@@ -25,12 +25,15 @@ class AddPlayerActivity : AppCompatActivity() {
     private var selectedImageResId = 0
 
     private val imageOptions = arrayOf(
-        R.drawable.gamer,
-        R.drawable.man,
-        R.drawable.woman,
-        R.drawable.man_1,
-        R.drawable.man_2,
-        R.drawable.woman_1
+        R.drawable.blue,
+        R.drawable.cyan,
+        R.drawable.grey,
+        R.drawable.lime,
+        R.drawable.orange,
+        R.drawable.pink,
+        R.drawable.red,
+        R.drawable.violet,
+        R.drawable.yellow
     )
 
     private val playerViewModel: PlayerViewModel by viewModels {

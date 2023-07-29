@@ -118,6 +118,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        splashScreenManager.dismissAllSplashScreens()
+    }
+
     private fun drawCard(deck: String) {
         currentCard = gameStateViewModel.getNextCard(deck)
         if (currentCard != null) {
