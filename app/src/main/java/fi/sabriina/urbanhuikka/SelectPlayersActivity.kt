@@ -7,7 +7,6 @@ import android.widget.Button
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -45,8 +44,8 @@ class SelectPlayersActivity : AppCompatActivity() {
 
         splashScreenManager = SplashScreenManager(this)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview_leaderboard)
-        nextButton = findViewById(R.id.buttonNext)
-        adapter = PlayerListAdapter(nextButton)
+        nextButton = findViewById(R.id.buttonDelete)
+        adapter = PlayerListAdapter("SELECT", nextButton)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         fab = findViewById(R.id.floatingActionButton)
@@ -79,47 +78,10 @@ class SelectPlayersActivity : AppCompatActivity() {
             players?.let { adapter.submitList(it) }
         }
 
-
         fab.setOnClickListener {
             val intent = Intent(this@SelectPlayersActivity, AddPlayerActivity::class.java)
             startActivity(intent)
         }
-
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                // this method is called
-                // when the item is moved.
-                return false
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-
-                // below line is to get the position
-                // of the item at that position.
-                val position = viewHolder.adapterPosition
-
-                // this method is called when we swipe our item to right direction.
-                // on below line we are getting the item at a particular position.
-                adapter.getItemId(position)
-
-                val list = adapter.currentList
-                val player = list[position]
-
-                if (adapter.currentList.size == 1){
-                    nextButton.isEnabled = false
-                }
-
-                // this method is called when item is swiped.
-                // below line is to remove item from our array list.
-                playerViewModel.delete(player)
-            }
-            // at last we are adding this
-            // to our recycler view.
-        }).attachToRecyclerView(recyclerView)
     }
 
     private fun startGame() {
