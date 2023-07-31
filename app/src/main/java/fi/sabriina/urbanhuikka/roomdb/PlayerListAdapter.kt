@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import fi.sabriina.urbanhuikka.R
 
-class PlayerListAdapter(var nextButton: Button) : ListAdapter<Player, PlayerViewHolder>(PlayersComparator()) {
+class PlayerListAdapter(private var nextButton: Button) : ListAdapter<Player, PlayerViewHolder>(PlayersComparator()) {
     private var selectedPlayers = mutableListOf<Player>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {

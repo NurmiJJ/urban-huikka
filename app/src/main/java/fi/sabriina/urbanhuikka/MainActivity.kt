@@ -28,7 +28,7 @@ const val TAG = "Huikkasofta"
 const val TRUTH_DECK = "truth"
 const val DARE_DECK = "dare"
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
     private lateinit var playerName : TextView
     private lateinit var playerPicture : ImageView
@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         leaderboardButton = findViewById(R.id.leaderboardButton)
 
         cardView = findViewById(R.id.cardView)
+        cardView.setOnCardSwipeListener(this)
         selectionButtons = findViewById(R.id.selectionButtons)
         selectionTaskButtons = findViewById(R.id.selectionTaskButtons)
 
@@ -133,6 +134,14 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onSwipeRight() {
+        drawCard(TRUTH_DECK)
+    }
+
+    override fun onSwipeLeft() {
+        drawCard(DARE_DECK)
+    }
+
     private fun drawCard(deck: String) {
         currentCard = gameStateViewModel.getNextCard(deck)
         if (currentCard != null) {
@@ -144,12 +153,6 @@ class MainActivity : AppCompatActivity() {
     private fun hideTaskButtons(){
         selectionTaskButtons.visibility = View.INVISIBLE
         selectionButtons.visibility = View.VISIBLE
-    }
-
-    private fun showTaskButtons(){
-        cardView.setBackside()
-        selectionTaskButtons.visibility = View.VISIBLE
-        selectionButtons.visibility = View.INVISIBLE
     }
 
     private fun cardSkipped() {
@@ -167,6 +170,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun endTurn()  {
         gameStateViewModel.endTurn()
-        showTaskButtons()
+        cardView.setCardSide(true)
     }
 }
