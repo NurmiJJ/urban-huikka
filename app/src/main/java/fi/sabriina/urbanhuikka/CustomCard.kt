@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -32,6 +33,7 @@ class CustomCard : ConstraintLayout {
     private var swipeListener: OnCardSwipeListener? = null
 
     private var backside = true
+    private var feedbackGiven = false
 
     init {
         LayoutInflater.from(context).inflate(R.layout.custom_card, this, true)
@@ -54,6 +56,7 @@ class CustomCard : ConstraintLayout {
 
     // Helper function to toggle content visibility
     fun setCardSide(showBackside: Boolean) {
+        feedbackGiven = false
         backside = showBackside
         val frontView = findViewById<ConstraintLayout>(R.id.frontLayout)
         val backView = findViewById<ImageView>(R.id.cardBackside)
@@ -151,6 +154,16 @@ class CustomCard : ConstraintLayout {
 
                     // Mark the card as moving to avoid conflicting with other touch events
                     isMoving = true
+
+                    if ((deltaX > SWIPE_THRESHOLD || deltaX < -SWIPE_THRESHOLD) && !feedbackGiven) {
+                        feedbackGiven = true
+                        // make haptic feedback stronger
+                        for (i in 1..2) {
+                            performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                        }
+                    } else if (deltaX < SWIPE_THRESHOLD && deltaX > -SWIPE_THRESHOLD) {
+                        feedbackGiven = false
+                    }
 
                     return true
                 }

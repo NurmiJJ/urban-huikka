@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
@@ -87,10 +88,20 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         titleText = findViewById(R.id.titleText)
 
         swipeButton.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            var feedbackGiven = false
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 guideBar.visibility = View.INVISIBLE
                 guideCross.visibility = View.INVISIBLE
                 guideCheckmark.visibility = View.INVISIBLE
+                if ((progress < 15 || progress > 85) && !feedbackGiven) {
+                    // make haptic feedback stronger
+                    for (i in 1..2) {
+                        seekBar.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                    }
+                    feedbackGiven = true
+                } else if (progress in 15..85) {
+                    feedbackGiven = false
+                }
                 if (progress < 50) {
                     seekBar.progressDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.swipe_bar_red)
                     guideSkipText.visibility = View.VISIBLE
