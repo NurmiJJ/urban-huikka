@@ -1,5 +1,6 @@
 package fi.sabriina.urbanhuikka
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -45,6 +46,8 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     private lateinit var guideCompleteText: TextView
     private lateinit var guideSkipText: TextView
 
+    private lateinit var titleText: TextView
+
     private lateinit var leaderboardButton : ImageButton
 
     private lateinit var drawableDrink : Drawable
@@ -80,6 +83,8 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         guideCross = findViewById(R.id.guideCross)
         guideSkipText = findViewById(R.id.guideSkipText)
         guideCompleteText = findViewById(R.id.guideCompleteText)
+
+        titleText = findViewById(R.id.titleText)
 
         swipeButton.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -184,7 +189,12 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         currentCard = gameStateViewModel.getNextCard(deck)
         if (currentCard != null) {
             cardView.setCard(currentCard!!)
-            selectionButtons.visibility = View.VISIBLE
+            CoroutineScope(Dispatchers.Main).launch {
+                ObjectAnimator.ofFloat(titleText, View.ALPHA, 0f).start()
+                delay(250)
+                ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
+                selectionButtons.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -208,6 +218,8 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             delay(200)
             cardView.setCardSide(true)
             selectionButtons.visibility = View.INVISIBLE
+            ObjectAnimator.ofFloat(titleText, View.ALPHA, 1f).start()
+            ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 0f).start()
         }
     }
 }
