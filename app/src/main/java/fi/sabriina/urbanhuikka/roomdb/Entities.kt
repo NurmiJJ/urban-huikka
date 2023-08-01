@@ -16,7 +16,14 @@ data class Player(
 data class GameState (
     @PrimaryKey (autoGenerate = true) @ColumnInfo(name = "id") val id: Int,
     @ColumnInfo(name = "status") var status: String,
-    @ColumnInfo(name = "currentPlayerIndex") var currentPlayerIndex: Int = 0
+    @ColumnInfo(name = "currentPlayerIndex") var currentPlayerIndex: Int = 0,
+)
+
+@Entity(tableName = "card_category")
+data class CardCategory (
+    @PrimaryKey (autoGenerate = true) @ColumnInfo(name = "id") val id: Int,
+    @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "enabled") var enabled: Boolean
 )
 
 @Entity(tableName = "scoreboard")

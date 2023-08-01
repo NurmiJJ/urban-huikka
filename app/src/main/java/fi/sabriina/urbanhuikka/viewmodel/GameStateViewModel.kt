@@ -8,16 +8,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fi.sabriina.urbanhuikka.TAG
 import fi.sabriina.urbanhuikka.card.Card
+import fi.sabriina.urbanhuikka.helpers.DbConstants
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.repository.GameStateRepository
 import fi.sabriina.urbanhuikka.repository.GameStateRepositoryInterface
+import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 import kotlinx.coroutines.launch
-
-const val DareCollection = "DareCards"
-const val TruthCollection = "TruthCards"
 
 class GameStateViewModel (private val repository: GameStateRepositoryInterface): ViewModel() {
     private var truthCards = mutableListOf<Card>()
@@ -31,10 +30,14 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     private var _currentPlayer = MutableLiveData<Player>()
     var currentPlayer: LiveData<Player> = _currentPlayer
 
-    fun initializeDatabase() {
-        deleteAllGames()
-        deleteAllPlayersFromScoreboard()
-        insertGameState(GameState(0,"INITIALIZED",0))
+    suspend fun initializeDatabase() {
+        startNewGame()
+        for (category in DbConstants.DARE_CATEGORIES) {
+            insertCardCategory(category)
+        }
+        for (category in DbConstants.TRUTH_CATEGORIES) {
+            insertCardCategory(category)
+        }
     }
 
     suspend fun checkInitialization() {
@@ -42,6 +45,16 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         if (count != 1 || getCurrentGame().status !in arrayOf("INITIALIZED", "ONGOING", "SAVED"))  {
             initializeDatabase()
         }
+    }
+
+    fun startNewGame() {
+        deleteAllGames()
+        deleteAllPlayersFromScoreboard()
+        insertGameState(GameState(0,"INITIALIZED",0))
+    }
+
+    private suspend fun insertCardCategory(name: String) {
+        repository.insertCardCategory(CardCategory(0, name, true))
     }
 
     fun startGame() = viewModelScope.launch {
@@ -59,20 +72,21 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         return repository.getPlayers()
     }
 
-    private fun updateDatabase() {
-        val (truthCardList, dareCardList) = repository.updateDatabase()
+    private suspend fun updateDatabase() {
+        val enabledCategories = repository.getEnabledCardCategories()
+        val (truthCardList, dareCardList) = repository.updateDatabase(enabledCategories)
         truthCards = truthCardList
         dareCards = dareCardList
 
     }
 
     private fun checkRemainingCards() {
-        if (truthCardIndex == truthCards.size - 1) {
+        if (truthCardIndex == truthCards.size) {
             truthCardIndex = 0
             truthCards.shuffle()
         }
 
-        if (dareCardIndex == dareCards.size - 1) {
+        if (dareCardIndex == dareCards.size) {
             dareCardIndex = 0
             dareCards.shuffle()
         }
@@ -92,11 +106,11 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     fun getNextCard(deck: String) : Card? {
         if (deck == "truth") {
             truthCardIndex += 1
-            return truthCards[truthCardIndex]
+            return truthCards[truthCardIndex-1]
         }
         if (deck == "dare") {
             dareCardIndex += 1
-            return dareCards[dareCardIndex]
+            return dareCards[dareCardIndex-1]
         }
         return null
     }
@@ -158,6 +172,17 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
 
     private fun deleteAllPlayersFromScoreboard() = viewModelScope.launch {
         repository.deleteAllPlayersFromScoreboard()
+    }
+
+    suspend fun setEnabledCardCategories(enabledCategories: List<String>) {
+        val allCategories = DbConstants.DARE_CATEGORIES + DbConstants.TRUTH_CATEGORIES
+        for (category in allCategories) {
+            if (category in enabledCategories) {
+                repository.setCardCategoryEnabled(category, true)
+            } else {
+                repository.setCardCategoryEnabled(category, false)
+            }
+        }
     }
 }
 

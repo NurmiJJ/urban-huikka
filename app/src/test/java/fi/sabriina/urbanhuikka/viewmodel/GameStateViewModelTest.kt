@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.getOrAwaitValue
+import fi.sabriina.urbanhuikka.helpers.DbConstants
 import fi.sabriina.urbanhuikka.repository.FakeGameStateRepository
 import fi.sabriina.urbanhuikka.repository.GameStateRepositoryInterface
 import fi.sabriina.urbanhuikka.roomdb.Player
@@ -60,6 +61,9 @@ class GameStateViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
         val currentGameStatus = repository.getCurrentGame().status
         assertThat(currentGameStatus).isEqualTo("INITIALIZED")
+
+        val expectedSize = DbConstants.DARE_CATEGORIES.size + DbConstants.TRUTH_CATEGORIES.size
+        assertThat(repository.getEnabledCardCategories()).hasSize(expectedSize)
     }
 
     @Test
@@ -86,8 +90,9 @@ class GameStateViewModelTest {
             if (currentCard != null) {
                 cards.add(currentCard)
             }
+            viewModel.endTurn()
         }
-        assertThat(cards.distinct().count() == cards.size).isEqualTo(true)
+        assertThat(cards).containsNoDuplicates()
     }
 
     @Test
@@ -137,6 +142,23 @@ class GameStateViewModelTest {
 
         testDispatcher.scheduler.advanceUntilIdle()
         assertThat(viewModel.checkSavedGameExists()).isEqualTo(true)
+    }
+
+    @Test
+    fun `enable only one card category`() = runTest {
+        viewModel.initializeDatabase()
+        viewModel.setEnabledCardCategories(listOf(DbConstants.TRUTH_CATEGORIES[1]))
+        testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.startGame()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        for (i in 1..5) {
+            val currentCard = viewModel.getNextCard("truth")
+            if (currentCard != null) {
+                assertThat(currentCard.category).isEqualTo(DbConstants.TRUTH_CATEGORIES[1])
+            }
+            viewModel.endTurn()
+        }
     }
 
 }

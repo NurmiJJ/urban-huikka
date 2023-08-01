@@ -2,13 +2,14 @@ package fi.sabriina.urbanhuikka.repository
 
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.card.Card
+import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 
 interface GameStateRepositoryInterface {
 
-    fun updateDatabase(): Pair<MutableList<Card>, MutableList<Card>>
+    fun updateDatabase(enabledCategories: List<String>): Pair<MutableList<Card>, MutableList<Card>>
 
     suspend fun insertGameState(gameState: GameState)
 
@@ -35,4 +36,10 @@ interface GameStateRepositoryInterface {
     suspend fun deleteAllGames()
 
     suspend fun deleteAllPlayersFromScoreboard()
+
+    suspend fun insertCardCategory(cardCategory: CardCategory)
+
+    suspend fun setCardCategoryEnabled(name: String, enabled: Boolean)
+
+    suspend fun getEnabledCardCategories(): List<String>
 }

@@ -30,10 +30,6 @@ class StartActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        CoroutineScope(Dispatchers.Main).launch {
-            gameStateViewModel.checkInitialization()
-        }
-
         setContentView(R.layout.activity_start)
 
         splashScreenManager = SplashScreenManager(this)
@@ -63,6 +59,11 @@ class StartActivity : AppCompatActivity() {
                 }
             }
         }
+
+        CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.checkInitialization()
+            continueButton.isEnabled = gameStateViewModel.checkSavedGameExists()
+        }
     }
 
     private var resultLauncher = registerForActivityResult(
@@ -71,14 +72,6 @@ class StartActivity : AppCompatActivity() {
         if (result.resultCode == Activity.RESULT_OK) {
             val intent = Intent(this@StartActivity, MainActivity::class.java)
             startActivity(intent)
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        CoroutineScope(Dispatchers.Main).launch {
-            continueButton.isEnabled = gameStateViewModel.checkSavedGameExists()
         }
     }
 }

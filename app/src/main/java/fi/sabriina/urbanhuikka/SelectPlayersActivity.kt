@@ -88,11 +88,14 @@ class SelectPlayersActivity : AppCompatActivity() {
         val replyIntent = Intent()
         setResult(Activity.RESULT_OK, replyIntent)
 
-        gameStateViewModel.initializeDatabase()
-        gameStateViewModel.updateGameStatus("PLAYER_SELECT")
-        for (player in adapter.getSelected()) {
-            gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
+        CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.startNewGame()
+            gameStateViewModel.updateGameStatus("PLAYER_SELECT")
+            gameStateViewModel.setEnabledCardCategories(listOf("Seksi"))
+            for (player in adapter.getSelected()) {
+                gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
+            }
+            finish()
         }
-        finish()
     }
 }

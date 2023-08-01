@@ -1,6 +1,7 @@
 package fi.sabriina.urbanhuikka.repository
 
 import fi.sabriina.urbanhuikka.card.Card
+import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
@@ -11,11 +12,25 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
     private var repoGameState : GameState? = null
     private var scoreboard = mutableListOf<ScoreboardEntry>()
     private var playerList = mutableListOf(Player(1,"Eetu",123), Player(2,"Matias", 1234), Player(3,"Krista", 123), Player(4, "Mikko", 123))
+    private var cardCategories = mutableListOf<CardCategory>()
 
-    override fun updateDatabase(): Pair<MutableList<Card>, MutableList<Card>> {
-        val truthCards = mutableListOf(Card("Haaveet ja unelmat","Milloin itkit viimeksi?",1), Card("Seksi","Miten vanhemmat otti kukkaset ja mehiläiset puheeksi?",1), Card("Kaverit", "Kuka on paras ystäväsi?", 1), Card("Opinnot", "Mikä on huonoin kouluarvosanasi?", 3))
+
+    override fun updateDatabase(enabledCategories: List<String>): Pair<MutableList<Card>, MutableList<Card>> {
+        val truthCards = mutableListOf(Card("Haaveet ja unelmat","Milloin itkit viimeksi?",1), Card("Seksi","Miten vanhemmat otti kukkaset ja mehiläiset puheeksi?",1), Card("Salaisuudet ja paljastukset", "Kuka on paras ystäväsi?", 1), Card("Pelot ja epävarmuudet", "Mikä on huonoin kouluarvosanasi?", 3))
         val dareCards = mutableListOf(Card("Ruoka ja juoma","Ota huikka!",1), Card("Onks pakko?","Ole lankku-asennossa yksi minuutti!",2,60))
-        return Pair(truthCards, dareCards)
+        val filteredTruthCards = mutableListOf<Card>()
+        val filteredDareCards = mutableListOf<Card>()
+        for (card in truthCards) {
+            if (card.category in enabledCategories) {
+                filteredTruthCards.add(card)
+            }
+        }
+        for (card in dareCards) {
+            if (card.category in enabledCategories) {
+                filteredDareCards.add(card)
+            }
+        }
+        return Pair(filteredTruthCards, filteredDareCards)
     }
 
     override suspend fun insertGameState(gameState: GameState) {
@@ -88,5 +103,27 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
 
     override suspend fun deleteAllPlayersFromScoreboard() {
         scoreboard.clear()
+    }
+
+    override suspend fun insertCardCategory(cardCategory: CardCategory) {
+        cardCategories.add(cardCategory)
+    }
+
+    override suspend fun setCardCategoryEnabled(name: String, enabled: Boolean) {
+        for (category in cardCategories) {
+            if (category.name == name) {
+                category.enabled = enabled
+            }
+        }
+    }
+
+    override suspend fun getEnabledCardCategories(): List<String> {
+        val enabledCategories = mutableListOf<String>()
+        for (category in cardCategories) {
+            if (category.enabled) {
+                enabledCategories.add(category.name)
+            }
+        }
+        return enabledCategories
     }
 }
