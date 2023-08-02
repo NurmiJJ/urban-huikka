@@ -53,5 +53,3 @@ class PlayerScoreComparator : DiffUtil.ItemCallback<PlayerAndScore>() {
         return oldItem == newItem
     }
 }
-
-

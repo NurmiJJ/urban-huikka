@@ -12,10 +12,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import fi.sabriina.urbanhuikka.R
 
-class PlayerListAdapter(private var nextButton: Button) : ListAdapter<Player, PlayerViewHolder>(PlayersComparator()) {
+class PlayerListAdapter(private val  listType : String,  private val button: Button) : ListAdapter<Player, PlayerViewHolder>(PlayersComparator()) {
     private var selectedPlayers = mutableListOf<Player>()
+    private var selecting = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
+
         return PlayerViewHolder.create(parent)
     }
 
@@ -23,20 +25,56 @@ class PlayerListAdapter(private var nextButton: Button) : ListAdapter<Player, Pl
         val current = getItem(position)
         holder.bind(current.name, current.pictureResId)
 
-        holder.itemView.setOnClickListener{
-            holder.playerClicked()
-            if (!selectedPlayers.remove(current)){
-                nextButton.isEnabled = true
-                selectedPlayers.add(current)
+        // Show selection
+        holder.playerSelected(selectedPlayers.contains(current))
+
+        if (listType == "SELECT") {
+            holder.itemView.setOnClickListener{
+                holder.playerClicked()
+                clicked(current, 1)
             }
-            if (selectedPlayers.size <= 1) {
-                nextButton.isEnabled = false
+        }
+
+        if (listType == "MANAGE") {
+            holder.itemView.setOnLongClickListener {
+                holder.playerClicked()
+                clicked(current, 0)
+                true
+            }
+
+            holder.itemView.setOnClickListener{
+                if (selecting) {
+                    holder.playerClicked()
+                    clicked(current, 0)
+                }
+                else {
+                    // ("Show player profile")
+                }
+
             }
         }
 
     }
     fun getSelected():MutableList<Player> {
         return selectedPlayers
+    }
+
+    fun emptySelected() {
+        selectedPlayers.clear()
+        selecting = false
+        button.isEnabled = false
+    }
+
+    private fun clicked(player: Player, disableSize: Int) {
+        if (!selectedPlayers.remove(player)){
+            button.isEnabled = true
+            selecting = true
+            selectedPlayers.add(player)
+        }
+        if (selectedPlayers.size <= disableSize) {
+            button.isEnabled = false
+            selecting = false
+        }
     }
 }
 
@@ -52,7 +90,21 @@ class PlayerListAdapter(private var nextButton: Button) : ListAdapter<Player, Pl
         }
 
         fun playerClicked() {
-            playerSelectImage.visibility = if (playerSelectImage.visibility == View.VISIBLE) View.INVISIBLE else View.VISIBLE
+             playerSelected(playerSelectImage.visibility == View.INVISIBLE)
+        }
+
+        fun playerSelected(boolean: Boolean) {
+            if (boolean) {
+                playerSelectImage.visibility = View.VISIBLE
+                val theme = ContextCompat.getDrawable(itemView.context, R.drawable.player_list_theme_selected)
+                playerItemView.background = theme
+            }
+            else {
+                playerSelectImage.visibility = View.INVISIBLE
+                val theme = ContextCompat.getDrawable(itemView.context, R.drawable.player_list_theme)
+                playerItemView.background = theme
+            }
+
         }
 
         companion object {
