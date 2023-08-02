@@ -1,26 +1,30 @@
 package fi.sabriina.urbanhuikka
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
 import android.view.View
-import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.LinearLayout
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import fi.sabriina.urbanhuikka.card.Card
-import fi.sabriina.urbanhuikka.roomdb.*
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
+import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.splashScreens.SplashScreenManager
 import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModel
 import fi.sabriina.urbanhuikka.viewmodel.GameStateViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -28,20 +32,22 @@ const val TAG = "Huikkasofta"
 const val TRUTH_DECK = "truth"
 const val DARE_DECK = "dare"
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
     private lateinit var playerName : TextView
     private lateinit var playerPicture : ImageView
     private lateinit var cardView : CustomCard
 
-    private lateinit var selectionTaskButtons : LinearLayout
-    private lateinit var selectionButtons : LinearLayout
+    private lateinit var selectionButtons : FrameLayout
 
-    private lateinit var truthButton : Button
-    private lateinit var dareButton : Button
+    private lateinit var swipeButton: SeekBar
+    private lateinit var guideCheckmark: ImageView
+    private lateinit var guideCross: ImageView
+    private lateinit var guideBar: ImageView
+    private lateinit var guideCompleteText: TextView
+    private lateinit var guideSkipText: TextView
 
-    private lateinit var skipButton : Button
-    private lateinit var completeButton : Button
+    private lateinit var titleText: TextView
 
     private lateinit var leaderboardButton : ImageButton
 
@@ -66,26 +72,75 @@ class MainActivity : AppCompatActivity() {
         playerPicture = findViewById(R.id.playerPicture)
 
         //Buttons
-        truthButton = findViewById(R.id.truthButton)
-        dareButton = findViewById(R.id.dareButton)
-        skipButton = findViewById(R.id.skipButton)
-        completeButton = findViewById(R.id.completeButton)
         leaderboardButton = findViewById(R.id.leaderboardButton)
 
         cardView = findViewById(R.id.cardView)
-        selectionButtons = findViewById(R.id.selectionButtons)
-        selectionTaskButtons = findViewById(R.id.selectionTaskButtons)
+        cardView.setOnCardSwipeListener(this)
+        selectionButtons = findViewById(R.id.swipeSelectorLayout)
 
-        truthButton.setOnClickListener {
-            drawCard(TRUTH_DECK)
-        }
+        swipeButton = findViewById(R.id.swipeSelector)
+        guideBar = findViewById(R.id.guideBar)
+        guideCheckmark = findViewById(R.id.guideCheckmark)
+        guideCross = findViewById(R.id.guideCross)
+        guideSkipText = findViewById(R.id.guideSkipText)
+        guideCompleteText = findViewById(R.id.guideCompleteText)
 
-        dareButton.setOnClickListener {
-            drawCard(DARE_DECK)
-        }
+        titleText = findViewById(R.id.titleText)
 
-        skipButton.setOnClickListener { cardSkipped() }
-        completeButton.setOnClickListener { cardCompleted() }
+        swipeButton.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            var feedbackGiven = false
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                guideBar.visibility = View.INVISIBLE
+                guideCross.visibility = View.INVISIBLE
+                guideCheckmark.visibility = View.INVISIBLE
+                if ((progress < 15 || progress > 85) && !feedbackGiven) {
+                    // make haptic feedback stronger
+                    for (i in 1..2) {
+                        seekBar.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                    }
+                    feedbackGiven = true
+                } else if (progress in 15..85) {
+                    feedbackGiven = false
+                }
+                if (progress < 50) {
+                    seekBar.progressDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.swipe_bar_red)
+                    guideSkipText.visibility = View.VISIBLE
+                    guideCompleteText.visibility = View.INVISIBLE
+                } else if (progress > 50) {
+                    seekBar.progressDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.swipe_bar_green)
+                    guideCompleteText.visibility = View.VISIBLE
+                    guideSkipText.visibility = View.INVISIBLE
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                var action = false
+                if (seekBar.progress < 15) {
+                    cardSkipped()
+                    action = true
+
+                } else if (seekBar.progress > 85) {
+                    cardCompleted()
+                    action = true
+                }
+                CoroutineScope(Dispatchers.Main).launch {
+                    // prevent view from updating before splash screen is showing
+                    if (action) {
+                        delay(200)
+                    }
+                    seekBar.progressDrawable = null
+                    seekBar.background = null
+                    seekBar.progress = 50
+                    guideBar.visibility = View.VISIBLE
+                    guideCheckmark.visibility = View.VISIBLE
+                    guideCross.visibility = View.VISIBLE
+                    guideSkipText.visibility = View.INVISIBLE
+                    guideCompleteText.visibility = View.INVISIBLE
+                }
+            }
+        })
 
         leaderboardButton.setOnClickListener {
             val intent = Intent(this@MainActivity, LeaderboardActivity::class.java)
@@ -133,23 +188,25 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onSwipeRight() {
+        drawCard(TRUTH_DECK)
+    }
+
+    override fun onSwipeLeft() {
+        drawCard(DARE_DECK)
+    }
+
     private fun drawCard(deck: String) {
         currentCard = gameStateViewModel.getNextCard(deck)
         if (currentCard != null) {
             cardView.setCard(currentCard!!)
-            hideTaskButtons()
+            CoroutineScope(Dispatchers.Main).launch {
+                ObjectAnimator.ofFloat(titleText, View.ALPHA, 0f).start()
+                delay(250)
+                ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
+                selectionButtons.visibility = View.VISIBLE
+            }
         }
-    }
-
-    private fun hideTaskButtons(){
-        selectionTaskButtons.visibility = View.INVISIBLE
-        selectionButtons.visibility = View.VISIBLE
-    }
-
-    private fun showTaskButtons(){
-        cardView.setBackside()
-        selectionTaskButtons.visibility = View.VISIBLE
-        selectionButtons.visibility = View.INVISIBLE
     }
 
     private fun cardSkipped() {
@@ -167,6 +224,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun endTurn()  {
         gameStateViewModel.endTurn()
-        showTaskButtons()
+        CoroutineScope(Dispatchers.Main).launch {
+            // prevent view from updating before splash screen is showing
+            delay(200)
+            cardView.setCardSide(true)
+            selectionButtons.visibility = View.INVISIBLE
+            ObjectAnimator.ofFloat(titleText, View.ALPHA, 1f).start()
+            ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 0f).start()
+        }
     }
 }
