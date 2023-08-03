@@ -110,12 +110,10 @@ class GameStateViewModelTest {
     @Test
     fun `add points`() = runTest {
         viewModel.initializeDatabase()
-        viewModel.startGame()
-
         for (i in 1 .. repository.getPlayers().size) {
             viewModel.insertPlayerToScoreboard(ScoreboardEntry(0,i))
         }
-
+        viewModel.startGame()
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.addPoints(amount = 2)
@@ -137,6 +135,30 @@ class GameStateViewModelTest {
 
         testDispatcher.scheduler.advanceUntilIdle()
         assertThat(viewModel.checkSavedGameExists()).isEqualTo(true)
+    }
+
+    @Test
+    fun `game ends with correct player winning`() = runTest {
+        viewModel.initializeDatabase()
+        viewModel.setPointsToWin(10)
+        for (i in 1 .. repository.getPlayers().size) {
+            viewModel.insertPlayerToScoreboard(ScoreboardEntry(0,i))
+        }
+        viewModel.startGame()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.addPoints(amount = 5)
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertThat(viewModel.checkWinner()).isNull()
+
+        viewModel.endTurn()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val playerToWin = viewModel.currentPlayer.value
+        viewModel.addPoints(amount = 10)
+        assertThat(viewModel.checkWinner()).isEqualTo(playerToWin)
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertThat(viewModel.getCurrentGame().status).isEqualTo("ENDED")
     }
 
 }

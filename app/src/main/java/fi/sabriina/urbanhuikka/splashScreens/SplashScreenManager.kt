@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.CountDownTimer
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -193,6 +194,7 @@ class SplashScreenManager(private val context: Context) {
 
             okButton = dialog.findViewById(R.id.okButton)
             cancelButton = dialog.findViewById(R.id.cancelButton)
+            cancelButton.visibility = View.INVISIBLE
             content = dialog.findViewById(R.id.notifContent)
             icon = dialog.findViewById(R.id.notifIcon)
 
@@ -204,10 +206,13 @@ class SplashScreenManager(private val context: Context) {
                 dialog.dismiss()
             }
 
-            cancelButton.text = cancelText
-            cancelButton.setOnClickListener {
-                confirmed = false
-                dialog.dismiss()
+            if (cancelText != "") {
+                cancelButton.visibility = View.VISIBLE
+                cancelButton.text = cancelText
+                cancelButton.setOnClickListener {
+                    confirmed = false
+                    dialog.dismiss()
+                }
             }
 
             content.text = dialogMessage

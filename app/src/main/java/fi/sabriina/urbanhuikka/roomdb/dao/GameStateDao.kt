@@ -46,4 +46,10 @@ interface GameStateDao {
 
     @Query("SELECT player_table.* FROM player_table INNER JOIN scoreboard ON player_table.id = scoreboard.playerId")
     suspend fun getPlayers(): List<Player>
+
+    @Query("SELECT pointsToWin FROM game_state")
+    suspend fun getPointsToWin(): Int
+
+    @Query("UPDATE game_state SET pointsToWin = :points")
+    suspend fun setPointsToWin(points: Int)
 }

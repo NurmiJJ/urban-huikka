@@ -217,9 +217,16 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     private fun cardCompleted() {
         CoroutineScope(Dispatchers.Main).launch {
             gameStateViewModel.addPoints(amount=currentCard!!.points)
-            splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
-            endTurn()
+            val winner = gameStateViewModel.checkWinner()
+            if (winner != null) {
+                currentPlayerPicture = ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
+                splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableDrink, "Poistu päävalikkoon", "") {
+                    finish()
+                }
+            }
         }
+        splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
+        endTurn()
     }
 
     private fun endTurn()  {

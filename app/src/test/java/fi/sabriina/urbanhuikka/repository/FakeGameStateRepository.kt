@@ -11,6 +11,7 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
     private var repoGameState : GameState? = null
     private var scoreboard = mutableListOf<ScoreboardEntry>()
     private var playerList = mutableListOf(Player(1,"Eetu",123), Player(2,"Matias", 1234), Player(3,"Krista", 123), Player(4, "Mikko", 123))
+    private var pointsToWin = 30
 
     override fun updateDatabase(): Pair<MutableList<Card>, MutableList<Card>> {
         val truthCards = mutableListOf(Card("Haaveet ja unelmat","Milloin itkit viimeksi?",1), Card("Seksi","Miten vanhemmat otti kukkaset ja mehiläiset puheeksi?",1), Card("Kaverit", "Kuka on paras ystäväsi?", 1), Card("Opinnot", "Mikä on huonoin kouluarvosanasi?", 3))
@@ -88,5 +89,13 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
 
     override suspend fun deleteAllPlayersFromScoreboard() {
         scoreboard.clear()
+    }
+
+    override suspend fun setPointsToWin(points: Int) {
+        pointsToWin = points
+    }
+
+    override suspend fun getPointsToWin(): Int {
+        return pointsToWin
     }
 }

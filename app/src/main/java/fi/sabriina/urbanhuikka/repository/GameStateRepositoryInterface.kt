@@ -35,4 +35,8 @@ interface GameStateRepositoryInterface {
     suspend fun deleteAllGames()
 
     suspend fun deleteAllPlayersFromScoreboard()
+
+    suspend fun setPointsToWin(points: Int)
+
+    suspend fun getPointsToWin(): Int
 }
