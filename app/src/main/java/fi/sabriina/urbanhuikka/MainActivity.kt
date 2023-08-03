@@ -224,9 +224,9 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
                     finish()
                 }
             }
+            splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
+            endTurn()
         }
-        splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
-        endTurn()
     }
 
     private fun endTurn()  {
