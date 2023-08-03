@@ -91,7 +91,6 @@ class SelectPlayersActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.Main).launch {
             gameStateViewModel.startNewGame()
             gameStateViewModel.updateGameStatus("PLAYER_SELECT")
-            gameStateViewModel.setEnabledCardCategories(listOf("Seksi"))
             for (player in adapter.getSelected()) {
                 gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
             }
