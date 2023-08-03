@@ -21,4 +21,8 @@
 
     <color name="skip">#FF0000</color>
     <color name="complete">#00FF00</color>
+    <color name="cancel_color_start">#3CFF0000</color>
+    <color name="cancel_color_end">#FF0000</color>
+    <color name="confirm_color_start">#3700FF00</color>
+    <color name="confirm_color_end">#00FF00</color>
 </resources>

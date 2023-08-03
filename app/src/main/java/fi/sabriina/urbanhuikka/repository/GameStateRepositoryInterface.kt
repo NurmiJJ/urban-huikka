@@ -42,4 +42,8 @@ interface GameStateRepositoryInterface {
     suspend fun setCardCategoryEnabled(name: String, enabled: Boolean)
 
     suspend fun getEnabledCardCategories(): List<String>
+
+    suspend fun setPointsToWin(points: Int)
+
+    suspend fun getPointsToWin(): Int
 }

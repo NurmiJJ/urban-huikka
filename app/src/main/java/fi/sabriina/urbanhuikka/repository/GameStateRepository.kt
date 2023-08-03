@@ -122,4 +122,12 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
     override suspend fun getEnabledCardCategories(): List<String> {
         return gameStateDao.getEnabledCardCategories()
     }
+
+    override suspend fun setPointsToWin(points: Int) {
+        gameStateDao.setPointsToWin(points)
+    }
+
+    override suspend fun getPointsToWin(): Int {
+        return gameStateDao.getPointsToWin()
+    }
 }

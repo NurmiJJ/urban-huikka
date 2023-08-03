@@ -56,4 +56,10 @@ interface GameStateDao {
 
     @Query("SELECT name FROM card_category WHERE enabled")
     suspend fun getEnabledCardCategories(): List<String>
+
+    @Query("SELECT pointsToWin FROM game_state")
+    suspend fun getPointsToWin(): Int
+
+    @Query("UPDATE game_state SET pointsToWin = :points")
+    suspend fun setPointsToWin(points: Int)
 }

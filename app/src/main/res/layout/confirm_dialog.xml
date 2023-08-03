@@ -10,13 +10,13 @@
         android:id="@+id/okButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="48dp"
+        android:layout_marginTop="248dp"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
         android:text="@string/yes"
-        app:icon="@android:drawable/ic_menu_close_clear_cancel"
+        app:icon="@drawable/ic_check_white"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/notifContent" />
 
     <TextView
@@ -49,16 +49,14 @@
         android:id="@+id/cancelButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
         android:text="@string/no"
+        android:visibility="visible"
         app:icon="@android:drawable/ic_menu_revert"
-        app:layout_constraintEnd_toStartOf="@+id/okButton"
-        app:layout_constraintHorizontal_bias="0.529"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/notifContent" />
+        app:layout_constraintTop_toBottomOf="@+id/okButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

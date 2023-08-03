@@ -13,6 +13,7 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
     private var scoreboard = mutableListOf<ScoreboardEntry>()
     private var playerList = mutableListOf(Player(1,"Eetu",123), Player(2,"Matias", 1234), Player(3,"Krista", 123), Player(4, "Mikko", 123))
     private var cardCategories = mutableListOf<CardCategory>()
+    private var pointsToWin = 30
 
 
     override fun updateDatabase(enabledCategories: List<String>): Pair<MutableList<Card>, MutableList<Card>> {
@@ -125,5 +126,13 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
             }
         }
         return enabledCategories
+    }
+
+    override suspend fun setPointsToWin(points: Int) {
+        pointsToWin = points
+    }
+
+    override suspend fun getPointsToWin(): Int {
+        return pointsToWin
     }
 }

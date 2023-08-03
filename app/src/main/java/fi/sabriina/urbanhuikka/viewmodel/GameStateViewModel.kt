@@ -30,6 +30,9 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     private var _currentPlayer = MutableLiveData<Player>()
     var currentPlayer: LiveData<Player> = _currentPlayer
 
+    // this hardcoded value is never used, but lateinit is not allowed
+    private var pointsToWin: Int = 30
+
     suspend fun initializeDatabase() {
         startNewGame()
         for (category in DbConstants.DARE_CATEGORIES) {
@@ -60,6 +63,7 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     fun startGame() = viewModelScope.launch {
         updateDatabase()
         playerList = getPlayers()
+        pointsToWin = repository.getPointsToWin()
         updateGameStatus("ONGOING")
         shuffleCards("truth")
         shuffleCards("dare")
@@ -126,6 +130,16 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         repository.updatePlayerScore(playerId, score)
     }
 
+    suspend fun checkWinner(): Player? {
+        for (entry in getAllScores()) {
+            if (entry.score >= pointsToWin) {
+                updateGameStatus("ENDED")
+                return entry.player
+            }
+        }
+        return null
+    }
+
     suspend fun getAllScores() : List<PlayerAndScore> {
         return repository.getAllScores()
     }
@@ -184,6 +198,11 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
             }
         }
     }
+
+    suspend fun setPointsToWin(points: Int) {
+        repository.setPointsToWin(points)
+    }
+
 }
 
 class GameStateViewModelFactory(private val repository: GameStateRepository): ViewModelProvider.Factory {
