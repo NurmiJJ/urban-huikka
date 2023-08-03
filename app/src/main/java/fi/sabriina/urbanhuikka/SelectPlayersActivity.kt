@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -37,6 +39,8 @@ class SelectPlayersActivity : AppCompatActivity() {
     }
 
     private lateinit var splashScreenManager : SplashScreenManager
+    private lateinit var pointsToWinSelector: SeekBar
+    private lateinit var pointsToWinValue: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +53,17 @@ class SelectPlayersActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         fab = findViewById(R.id.floatingActionButton)
+
+        pointsToWinSelector = findViewById(R.id.pointsToWinSelector)
+        pointsToWinValue = findViewById(R.id.pointsToWinValue)
+        pointsToWinValue.text = pointsToWinSelector.progress.toString()
+        pointsToWinSelector.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                pointsToWinValue.text = progress.toString()
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        })
 
         nextButton.setOnClickListener {
             val icon = ContextCompat.getDrawable(this, com.google.android.material.R.drawable.mtrl_ic_error)!!
@@ -89,6 +104,9 @@ class SelectPlayersActivity : AppCompatActivity() {
         setResult(Activity.RESULT_OK, replyIntent)
 
         gameStateViewModel.initializeDatabase()
+        CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.setPointsToWin(pointsToWinSelector.progress)
+        }
         gameStateViewModel.updateGameStatus("PLAYER_SELECT")
         for (player in adapter.getSelected()) {
             gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))

@@ -32,4 +32,6 @@
     <string name="no_players">Sinulla ei ole yhtään pelaajaa lisättynä!</string>
     <string name="all_players">Tässä kaikki pelaajat!</string>
     <string name="select_players">Valitse alta kaikki peliin osallistuvat pelaajat!</string>
+
+    <string name="points_to_win">Pisteitä voittoon</string>
 </resources>
