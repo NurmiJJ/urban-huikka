@@ -18,12 +18,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view">
+        app:layout_constraintTop_toBottomOf="@+id/dividerMiddle">
 
     </fi.sabriina.urbanhuikka.CustomCard>
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/dividerMiddle"
         style="@style/Divider"
         android:layout_marginTop="64dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -117,7 +117,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/view"
+        app:layout_constraintBottom_toTopOf="@+id/dividerMiddle"
         app:layout_constraintEnd_toStartOf="@+id/leaderboardButton"
         app:layout_constraintStart_toEndOf="@+id/playerPicture"
         app:layout_constraintTop_toTopOf="parent" />
@@ -129,7 +129,7 @@
         android:layout_height="32dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/ic_more_vert"
-        app:layout_constraintBottom_toTopOf="@+id/view"
+        app:layout_constraintBottom_toTopOf="@+id/dividerMiddle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
