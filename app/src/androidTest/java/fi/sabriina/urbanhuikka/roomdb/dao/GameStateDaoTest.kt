@@ -84,4 +84,12 @@ class GameStateDaoTest {
         dao.deleteAllPlayersFromScoreboard()
         assertThat(dao.getAllScores()).isEmpty()
     }
+
+    @Test
+    fun getPointsToWin() = runTest {
+        dao.insertGameState(GameState(0,"INITIALIZED",0))
+        assertThat(dao.getPointsToWin()).isNotNull()
+        dao.setPointsToWin(20)
+        assertThat(dao.getPointsToWin()).isEqualTo(20)
+    }
 }

@@ -105,4 +105,12 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
     override suspend fun deleteAllPlayersFromScoreboard() {
         gameStateDao.deleteAllPlayersFromScoreboard()
     }
+
+    override suspend fun setPointsToWin(points: Int) {
+        gameStateDao.setPointsToWin(points)
+    }
+
+    override suspend fun getPointsToWin(): Int {
+        return gameStateDao.getPointsToWin()
+    }
 }
