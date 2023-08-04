@@ -20,6 +20,13 @@ data class GameState (
     @ColumnInfo(name = "pointsToWin") var pointsToWin: Int = 30
 )
 
+@Entity(tableName = "card_category")
+data class CardCategory (
+    @PrimaryKey (autoGenerate = true) @ColumnInfo(name = "id") val id: Int,
+    @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "enabled") var enabled: Boolean
+)
+
 @Entity(tableName = "scoreboard")
 data class ScoreboardEntry (
     @PrimaryKey (autoGenerate = true) @ColumnInfo(name = "id") val id: Int,

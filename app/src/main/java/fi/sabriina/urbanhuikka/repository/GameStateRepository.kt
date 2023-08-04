@@ -5,20 +5,21 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import fi.sabriina.urbanhuikka.TAG
 import fi.sabriina.urbanhuikka.card.Card
+import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 import fi.sabriina.urbanhuikka.roomdb.dao.GameStateDao
-import fi.sabriina.urbanhuikka.viewmodel.DareCollection
-import fi.sabriina.urbanhuikka.viewmodel.TruthCollection
 
+const val DareCollection = "DareCards"
+const val TruthCollection = "TruthCards"
 
 class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRepositoryInterface {
 
     private val database = Firebase.firestore
 
-    override fun updateDatabase() : Pair<MutableList<Card>, MutableList<Card>> {
+    override fun updateDatabase(enabledCategories: List<String>) : Pair<MutableList<Card>, MutableList<Card>> {
         val truthCardList = mutableListOf<Card>()
         val dareCardList = mutableListOf<Card>()
         database.collection(TruthCollection)
@@ -31,8 +32,10 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
                 truthCardList.clear()
                 for (doc in value!!) {
                     val card: Card = doc.toObject(Card::class.java)
-                    truthCardList.add(card)
-                    counter += 1
+                    if (card.category in enabledCategories) {
+                        truthCardList.add(card)
+                        counter += 1
+                    }
                 }
                 Log.d("Huikkasofta", "Added $counter truth cards")
             }
@@ -47,8 +50,10 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
                 dareCardList.clear()
                 for (doc in value!!) {
                     val card : Card = doc.toObject(Card::class.java)
-                    dareCardList.add(card)
-                    counter += 1
+                    if (card.category in enabledCategories) {
+                        dareCardList.add(card)
+                        counter += 1
+                    }
                 }
                 Log.d("Huikkasofta", "Added $counter dare cards")
             }
@@ -104,6 +109,18 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
 
     override suspend fun deleteAllPlayersFromScoreboard() {
         gameStateDao.deleteAllPlayersFromScoreboard()
+    }
+
+    override suspend fun insertCardCategory(cardCategory: CardCategory) {
+        gameStateDao.insertCardCategory(cardCategory)
+    }
+
+    override suspend fun setCardCategoryEnabled(name: String, enabled: Boolean) {
+        gameStateDao.setCardCategoryEnabled(name, enabled)
+    }
+
+    override suspend fun getEnabledCardCategories(): List<String> {
+        return gameStateDao.getEnabledCardCategories()
     }
 
     override suspend fun setPointsToWin(points: Int) {

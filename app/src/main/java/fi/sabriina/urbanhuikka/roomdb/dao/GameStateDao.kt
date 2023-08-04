@@ -1,6 +1,7 @@
 package fi.sabriina.urbanhuikka.roomdb.dao
 
 import androidx.room.*
+import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.Player
@@ -46,6 +47,15 @@ interface GameStateDao {
 
     @Query("SELECT player_table.* FROM player_table INNER JOIN scoreboard ON player_table.id = scoreboard.playerId")
     suspend fun getPlayers(): List<Player>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertCardCategory(cardCategory: CardCategory)
+
+    @Query("UPDATE card_category SET enabled = :enabled WHERE name = :name")
+    suspend fun setCardCategoryEnabled(name: String, enabled: Boolean)
+
+    @Query("SELECT name FROM card_category WHERE enabled")
+    suspend fun getEnabledCardCategories(): List<String>
 
     @Query("SELECT pointsToWin FROM game_state")
     suspend fun getPointsToWin(): Int

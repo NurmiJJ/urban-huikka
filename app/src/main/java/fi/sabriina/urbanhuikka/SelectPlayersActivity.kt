@@ -3,7 +3,14 @@ package fi.sabriina.urbanhuikka
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.BaseAdapter
 import android.widget.Button
+import android.widget.CheckBox
+import android.widget.GridView
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -11,7 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import fi.sabriina.urbanhuikka.helpers.DbConstants
 import fi.sabriina.urbanhuikka.roomdb.*
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
 import fi.sabriina.urbanhuikka.splashScreens.SplashScreenManager
@@ -25,7 +32,7 @@ import kotlinx.coroutines.launch
 
 
 class SelectPlayersActivity : AppCompatActivity() {
-    private lateinit var fab: FloatingActionButton
+    private lateinit var managePlayersButton: Button
     private lateinit var nextButton: Button
 
     private val gameStateViewModel: GameStateViewModel by viewModels {
@@ -38,9 +45,14 @@ class SelectPlayersActivity : AppCompatActivity() {
         PlayerViewModelFactory((application as HuikkaApplication).playerRepository)
     }
 
-    private lateinit var splashScreenManager : SplashScreenManager
+    private lateinit var splashScreenManager: SplashScreenManager
     private lateinit var pointsToWinSelector: SeekBar
     private lateinit var pointsToWinValue: TextView
+    private lateinit var categorySelection: GridView
+
+    private val allCategories = DbConstants.DARE_CATEGORIES + DbConstants.TRUTH_CATEGORIES
+    private var enabledCategories = mutableListOf<String>()
+    private var gridItems = mutableListOf<GridItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +64,14 @@ class SelectPlayersActivity : AppCompatActivity() {
         adapter = PlayerListAdapter("SELECT", nextButton)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
-        fab = findViewById(R.id.floatingActionButton)
+        managePlayersButton = findViewById(R.id.managePlayersButton)
+
+        for (category in allCategories) {
+            gridItems.add(GridItem(category, true))
+        }
+
+        categorySelection = findViewById(R.id.categorySelection)
+        categorySelection.adapter = CategorySelectionAdapter()
 
         pointsToWinSelector = findViewById(R.id.pointsToWinSelector)
         pointsToWinValue = findViewById(R.id.pointsToWinValue)
@@ -61,24 +80,31 @@ class SelectPlayersActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 pointsToWinValue.text = progress.toString()
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
 
         nextButton.setOnClickListener {
-            val icon = ContextCompat.getDrawable(this, com.google.android.material.R.drawable.mtrl_ic_error)!!
+            val icon = ContextCompat.getDrawable(
+                this,
+                com.google.android.material.R.drawable.mtrl_ic_error
+            )!!
             CoroutineScope(Dispatchers.Main).launch {
                 if (gameStateViewModel.checkSavedGameExists()) {
-                    splashScreenManager.showConfirmDialog("Uuden pelin aloittaminen korvaa edellisen keskeneräisen pelin", icon, getString(R.string.continue_), getString(R.string.cancel)) { confirmed ->
+                    splashScreenManager.showConfirmDialog(
+                        "Uuden pelin aloittaminen korvaa edellisen keskeneräisen pelin",
+                        icon,
+                        getString(R.string.continue_),
+                        getString(R.string.cancel)
+                    ) { confirmed ->
                         if (confirmed) {
                             startGame()
-                        }
-                        else {
+                        } else {
                             finish()
                         }
                     }
-                }
-                else {
+                } else {
                     startGame()
                 }
                 gameStateViewModel.updateGameStatus("PLAYER_SELECT")
@@ -93,9 +119,32 @@ class SelectPlayersActivity : AppCompatActivity() {
             players?.let { adapter.submitList(it) }
         }
 
-        fab.setOnClickListener {
-            val intent = Intent(this@SelectPlayersActivity, AddPlayerActivity::class.java)
+
+
+        managePlayersButton.setOnClickListener {
+            val intent = Intent(this, ManagePlayersActivity::class.java)
             startActivity(intent)
+        }
+    }
+
+    private fun checkStartGameButtonStatus() {
+        var truthCount = 0
+        var dareCount = 0
+        for (category in gridItems) {
+            Log.d(TAG, "$truthCount $dareCount")
+            if (category.name in DbConstants.TRUTH_CATEGORIES) {
+                if (category.isChecked) {
+                    truthCount += 1
+                }
+            } else {
+                if (category.isChecked) {
+                    dareCount += 1
+                }
+            }
+            nextButton.isEnabled = truthCount > 0 && dareCount > 0 && adapter.getSelected().size > 1
+            if (nextButton.isEnabled) {
+                break
+            }
         }
     }
 
@@ -103,14 +152,52 @@ class SelectPlayersActivity : AppCompatActivity() {
         val replyIntent = Intent()
         setResult(Activity.RESULT_OK, replyIntent)
 
-        gameStateViewModel.initializeDatabase()
+        for (category in gridItems) {
+            if (category.isChecked) {
+                enabledCategories.add(category.name)
+            }
+        }
+
         CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.startNewGame()
             gameStateViewModel.setPointsToWin(pointsToWinSelector.progress)
+            gameStateViewModel.setEnabledCardCategories(enabledCategories)
+            gameStateViewModel.updateGameStatus("PLAYER_SELECT")
+            for (player in adapter.getSelected()) {
+                gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
+            }
+            finish()
         }
-        gameStateViewModel.updateGameStatus("PLAYER_SELECT")
-        for (player in adapter.getSelected()) {
-            gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
-        }
-        finish()
     }
+
+    private inner class CategorySelectionAdapter : BaseAdapter() {
+        override fun getCount(): Int {
+            return gridItems.size
+        }
+
+        override fun getItem(position: Int): Any {
+            return gridItems[position]
+        }
+
+        override fun getItemId(position: Int): Long {
+            return position.toLong()
+        }
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val view = convertView ?: LayoutInflater.from(applicationContext).inflate(R.layout.category_selector, parent, false)
+            val categorySelector: CheckBox = view.findViewById(R.id.checkBox)
+            val item = gridItems[position]
+
+            categorySelector.setOnCheckedChangeListener { _, isChecked ->
+                item.isChecked = isChecked
+                checkStartGameButtonStatus()
+            }
+
+            categorySelector.text = item.name
+            categorySelector.isChecked = item.isChecked
+            return view
+        }
+    }
+
+    data class GridItem(val name: String, var isChecked: Boolean)
 }

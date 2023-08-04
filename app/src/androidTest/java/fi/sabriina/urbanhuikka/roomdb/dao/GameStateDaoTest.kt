@@ -6,6 +6,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import fi.sabriina.urbanhuikka.helpers.DbConstants
+import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.HuikkaDb
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
@@ -83,6 +85,43 @@ class GameStateDaoTest {
     fun deleteAllPlayersFromScoreboard() = runTest {
         dao.deleteAllPlayersFromScoreboard()
         assertThat(dao.getAllScores()).isEmpty()
+    }
+
+    @Test
+    fun updateCurrentPlayerIndex() = runTest {
+        dao.insertGameState(GameState(0,"INITIALIZED",0))
+        dao.updateCurrentPlayerIndex(1)
+        assertThat(dao.getCurrentPlayerIndex()).isEqualTo(1)
+        dao.updateCurrentPlayerIndex(2)
+        assertThat(dao.getCurrentPlayerIndex()).isEqualTo(2)
+    }
+
+    @Test
+    fun updatePlayerScore() = runTest {
+        dao.insertPlayerToScoreboard(ScoreboardEntry(0,3,0))
+        dao.insertPlayerToScoreboard(ScoreboardEntry(0,2,14))
+        assertThat(dao.getPlayerScore(3)).isEqualTo(0)
+        dao.updatePlayerScore(3,5)
+        assertThat(dao.getPlayerScore(3)).isEqualTo(5)
+        assertThat(dao.getPlayerScore(2)).isEqualTo(14)
+    }
+
+    @Test
+    fun insertCardCategory() = runTest {
+        dao.insertCardCategory(CardCategory(0, DbConstants.DARE_CATEGORIES[0], true))
+        dao.insertCardCategory(CardCategory(0, DbConstants.TRUTH_CATEGORIES[1], true))
+        val expectedList = listOf(DbConstants.DARE_CATEGORIES[0], DbConstants.TRUTH_CATEGORIES[1])
+        assertThat(dao.getEnabledCardCategories()).containsExactlyElementsIn(expectedList)
+    }
+
+    @Test
+    fun disableCardCategories() = runTest {
+        dao.insertCardCategory(CardCategory(0, DbConstants.DARE_CATEGORIES[0], true))
+        dao.insertCardCategory(CardCategory(0, DbConstants.TRUTH_CATEGORIES[1], true))
+        dao.setCardCategoryEnabled(DbConstants.TRUTH_CATEGORIES[1], false)
+        val expectedList = listOf(DbConstants.DARE_CATEGORIES[0])
+        assertThat(dao.getEnabledCardCategories()).containsExactlyElementsIn(expectedList)
+
     }
 
     @Test
