@@ -119,8 +119,6 @@ class SelectPlayersActivity : AppCompatActivity() {
             players?.let { adapter.submitList(it) }
         }
 
-
-
         managePlayersButton.setOnClickListener {
             val intent = Intent(this, ManagePlayersActivity::class.java)
             startActivity(intent)

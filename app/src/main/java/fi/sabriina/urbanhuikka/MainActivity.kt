@@ -51,7 +51,11 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
     private lateinit var leaderboardButton : ImageButton
 
-    private lateinit var drawableDrink : Drawable
+    private lateinit var drawableBeer : Drawable
+    private lateinit var drawableHand : Drawable
+    private lateinit var drawableCoins : Drawable
+    private lateinit var drawableCrown : Drawable
+    private lateinit var drawableWine: Drawable
     private lateinit var splashScreenManager : SplashScreenManager
     private lateinit var currentPlayer: Player
     private lateinit var currentPlayerPicture : Drawable
@@ -64,7 +68,11 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        drawableDrink = ContextCompat.getDrawable(this, R.drawable.drink)!!
+        drawableBeer = ContextCompat.getDrawable(this, R.drawable.beer_mug_empty_solid)!!
+        drawableHand = ContextCompat.getDrawable(this, R.drawable.hand_point_right_solid)!!
+        drawableCoins = ContextCompat.getDrawable(this, R.drawable.coins_solid)!!
+        drawableCrown = ContextCompat.getDrawable(this, R.drawable.crown_solid)!!
+        drawableWine = ContextCompat.getDrawable(this, R.drawable.wine_bottle_solid)!!
         splashScreenManager = SplashScreenManager(this)
 
         setContentView(R.layout.activity_main)
@@ -161,7 +169,7 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             currentPlayerPicture = ContextCompat.getDrawable(this, currentPlayer.pictureResId)!!
             playerPicture.setImageDrawable(currentPlayerPicture)
 
-            splashScreenManager.showSplashScreen(currentPlayer.name,currentPlayerPicture,"Seuraavana vuorossa ${currentPlayer.name}", drawableDrink)
+            splashScreenManager.showSplashScreen(currentPlayer.name,currentPlayerPicture,"Seuraavana vuorossa ${currentPlayer.name}", drawableHand)
         }
 
         onBackPressedDispatcher.addCallback(this) {
@@ -210,7 +218,7 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     }
 
     private fun cardSkipped() {
-        splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Ota ${currentCard!!.points} huikkaa!", drawableDrink)
+        splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Ota ${currentCard!!.points} huikkaa!", drawableWine)
         endTurn()
     }
 
@@ -220,11 +228,11 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             val winner = gameStateViewModel.checkWinner()
             if (winner != null) {
                 currentPlayerPicture = ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
-                splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableDrink, "Poistu päävalikkoon", "") {
+                splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableCrown, "Poistu päävalikkoon", "") {
                     finish()
                 }
             }
-            splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
+            splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Sait ${currentCard!!.points} pistettä!", drawableCoins)
             endTurn()
         }
     }
