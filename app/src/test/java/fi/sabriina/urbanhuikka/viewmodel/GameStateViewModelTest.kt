@@ -185,6 +185,8 @@ class GameStateViewModelTest {
 
     @Test
     fun `player card selection`() = runTest {
+        viewModel.initializeDatabase()
+        testDispatcher.scheduler.advanceUntilIdle()
         val card = Card("Haaveet ja unelmat","Milloin itkit viimeksi?",1)
         viewModel.updateSelectedCard(card)
 

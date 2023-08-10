@@ -213,11 +213,10 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     }
 
     private fun drawCard(deck: String) {
-        currentCard = gameStateViewModel.getNextCard(deck)
-        if (currentCard != null) {
-            cardView.setCard(currentCard!!)
-            CoroutineScope(Dispatchers.Main).launch {
-                gameStateViewModel.updateSelectedCard(currentCard)
+        CoroutineScope(Dispatchers.Main).launch {
+            currentCard = gameStateViewModel.getNextCard(deck)
+            if (currentCard != null) {
+                cardView.setCard(currentCard!!)
                 ObjectAnimator.ofFloat(titleText, View.ALPHA, 0f).start()
                 delay(250)
                 ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()

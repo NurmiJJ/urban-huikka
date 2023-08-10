@@ -9,7 +9,7 @@ import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 
 interface GameStateRepositoryInterface {
 
-    fun updateDatabase(enabledCategories: List<String>): Pair<MutableList<Card>, MutableList<Card>>
+    suspend fun updateDatabase(enabledCategories: List<String>): Pair<MutableList<Card>, MutableList<Card>>
 
     suspend fun insertGameState(gameState: GameState)
 

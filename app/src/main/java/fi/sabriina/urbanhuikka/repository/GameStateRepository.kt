@@ -19,7 +19,7 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
 
     private val database = Firebase.firestore
 
-    override fun updateDatabase(enabledCategories: List<String>) : Pair<MutableList<Card>, MutableList<Card>> {
+    override suspend fun updateDatabase(enabledCategories: List<String>) : Pair<MutableList<Card>, MutableList<Card>> {
         val truthCardList = mutableListOf<Card>()
         val dareCardList = mutableListOf<Card>()
         database.collection(TruthCollection)
@@ -29,16 +29,15 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
                     Log.w(TAG, "Listen failed.", e)
                     return@addSnapshotListener
                 }
-                truthCardList.clear()
                 for (doc in value!!) {
                     val card: Card = doc.toObject(Card::class.java)
+                    // TODO: move this logic to ViewModel
                     if (card.category in enabledCategories) {
                         truthCardList.add(card)
                         counter += 1
                     }
                 }
                 Log.d("Huikkasofta", "Added $counter truth cards")
-                truthCardList.shuffle()
             }
 
         database.collection(DareCollection)
@@ -48,8 +47,8 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
                     Log.w(TAG, "Listen failed.", e)
                     return@addSnapshotListener
                 }
-                dareCardList.clear()
                 for (doc in value!!) {
+                    // TODO: move this logic to ViewModel
                     val card : Card = doc.toObject(Card::class.java)
                     if (card.category in enabledCategories) {
                         dareCardList.add(card)
@@ -57,7 +56,6 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
                     }
                 }
                 Log.d("Huikkasofta", "Added $counter dare cards")
-                dareCardList.shuffle()
             }
         return Pair(truthCardList, dareCardList)
     }

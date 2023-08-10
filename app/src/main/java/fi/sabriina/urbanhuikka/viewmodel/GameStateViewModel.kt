@@ -16,10 +16,7 @@ import fi.sabriina.urbanhuikka.repository.GameStateRepository
 import fi.sabriina.urbanhuikka.repository.GameStateRepositoryInterface
 import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class GameStateViewModel (private val repository: GameStateRepositoryInterface): ViewModel() {
     private var truthCards = mutableListOf<Card>()
@@ -32,8 +29,6 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     private var currentPlayerIndex = 0
     private var _currentPlayer = MutableLiveData<Player>()
     var currentPlayer: LiveData<Player> = _currentPlayer
-
-    private var selectedCard = null
 
     // this hardcoded value is never used, but lateinit is not allowed
     private var pointsToWin: Int = 30
@@ -74,8 +69,6 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         Log.d(TAG, "truth $truthCards")
         Log.d(TAG, "dare $dareCards")
 
-        shuffleCards("truth")
-        shuffleCards("dare")
         currentPlayerIndex = repository.getCurrentPlayerIndex()
         _currentPlayer.value = playerList[currentPlayerIndex]
         Log.d("Huikkasofta", "startGame()")
@@ -91,18 +84,17 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         val (truthCardList, dareCardList) = repository.updateDatabase(enabledCategories)
         truthCards = truthCardList
         dareCards = dareCardList
-
+        shuffleCards("truth")
+        shuffleCards("dare")
     }
 
     private fun checkRemainingCards() {
         if (truthCardIndex == truthCards.size) {
-            truthCardIndex = 0
-            truthCards.shuffle()
+            shuffleCards("truth")
         }
 
         if (dareCardIndex == dareCards.size) {
-            dareCardIndex = 0
-            dareCards.shuffle()
+            shuffleCards("dare")
         }
     }
 
@@ -117,16 +109,18 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         }
     }
 
-    fun getNextCard(deck: String) : Card? {
+    suspend fun getNextCard(deck: String) : Card? {
+        var selectedCard: Card? = null
         if (deck == "truth") {
             truthCardIndex += 1
-            return truthCards[truthCardIndex-1]
+            selectedCard = truthCards[truthCardIndex]
         }
         if (deck == "dare") {
             dareCardIndex += 1
-            return dareCards[dareCardIndex-1]
+            selectedCard = dareCards[dareCardIndex]
         }
-        return null
+        updateSelectedCard(selectedCard)
+        return selectedCard
     }
 
     suspend fun endTurn() {

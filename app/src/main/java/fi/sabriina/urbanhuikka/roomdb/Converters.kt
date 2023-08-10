@@ -7,6 +7,7 @@ import fi.sabriina.urbanhuikka.card.Card
 
 class Converters {
 
+    // Converter is required to add Card database
     @TypeConverter
     fun fromString(value: String): Card? {
         val gson = Gson()
