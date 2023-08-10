@@ -154,6 +154,22 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             }
         }
 
+        CoroutineScope(Dispatchers.Main).launch {
+            val selectedCard = gameStateViewModel.getSelectedCard()
+            if ( selectedCard != null) {
+                currentCard = selectedCard
+                cardView.setCard(selectedCard)
+                cardView.setCardSide(false)
+
+                ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
+                selectionButtons.visibility = View.VISIBLE
+
+            } else {
+                ObjectAnimator.ofFloat(titleText, View.ALPHA, 1f).start()
+                titleText.visibility = View.VISIBLE
+            }
+        }
+
         gameStateViewModel.currentPlayer.observe(this) { player ->
             currentPlayer = player
             playerName.text = currentPlayer.name
@@ -201,6 +217,7 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         if (currentCard != null) {
             cardView.setCard(currentCard!!)
             CoroutineScope(Dispatchers.Main).launch {
+                gameStateViewModel.updateSelectedCard(currentCard)
                 ObjectAnimator.ofFloat(titleText, View.ALPHA, 0f).start()
                 delay(250)
                 ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
@@ -230,14 +247,15 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     }
 
     private fun endTurn()  {
-        gameStateViewModel.endTurn()
         CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.endTurn()
             // prevent view from updating before splash screen is showing
             delay(200)
             cardView.setCardSide(true)
             selectionButtons.visibility = View.INVISIBLE
             ObjectAnimator.ofFloat(titleText, View.ALPHA, 1f).start()
             ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 0f).start()
+            gameStateViewModel.updateSelectedCard(null)
         }
     }
 }

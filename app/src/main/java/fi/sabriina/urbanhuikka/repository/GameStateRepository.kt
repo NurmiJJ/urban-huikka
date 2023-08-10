@@ -38,6 +38,7 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
                     }
                 }
                 Log.d("Huikkasofta", "Added $counter truth cards")
+                truthCardList.shuffle()
             }
 
         database.collection(DareCollection)
@@ -56,6 +57,7 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
                     }
                 }
                 Log.d("Huikkasofta", "Added $counter dare cards")
+                dareCardList.shuffle()
             }
         return Pair(truthCardList, dareCardList)
     }
@@ -74,6 +76,10 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
 
     override suspend fun updateCurrentPlayerIndex(index: Int) {
         gameStateDao.updateCurrentPlayerIndex(index)
+    }
+
+    override suspend fun updateSelectedCard(card: Card?) {
+        gameStateDao.updateSelectedCard(card)
     }
 
     override suspend fun getCurrentGame() : GameState {
@@ -101,6 +107,10 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
 
     override suspend fun getCurrentPlayerIndex(): Int {
         return gameStateDao.getCurrentPlayerIndex()
+    }
+
+    override suspend fun getSelectedCard(): Card? {
+        return gameStateDao.getSelectedCard()
     }
 
     override suspend fun deleteAllGames() {

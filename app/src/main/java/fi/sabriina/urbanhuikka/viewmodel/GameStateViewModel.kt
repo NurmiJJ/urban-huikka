@@ -16,7 +16,10 @@ import fi.sabriina.urbanhuikka.repository.GameStateRepository
 import fi.sabriina.urbanhuikka.repository.GameStateRepositoryInterface
 import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class GameStateViewModel (private val repository: GameStateRepositoryInterface): ViewModel() {
     private var truthCards = mutableListOf<Card>()
@@ -29,6 +32,8 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     private var currentPlayerIndex = 0
     private var _currentPlayer = MutableLiveData<Player>()
     var currentPlayer: LiveData<Player> = _currentPlayer
+
+    private var selectedCard = null
 
     // this hardcoded value is never used, but lateinit is not allowed
     private var pointsToWin: Int = 30
@@ -65,11 +70,16 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         playerList = getPlayers()
         pointsToWin = repository.getPointsToWin()
         updateGameStatus("ONGOING")
+        Log.d(TAG, "Here we should have cards, but we don't always?")
+        Log.d(TAG, "truth $truthCards")
+        Log.d(TAG, "dare $dareCards")
+
         shuffleCards("truth")
         shuffleCards("dare")
         currentPlayerIndex = repository.getCurrentPlayerIndex()
         _currentPlayer.value = playerList[currentPlayerIndex]
         Log.d("Huikkasofta", "startGame()")
+
     }
 
     private suspend fun getPlayers() : List<Player> {
@@ -119,9 +129,10 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         return null
     }
 
-    fun endTurn() {
+    suspend fun endTurn() {
         checkRemainingCards()
         updateCurrentPlayer()
+        updateSelectedCard(null)
     }
 
     suspend fun addPoints(playerId: Int = playerList[currentPlayerIndex].id, amount: Int) {
@@ -150,6 +161,14 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
 
     suspend fun getCurrentGame() : GameState {
         return repository.getCurrentGame()
+    }
+
+    suspend fun getSelectedCard() : Card? {
+        return repository.getSelectedCard()
+    }
+
+    suspend fun updateSelectedCard(card: Card?) {
+        repository.updateSelectedCard(card)
     }
 
     suspend fun checkSavedGameExists(): Boolean {

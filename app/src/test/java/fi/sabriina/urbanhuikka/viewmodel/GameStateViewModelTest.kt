@@ -183,4 +183,16 @@ class GameStateViewModelTest {
         assertThat(viewModel.getCurrentGame().status).isEqualTo("ENDED")
     }
 
+    @Test
+    fun `player card selection`() = runTest {
+        val card = Card("Haaveet ja unelmat","Milloin itkit viimeksi?",1)
+        viewModel.updateSelectedCard(card)
+
+        testDispatcher.scheduler.advanceUntilIdle()
+        val testCard = viewModel.getSelectedCard()
+
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertThat(testCard).isEqualTo(card)
+    }
+
 }

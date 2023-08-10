@@ -50,6 +50,10 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
         repoGameState?.currentPlayerIndex = index
     }
 
+    override suspend fun updateSelectedCard(card: Card?) {
+        repoGameState?.selectedCard = card
+    }
+
     override suspend fun getCurrentGame() : GameState {
         return repoGameState!!
     }
@@ -96,6 +100,10 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
 
     override suspend fun getCurrentPlayerIndex(): Int {
         return repoGameState!!.currentPlayerIndex
+    }
+
+    override suspend fun getSelectedCard(): Card? {
+        return repoGameState?.selectedCard
     }
 
     override suspend fun deleteAllGames() {

@@ -1,6 +1,7 @@
 package fi.sabriina.urbanhuikka.roomdb.dao
 
 import androidx.room.*
+import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 import fi.sabriina.urbanhuikka.roomdb.GameState
@@ -20,6 +21,9 @@ interface GameStateDao {
 
     @Query("UPDATE game_state SET currentPlayerIndex = :index")
     suspend fun updateCurrentPlayerIndex(index: Int)
+
+    @Query("UPDATE game_state SET selectedCard = :card")
+    suspend fun updateSelectedCard(card: Card?)
 
     @Query("SELECT score FROM scoreboard WHERE playerId = :playerId")
     suspend fun getPlayerScore(playerId: Int) : Int
@@ -44,6 +48,9 @@ interface GameStateDao {
 
     @Query("SELECT currentPlayerIndex FROM game_state")
     suspend fun getCurrentPlayerIndex() : Int
+
+    @Query("SELECT selectedCard FROM game_state")
+    suspend fun getSelectedCard() : Card?
 
     @Query("SELECT player_table.* FROM player_table INNER JOIN scoreboard ON player_table.id = scoreboard.playerId")
     suspend fun getPlayers(): List<Player>
