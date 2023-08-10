@@ -152,6 +152,7 @@ class GameStateViewModelTest {
 
         for (i in 1..5) {
             val currentCard = viewModel.getNextCard("truth")
+            testDispatcher.scheduler.advanceUntilIdle()
             if (currentCard != null) {
                 assertThat(currentCard.category).isEqualTo(DbConstants.TRUTH_CATEGORIES[1])
             }

@@ -113,11 +113,11 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         var selectedCard: Card? = null
         if (deck == "truth") {
             truthCardIndex += 1
-            selectedCard = truthCards[truthCardIndex]
+            selectedCard = truthCards[truthCardIndex-1]
         }
-        if (deck == "dare") {
+        else if (deck == "dare") {
             dareCardIndex += 1
-            selectedCard = dareCards[dareCardIndex]
+            selectedCard = dareCards[dareCardIndex-1]
         }
         updateSelectedCard(selectedCard)
         return selectedCard
