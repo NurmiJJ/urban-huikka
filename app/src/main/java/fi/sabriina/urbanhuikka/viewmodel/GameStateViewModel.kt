@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import fi.sabriina.urbanhuikka.DARE_DECK
 import fi.sabriina.urbanhuikka.TAG
+import fi.sabriina.urbanhuikka.TRUTH_DECK
 import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.helpers.DbConstants
 import fi.sabriina.urbanhuikka.roomdb.GameState
@@ -60,19 +62,20 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         repository.insertCardCategory(CardCategory(0, name, true))
     }
 
-    fun startGame() = viewModelScope.launch {
+    suspend fun startGame() {
         updateDatabase()
         playerList = getPlayers()
         pointsToWin = repository.getPointsToWin()
         updateGameStatus("ONGOING")
-        Log.d(TAG, "Here we should have cards, but we don't always?")
-        Log.d(TAG, "truth $truthCards")
-        Log.d(TAG, "dare $dareCards")
 
         currentPlayerIndex = repository.getCurrentPlayerIndex()
         _currentPlayer.value = playerList[currentPlayerIndex]
-        Log.d("Huikkasofta", "startGame()")
+        Log.d("Huikkasofta", "at the end of startGame()")
 
+    }
+
+    suspend fun continueGame() {
+        startGame()
     }
 
     private suspend fun getPlayers() : List<Player> {
@@ -84,38 +87,49 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         val (truthCardList, dareCardList) = repository.updateDatabase(enabledCategories)
         truthCards = truthCardList
         dareCards = dareCardList
-        shuffleCards("truth")
-        shuffleCards("dare")
+        Log.d(TAG, "Truth cards: ${truthCards.size}")
+        Log.d(TAG, "Dare cards: ${dareCards.size}")
+        shuffleCards(TRUTH_DECK)
+        shuffleCards(DARE_DECK)
     }
 
     private fun checkRemainingCards() {
         if (truthCardIndex == truthCards.size) {
-            shuffleCards("truth")
+            shuffleCards(TRUTH_DECK)
         }
 
         if (dareCardIndex == dareCards.size) {
-            shuffleCards("dare")
+            shuffleCards(DARE_DECK)
         }
     }
 
     private fun shuffleCards(deck: String) {
-        if (deck == "truth") {
+        if (deck == TRUTH_DECK) {
+            if (truthCards.size < 1) {
+                Log.w(TAG, "No $deck cards to shuffle")
+                return
+            }
             truthCardIndex = 0
             truthCards.shuffle()
         }
-        else if (deck == "dare") {
+        else if (deck == DARE_DECK) {
+            if (dareCards.size < 1) {
+                Log.w(TAG, "No $deck cards to shuffle")
+                return
+            }
             dareCardIndex = 0
             dareCards.shuffle()
         }
+        Log.d(TAG, "Shuffled $deck deck")
     }
 
     suspend fun getNextCard(deck: String) : Card? {
         var selectedCard: Card? = null
-        if (deck == "truth") {
+        if (deck == TRUTH_DECK) {
             truthCardIndex += 1
             selectedCard = truthCards[truthCardIndex-1]
         }
-        else if (deck == "dare") {
+        else if (deck == DARE_DECK) {
             dareCardIndex += 1
             selectedCard = dareCards[dareCardIndex-1]
         }

@@ -149,8 +149,10 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
         CoroutineScope(Dispatchers.Main).launch {
             val gameStatus = gameStateViewModel.getCurrentGame().status
-            if (gameStatus in arrayOf("PLAYER_SELECT", "SAVED")) {
+            if (gameStatus == "PLAYER_SELECT") {
                 gameStateViewModel.startGame()
+            } else if (gameStatus == "SAVED") {
+                gameStateViewModel.continueGame()
             }
         }
 

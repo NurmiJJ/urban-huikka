@@ -11,6 +11,12 @@ import fi.sabriina.urbanhuikka.roomdb.GameState
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 import fi.sabriina.urbanhuikka.roomdb.dao.GameStateDao
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 const val DareCollection = "DareCards"
 const val TruthCollection = "TruthCards"
@@ -20,44 +26,62 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
     private val database = Firebase.firestore
 
     override suspend fun updateDatabase(enabledCategories: List<String>) : Pair<MutableList<Card>, MutableList<Card>> {
-        val truthCardList = mutableListOf<Card>()
-        val dareCardList = mutableListOf<Card>()
-        database.collection(TruthCollection)
-            .addSnapshotListener { value, e ->
-                var counter = 0
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
-                    return@addSnapshotListener
-                }
-                for (doc in value!!) {
-                    val card: Card = doc.toObject(Card::class.java)
-                    // TODO: move this logic to ViewModel
-                    if (card.category in enabledCategories) {
-                        truthCardList.add(card)
-                        counter += 1
+        return suspendCoroutine { continuation ->
+            val truthCardList = mutableListOf<Card>()
+            val dareCardList = mutableListOf<Card>()
+
+            val scope = CoroutineScope(Dispatchers.Main) // Use the appropriate dispatcher
+
+            val truthJob = scope.launch {
+                database.collection(TruthCollection)
+                    .addSnapshotListener { value, e ->
+                        if (e != null) {
+                            Log.w(TAG, "Listen failed.", e)
+                            continuation.resumeWithException(e)
+                            return@addSnapshotListener
+                        }
+                        truthCardList.clear()
+                        for (doc in value!!) {
+                            val card: Card = doc.toObject(Card::class.java)
+                            if (card.category in enabledCategories) {
+                                truthCardList.add(card)
+                            }
+                        }
+                        Log.d(TAG, "Truth cards update complete")
+                        if (dareCardList.isNotEmpty()) {
+                            continuation.resume(Pair(truthCardList, dareCardList))
+                        }
                     }
-                }
-                Log.d("Huikkasofta", "Added $counter truth cards")
             }
 
-        database.collection(DareCollection)
-            .addSnapshotListener { value, e ->
-                var counter = 0
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
-                    return@addSnapshotListener
-                }
-                for (doc in value!!) {
-                    // TODO: move this logic to ViewModel
-                    val card : Card = doc.toObject(Card::class.java)
-                    if (card.category in enabledCategories) {
-                        dareCardList.add(card)
-                        counter += 1
+            val dareJob = scope.launch {
+                database.collection(DareCollection)
+                    .addSnapshotListener { value, e ->
+                        if (e != null) {
+                            Log.w(TAG, "Listen failed.", e)
+                            continuation.resumeWithException(e)
+                            return@addSnapshotListener
+                        }
+                        dareCardList.clear()
+                        for (doc in value!!) {
+                            val card: Card = doc.toObject(Card::class.java)
+                            if (card.category in enabledCategories) {
+                                dareCardList.add(card)
+                            }
+                        }
+                        Log.d(TAG, "Dare cards update complete")
+                        if (truthCardList.isNotEmpty()) {
+                            continuation.resume(Pair(truthCardList, dareCardList))
+                        }
                     }
-                }
-                Log.d("Huikkasofta", "Added $counter dare cards")
             }
-        return Pair(truthCardList, dareCardList)
+
+            // Combine both jobs to wait for them to complete
+            scope.launch {
+                truthJob.join()
+                dareJob.join()
+            }
+        }
     }
 
     override suspend fun insertGameState(gameState: GameState) {
