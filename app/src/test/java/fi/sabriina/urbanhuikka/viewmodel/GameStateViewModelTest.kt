@@ -49,11 +49,11 @@ class GameStateViewModelTest {
 
     private fun initGameWithTestDefaults() = runTest {
         viewModel.initializeDatabase()
+        viewModel.startNewGame()
         for (i in 1 .. repository.getPlayers().size) {
             viewModel.insertPlayerToScoreboard(ScoreboardEntry(0,i))
         }
         testDispatcher.scheduler.advanceUntilIdle()
-        viewModel.updateGameStatus("PLAYER_SELECT")
     }
 
     @Test

@@ -42,7 +42,6 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         for (category in DbConstants.TRUTH_CATEGORIES) {
             insertCardCategory(category)
         }
-        updateGameStatus("INITIALIZED")
     }
 
     suspend fun checkInitialization() {
