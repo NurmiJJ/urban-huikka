@@ -39,6 +39,7 @@ class GameStateViewModelTest {
         repository = FakeGameStateRepository()
         viewModel = GameStateViewModel(repository)
         Dispatchers.setMain(testDispatcher)
+        initGameWithTestDefaults()
     }
 
     @After
@@ -46,29 +47,17 @@ class GameStateViewModelTest {
         Dispatchers.resetMain()
     }
 
-    @Test
-    fun `initialize database with new game`() = runTest {
+    private fun initGameWithTestDefaults() = runTest {
         viewModel.initializeDatabase()
+        for (i in 1 .. repository.getPlayers().size) {
+            viewModel.insertPlayerToScoreboard(ScoreboardEntry(0,i))
+        }
         testDispatcher.scheduler.advanceUntilIdle()
-        val currentGameStatus = repository.getCurrentGame().status
-        assertThat(currentGameStatus).isEqualTo("INITIALIZED")
-
-    }
-
-    @Test
-    fun `initialize database when no games exist`() = runTest {
-        viewModel.checkInitialization()
-        testDispatcher.scheduler.advanceUntilIdle()
-        val currentGameStatus = repository.getCurrentGame().status
-        assertThat(currentGameStatus).isEqualTo("INITIALIZED")
-
-        val expectedSize = DbConstants.DARE_CATEGORIES.size + DbConstants.TRUTH_CATEGORIES.size
-        assertThat(repository.getEnabledCardCategories()).hasSize(expectedSize)
+        viewModel.updateGameStatus("PLAYER_SELECT")
     }
 
     @Test
     fun `cards and current player exist after starting game`() = runTest {
-        viewModel.initializeDatabase()
         viewModel.startGame()
         testDispatcher.scheduler.advanceUntilIdle()
         val truthCard = viewModel.getNextCard("truth")
@@ -81,7 +70,6 @@ class GameStateViewModelTest {
 
     @Test
     fun `getting next card returns different cards`() = runTest {
-        viewModel.initializeDatabase()
         viewModel.startGame()
         testDispatcher.scheduler.advanceUntilIdle()
         val cards = mutableListOf<Card>()
@@ -97,10 +85,8 @@ class GameStateViewModelTest {
 
     @Test
     fun `end turn changes current player`() = runTest {
-        viewModel.initializeDatabase()
         viewModel.startGame()
         testDispatcher.scheduler.advanceUntilIdle()
-
         viewModel.endTurn()
         testDispatcher.scheduler.advanceUntilIdle()
         assertThat(repository.getCurrentPlayerIndex()).isEqualTo(1)
@@ -114,13 +100,8 @@ class GameStateViewModelTest {
 
     @Test
     fun `add points`() = runTest {
-        viewModel.initializeDatabase()
-        for (i in 1 .. repository.getPlayers().size) {
-            viewModel.insertPlayerToScoreboard(ScoreboardEntry(0,i))
-        }
         viewModel.startGame()
         testDispatcher.scheduler.advanceUntilIdle()
-
         viewModel.addPoints(amount = 2)
         viewModel.addPoints(3, 5)
 
@@ -131,7 +112,6 @@ class GameStateViewModelTest {
 
     @Test
     fun `update and check game status`() = runTest {
-        viewModel.initializeDatabase()
         viewModel.startGame()
         testDispatcher.scheduler.advanceUntilIdle()
         assertThat(viewModel.checkSavedGameExists()).isEqualTo(false)
@@ -144,7 +124,6 @@ class GameStateViewModelTest {
 
     @Test
     fun `enable only one card category`() = runTest {
-        viewModel.initializeDatabase()
         viewModel.setEnabledCardCategories(listOf(DbConstants.TRUTH_CATEGORIES[1]))
         testDispatcher.scheduler.advanceUntilIdle()
         viewModel.startGame()
@@ -162,11 +141,7 @@ class GameStateViewModelTest {
 
     @Test
     fun `game ends with correct player winning`() = runTest {
-        viewModel.initializeDatabase()
         viewModel.setPointsToWin(10)
-        for (i in 1 .. repository.getPlayers().size) {
-            viewModel.insertPlayerToScoreboard(ScoreboardEntry(0,i))
-        }
         viewModel.startGame()
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -186,7 +161,7 @@ class GameStateViewModelTest {
 
     @Test
     fun `player card selection`() = runTest {
-        viewModel.initializeDatabase()
+        viewModel.startGame()
         testDispatcher.scheduler.advanceUntilIdle()
         val card = Card("Haaveet ja unelmat","Milloin itkit viimeksi?",1)
         viewModel.updateSelectedCard(card)
