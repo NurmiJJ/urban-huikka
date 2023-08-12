@@ -154,6 +154,7 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             } else if (gameStatus == "SAVED") {
                 gameStateViewModel.continueGame()
             }
+            splashScreenManager.showLoadingDialog(false)
         }
 
         CoroutineScope(Dispatchers.Main).launch {
