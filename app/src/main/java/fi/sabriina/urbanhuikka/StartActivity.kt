@@ -59,12 +59,11 @@ class StartActivity : AppCompatActivity() {
                 }
             }
         }
-
-        initializeMainMenu()
     }
 
     override fun onResume() {
         super.onResume()
+        splashScreenManager.showLoadingDialog(true)
         initializeMainMenu()
     }
 
@@ -72,6 +71,7 @@ class StartActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.Main).launch {
             gameStateViewModel.checkInitialization()
             continueButton.isEnabled = gameStateViewModel.checkSavedGameExists()
+            splashScreenManager.showLoadingDialog(false)
         }
     }
 

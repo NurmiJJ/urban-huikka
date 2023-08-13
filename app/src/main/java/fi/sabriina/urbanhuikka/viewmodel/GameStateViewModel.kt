@@ -36,6 +36,7 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     private var pointsToWin: Int = 30
 
     suspend fun initializeDatabase() {
+        Log.d(TAG,"Initializing the database")
         for (category in DbConstants.DARE_CATEGORIES) {
             insertCardCategory(category)
         }
@@ -46,12 +47,15 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
 
     suspend fun checkInitialization() {
         val count = repository.getGameCount()
+        Log.d(TAG, count.toString())
         if (count != 1 || getCurrentGame().status !in arrayOf("INITIALIZED", "ONGOING", "SAVED"))  {
             initializeDatabase()
+            deleteAllGames()
+            insertGameState(GameState(0,"INITIALIZED"))
         }
     }
 
-    fun startNewGame() {
+    suspend fun startNewGame() {
         deleteAllGames()
         deleteAllPlayersFromScoreboard()
         insertGameState(GameState(0,"PLAYER_SELECT"))
@@ -159,7 +163,7 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         return repository.getAllScores()
     }
 
-    private fun insertGameState(gameState: GameState) = viewModelScope.launch {
+    private suspend fun insertGameState(gameState: GameState) {
         repository.insertGameState(gameState)
     }
 
@@ -182,17 +186,17 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         return false
     }
 
-    fun updateGameStatus(status: String) = viewModelScope.launch {
+    suspend fun updateGameStatus(status: String) = viewModelScope.launch {
         repository.updateGameState(status)
 
         Log.d(TAG, "Updated game status to: $status")
     }
 
-    fun insertPlayerToScoreboard(scoreboardEntry: ScoreboardEntry) = viewModelScope.launch {
+    suspend fun insertPlayerToScoreboard(scoreboardEntry: ScoreboardEntry) = viewModelScope.launch {
         repository.insertPlayerToScoreboard(scoreboardEntry)
     }
 
-    private fun updateCurrentPlayer() = viewModelScope.launch {
+    private suspend fun updateCurrentPlayer() {
         if (currentPlayerIndex < playerList.size - 1) {
             currentPlayerIndex += 1
         }
@@ -203,11 +207,11 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         _currentPlayer.value = playerList[currentPlayerIndex]
     }
 
-    private fun deleteAllGames() = viewModelScope.launch {
+    private suspend fun deleteAllGames() {
         repository.deleteAllGames()
     }
 
-    private fun deleteAllPlayersFromScoreboard() = viewModelScope.launch {
+    private suspend fun deleteAllPlayersFromScoreboard() {
         repository.deleteAllPlayersFromScoreboard()
     }
 

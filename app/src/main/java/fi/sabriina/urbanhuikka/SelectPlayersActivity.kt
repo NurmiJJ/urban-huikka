@@ -28,7 +28,6 @@ import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModel
 import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 
@@ -158,26 +157,15 @@ class SelectPlayersActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.Main).launch {
             splashScreenManager.showLoadingDialog(true)
 
-            // Launch asynchronous tasks
-            val newGameDeferred = async { gameStateViewModel.startNewGame() }
-            newGameDeferred.await()
-
-            val pointsDeferred = async { gameStateViewModel.setPointsToWin(pointsToWinSelector.progress) }
-            val categoriesDeferred = async { gameStateViewModel.setEnabledCardCategories(enabledCategories) }
-            val updateStatusDeferred = async { gameStateViewModel.updateGameStatus("PLAYER_SELECT") }
-            val playersDeferred = async {
-                val selectedPlayers = adapter.getSelected()
-                selectedPlayers.forEach { player ->
-                    Log.w(TAG, "Inserting $player to scoreboard")
-                    gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
-                }
+            gameStateViewModel.startNewGame()
+            gameStateViewModel.setPointsToWin(pointsToWinSelector.progress)
+            gameStateViewModel.setEnabledCardCategories(enabledCategories)
+            gameStateViewModel.updateGameStatus("PLAYER_SELECT")
+            val selectedPlayers = adapter.getSelected()
+            selectedPlayers.forEach { player ->
+                Log.w(TAG, "Inserting $player to scoreboard")
+                gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
             }
-
-            // Await the completion of the rest of the tasks
-            pointsDeferred.await()
-            categoriesDeferred.await()
-            updateStatusDeferred.await()
-            playersDeferred.await()
 
             finish()
         }
