@@ -28,6 +28,8 @@ import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModel
 import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -107,10 +109,6 @@ class SelectPlayersActivity : AppCompatActivity() {
                 } else {
                     startGame()
                 }
-                gameStateViewModel.updateGameStatus("PLAYER_SELECT")
-            }
-            for (player in adapter.getSelected()) {
-                gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
             }
         }
 
@@ -159,15 +157,36 @@ class SelectPlayersActivity : AppCompatActivity() {
         }
 
         CoroutineScope(Dispatchers.Main).launch {
-            gameStateViewModel.startNewGame()
-            gameStateViewModel.setPointsToWin(pointsToWinSelector.progress)
-            gameStateViewModel.setEnabledCardCategories(enabledCategories)
-            gameStateViewModel.updateGameStatus("PLAYER_SELECT")
-            for (player in adapter.getSelected()) {
-                gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
+            splashScreenManager.showLoadingDialog(true)
+
+            // Launch asynchronous tasks
+            val newGameDeferred = async { gameStateViewModel.startNewGame() }
+            val pointsDeferred = async { gameStateViewModel.setPointsToWin(pointsToWinSelector.progress) }
+            val categoriesDeferred = async { gameStateViewModel.setEnabledCardCategories(enabledCategories) }
+            val updateStatusDeferred = async { gameStateViewModel.updateGameStatus("PLAYER_SELECT") }
+            val playersDeferred = async {
+                val selectedPlayers = adapter.getSelected()
+                selectedPlayers.forEach { player ->
+                    gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
+                }
             }
+
+            // Await the completion of all tasks
+            newGameDeferred.await()
+            pointsDeferred.await()
+            categoriesDeferred.await()
+            updateStatusDeferred.await()
+            playersDeferred.await()
+
+            // Make sure db has enough time for all operations
+            // This is a safety to reduce the possibility of crashing
+            // but not strictly necessary
+            // Also makes the loading screen look nicer
+            delay(2000)
+
             finish()
         }
+
     }
 
     private inner class CategorySelectionAdapter : BaseAdapter() {

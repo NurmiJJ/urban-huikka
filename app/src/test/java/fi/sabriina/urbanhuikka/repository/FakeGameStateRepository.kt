@@ -16,7 +16,7 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
     private var pointsToWin = 30
 
 
-    override fun updateDatabase(enabledCategories: List<String>): Pair<MutableList<Card>, MutableList<Card>> {
+    override suspend fun updateDatabase(enabledCategories: List<String>): Pair<MutableList<Card>, MutableList<Card>> {
         val truthCards = mutableListOf(Card("Haaveet ja unelmat","Milloin itkit viimeksi?",1), Card("Seksi","Miten vanhemmat otti kukkaset ja mehiläiset puheeksi?",1), Card("Salaisuudet ja paljastukset", "Kuka on paras ystäväsi?", 1), Card("Pelot ja epävarmuudet", "Mikä on huonoin kouluarvosanasi?", 3))
         val dareCards = mutableListOf(Card("Ruoka ja juoma","Ota huikka!",1), Card("Onks pakko?","Ole lankku-asennossa yksi minuutti!",2,60))
         val filteredTruthCards = mutableListOf<Card>()
@@ -48,6 +48,10 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
 
     override suspend fun updateCurrentPlayerIndex(index: Int) {
         repoGameState?.currentPlayerIndex = index
+    }
+
+    override suspend fun updateSelectedCard(card: Card?) {
+        repoGameState?.selectedCard = card
     }
 
     override suspend fun getCurrentGame() : GameState {
@@ -96,6 +100,10 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
 
     override suspend fun getCurrentPlayerIndex(): Int {
         return repoGameState!!.currentPlayerIndex
+    }
+
+    override suspend fun getSelectedCard(): Card? {
+        return repoGameState?.selectedCard
     }
 
     override suspend fun deleteAllGames() {

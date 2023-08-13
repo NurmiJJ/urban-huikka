@@ -149,8 +149,27 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
         CoroutineScope(Dispatchers.Main).launch {
             val gameStatus = gameStateViewModel.getCurrentGame().status
-            if (gameStatus in arrayOf("PLAYER_SELECT", "SAVED")) {
+            if (gameStatus == "PLAYER_SELECT") {
                 gameStateViewModel.startGame()
+            } else if (gameStatus == "SAVED") {
+                gameStateViewModel.continueGame()
+            }
+            splashScreenManager.showLoadingDialog(false)
+        }
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val selectedCard = gameStateViewModel.getSelectedCard()
+            if ( selectedCard != null) {
+                currentCard = selectedCard
+                cardView.setCard(selectedCard)
+                cardView.setCardSide(false)
+
+                ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
+                selectionButtons.visibility = View.VISIBLE
+
+            } else {
+                ObjectAnimator.ofFloat(titleText, View.ALPHA, 1f).start()
+                titleText.visibility = View.VISIBLE
             }
         }
 
@@ -197,10 +216,10 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     }
 
     private fun drawCard(deck: String) {
-        currentCard = gameStateViewModel.getNextCard(deck)
-        if (currentCard != null) {
-            cardView.setCard(currentCard!!)
-            CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Main).launch {
+            currentCard = gameStateViewModel.getNextCard(deck)
+            if (currentCard != null) {
+                cardView.setCard(currentCard!!)
                 ObjectAnimator.ofFloat(titleText, View.ALPHA, 0f).start()
                 delay(250)
                 ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
@@ -230,14 +249,15 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     }
 
     private fun endTurn()  {
-        gameStateViewModel.endTurn()
         CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.endTurn()
             // prevent view from updating before splash screen is showing
             delay(200)
             cardView.setCardSide(true)
             selectionButtons.visibility = View.INVISIBLE
             ObjectAnimator.ofFloat(titleText, View.ALPHA, 1f).start()
             ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 0f).start()
+            gameStateViewModel.updateSelectedCard(null)
         }
     }
 }

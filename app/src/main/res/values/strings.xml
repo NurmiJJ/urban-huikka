@@ -27,6 +27,7 @@
     <string name="quit_confirm">Haluatko varmasti lopettaa?</string>
     <string name="profile_picture">Profiilikuva</string>
     <string name="delete">Poista</string>
+    <string name="loading">Ladataan…</string>
 
     -- UI Sentences
     <string name="no_players">Sinulla ei ole yhtään pelaajaa lisättynä!</string>

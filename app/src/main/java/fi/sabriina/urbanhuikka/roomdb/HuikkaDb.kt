@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import fi.sabriina.urbanhuikka.roomdb.dao.GameStateDao
 import fi.sabriina.urbanhuikka.roomdb.dao.PlayerDao
@@ -12,6 +13,7 @@ import kotlinx.coroutines.launch
 
 // Annotates class to be a Room Database with a table (entity) of the Player class
 @Database(entities = [Player::class, GameState::class, CardCategory::class, ScoreboardEntry::class], version = 7, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class HuikkaDb : RoomDatabase() {
 
     abstract fun playerDao(): PlayerDao

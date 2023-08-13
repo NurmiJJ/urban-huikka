@@ -16,6 +16,7 @@ class SplashScreenManager(private val context: Context) {
     private var currentNotification: SplashNotification? = null
     private var isShowingNotification = false
     private var confirmed = false
+    private var loadingDialog = LoadingDialog()
 
     fun showSplashScreen(playerName: String, playerPicture: Drawable, dialogMessage: String, dialogIcon: Drawable, dialogDelay: Long = 5000) {
         val notification = mapOf(
@@ -143,6 +144,14 @@ class SplashScreenManager(private val context: Context) {
         dialog.show { callback(confirmed) }
     }
 
+    fun showLoadingDialog(visible: Boolean) {
+        if (visible) {
+            loadingDialog.show()
+        } else {
+            loadingDialog.hide()
+        }
+    }
+
     private inner class PauseDialog {
         private var dialog: Dialog
         private val okButton: Button
@@ -224,6 +233,25 @@ class SplashScreenManager(private val context: Context) {
         fun show(onDismiss: () -> Unit) {
             dialog.setOnDismissListener { onDismiss.invoke() }
             dialog.show()
+        }
+    }
+
+    private inner class LoadingDialog {
+        private var dialog: Dialog
+
+        init {
+            val dialog = NonDismissableDialog(context)
+            dialog.setContentView(R.layout.loading_dialog)
+
+            this.dialog = dialog
+        }
+
+        fun show() {
+            dialog.show()
+        }
+
+        fun hide() {
+            dialog.dismiss()
         }
     }
 }

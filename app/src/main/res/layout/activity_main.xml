@@ -160,6 +160,7 @@
         android:layout_height="wrap_content"
         android:text="@string/truthOrDate"
         android:textSize="34sp"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/swipeSelectorLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -9,7 +9,7 @@ import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 
 interface GameStateRepositoryInterface {
 
-    fun updateDatabase(enabledCategories: List<String>): Pair<MutableList<Card>, MutableList<Card>>
+    suspend fun updateDatabase(enabledCategories: List<String>): Pair<MutableList<Card>, MutableList<Card>>
 
     suspend fun insertGameState(gameState: GameState)
 
@@ -18,6 +18,8 @@ interface GameStateRepositoryInterface {
     suspend fun updateGameState(status: String)
 
     suspend fun updateCurrentPlayerIndex(index: Int)
+
+    suspend fun updateSelectedCard(card: Card?)
 
     suspend fun getCurrentGame() : GameState
 
@@ -32,6 +34,8 @@ interface GameStateRepositoryInterface {
     suspend fun getAllScores() : List<PlayerAndScore>
 
     suspend fun getCurrentPlayerIndex(): Int
+
+    suspend fun getSelectedCard() : Card?
 
     suspend fun deleteAllGames()
 

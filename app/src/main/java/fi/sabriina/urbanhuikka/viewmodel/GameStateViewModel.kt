@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import fi.sabriina.urbanhuikka.DARE_DECK
 import fi.sabriina.urbanhuikka.TAG
+import fi.sabriina.urbanhuikka.TRUTH_DECK
 import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.helpers.DbConstants
 import fi.sabriina.urbanhuikka.roomdb.GameState
@@ -60,16 +62,20 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         repository.insertCardCategory(CardCategory(0, name, true))
     }
 
-    fun startGame() = viewModelScope.launch {
+    suspend fun startGame() {
         updateDatabase()
         playerList = getPlayers()
         pointsToWin = repository.getPointsToWin()
         updateGameStatus("ONGOING")
-        shuffleCards("truth")
-        shuffleCards("dare")
+
         currentPlayerIndex = repository.getCurrentPlayerIndex()
         _currentPlayer.value = playerList[currentPlayerIndex]
-        Log.d("Huikkasofta", "startGame()")
+        Log.d("Huikkasofta", "at the end of startGame()")
+
+    }
+
+    suspend fun continueGame() {
+        startGame()
     }
 
     private suspend fun getPlayers() : List<Player> {
@@ -81,47 +87,60 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         val (truthCardList, dareCardList) = repository.updateDatabase(enabledCategories)
         truthCards = truthCardList
         dareCards = dareCardList
-
+        Log.d(TAG, "Truth cards: ${truthCards.size}")
+        Log.d(TAG, "Dare cards: ${dareCards.size}")
+        shuffleCards(TRUTH_DECK)
+        shuffleCards(DARE_DECK)
     }
 
     private fun checkRemainingCards() {
         if (truthCardIndex == truthCards.size) {
-            truthCardIndex = 0
-            truthCards.shuffle()
+            shuffleCards(TRUTH_DECK)
         }
 
         if (dareCardIndex == dareCards.size) {
-            dareCardIndex = 0
-            dareCards.shuffle()
+            shuffleCards(DARE_DECK)
         }
     }
 
     private fun shuffleCards(deck: String) {
-        if (deck == "truth") {
+        if (deck == TRUTH_DECK) {
+            if (truthCards.size < 1) {
+                Log.w(TAG, "No $deck cards to shuffle")
+                return
+            }
             truthCardIndex = 0
             truthCards.shuffle()
         }
-        else if (deck == "dare") {
+        else if (deck == DARE_DECK) {
+            if (dareCards.size < 1) {
+                Log.w(TAG, "No $deck cards to shuffle")
+                return
+            }
             dareCardIndex = 0
             dareCards.shuffle()
         }
+        Log.d(TAG, "Shuffled $deck deck")
     }
 
-    fun getNextCard(deck: String) : Card? {
-        if (deck == "truth") {
+    suspend fun getNextCard(deck: String) : Card? {
+        var selectedCard: Card? = null
+        if (deck == TRUTH_DECK) {
             truthCardIndex += 1
-            return truthCards[truthCardIndex-1]
+            selectedCard = truthCards[truthCardIndex-1]
         }
-        if (deck == "dare") {
+        else if (deck == DARE_DECK) {
             dareCardIndex += 1
-            return dareCards[dareCardIndex-1]
+            selectedCard = dareCards[dareCardIndex-1]
         }
-        return null
+        updateSelectedCard(selectedCard)
+        return selectedCard
     }
 
-    fun endTurn() {
+    suspend fun endTurn() {
         checkRemainingCards()
         updateCurrentPlayer()
+        updateSelectedCard(null)
     }
 
     suspend fun addPoints(playerId: Int = playerList[currentPlayerIndex].id, amount: Int) {
@@ -150,6 +169,14 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
 
     suspend fun getCurrentGame() : GameState {
         return repository.getCurrentGame()
+    }
+
+    suspend fun getSelectedCard() : Card? {
+        return repository.getSelectedCard()
+    }
+
+    suspend fun updateSelectedCard(card: Card?) {
+        repository.updateSelectedCard(card)
     }
 
     suspend fun checkSavedGameExists(): Boolean {
