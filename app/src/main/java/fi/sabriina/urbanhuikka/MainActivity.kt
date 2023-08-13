@@ -186,8 +186,10 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         onBackPressedDispatcher.addCallback(this) {
             splashScreenManager.showPauseDialog { confirmed ->
                 if (confirmed) {
-                    gameStateViewModel.updateGameStatus("SAVED")
-                    finish()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        gameStateViewModel.updateGameStatus("SAVED")
+                        finish()
+                    }
                 }
             }
         }
@@ -203,7 +205,9 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         
     override fun onStop() {
         super.onStop()
-        gameStateViewModel.updateGameStatus("SAVED")
+        CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.updateGameStatus("SAVED")
+        }
 
     }
 
