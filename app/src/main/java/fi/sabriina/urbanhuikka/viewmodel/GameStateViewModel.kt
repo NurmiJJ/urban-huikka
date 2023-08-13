@@ -36,7 +36,6 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     private var pointsToWin: Int = 30
 
     suspend fun initializeDatabase() {
-        startNewGame()
         for (category in DbConstants.DARE_CATEGORIES) {
             insertCardCategory(category)
         }
@@ -55,7 +54,7 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     fun startNewGame() {
         deleteAllGames()
         deleteAllPlayersFromScoreboard()
-        insertGameState(GameState(0,"INITIALIZED",0))
+        insertGameState(GameState(0,"PLAYER_SELECT"))
     }
 
     private suspend fun insertCardCategory(name: String) {
@@ -63,23 +62,20 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     }
 
     suspend fun startGame() {
+        playerList = repository.getPlayers()
+        currentPlayerIndex = repository.getCurrentPlayerIndex()
+        _currentPlayer.value = playerList[currentPlayerIndex]
         updateDatabase()
-        playerList = getPlayers()
+        Log.d(TAG, playerList.toString())
         pointsToWin = repository.getPointsToWin()
         updateGameStatus("ONGOING")
 
-        currentPlayerIndex = repository.getCurrentPlayerIndex()
-        _currentPlayer.value = playerList[currentPlayerIndex]
         Log.d("Huikkasofta", "at the end of startGame()")
 
     }
 
     suspend fun continueGame() {
         startGame()
-    }
-
-    private suspend fun getPlayers() : List<Player> {
-        return repository.getPlayers()
     }
 
     private suspend fun updateDatabase() {

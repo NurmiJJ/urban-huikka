@@ -29,7 +29,6 @@ import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -161,28 +160,24 @@ class SelectPlayersActivity : AppCompatActivity() {
 
             // Launch asynchronous tasks
             val newGameDeferred = async { gameStateViewModel.startNewGame() }
+            newGameDeferred.await()
+
             val pointsDeferred = async { gameStateViewModel.setPointsToWin(pointsToWinSelector.progress) }
             val categoriesDeferred = async { gameStateViewModel.setEnabledCardCategories(enabledCategories) }
             val updateStatusDeferred = async { gameStateViewModel.updateGameStatus("PLAYER_SELECT") }
             val playersDeferred = async {
                 val selectedPlayers = adapter.getSelected()
                 selectedPlayers.forEach { player ->
+                    Log.w(TAG, "Inserting $player to scoreboard")
                     gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
                 }
             }
 
-            // Await the completion of all tasks
-            newGameDeferred.await()
+            // Await the completion of the rest of the tasks
             pointsDeferred.await()
             categoriesDeferred.await()
             updateStatusDeferred.await()
             playersDeferred.await()
-
-            // Make sure db has enough time for all operations
-            // This is a safety to reduce the possibility of crashing
-            // but not strictly necessary
-            // Also makes the loading screen look nicer
-            delay(2000)
 
             finish()
         }

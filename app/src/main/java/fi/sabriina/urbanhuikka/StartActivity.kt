@@ -60,6 +60,15 @@ class StartActivity : AppCompatActivity() {
             }
         }
 
+        initializeMainMenu()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initializeMainMenu()
+    }
+
+    private fun initializeMainMenu() {
         CoroutineScope(Dispatchers.Main).launch {
             gameStateViewModel.checkInitialization()
             continueButton.isEnabled = gameStateViewModel.checkSavedGameExists()
