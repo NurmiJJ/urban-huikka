@@ -11,10 +11,7 @@ class Converters {
     @TypeConverter
     fun fromString(value: String): Card? {
         val gson = Gson()
-        if (value != null) {
-            return gson.fromJson(value, Card::class.java)
-        }
-        return null
+        return gson.fromJson(value, Card::class.java)
     }
 
     @TypeConverter
