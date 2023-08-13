@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import fi.sabriina.urbanhuikka.DARE_DECK
 import fi.sabriina.urbanhuikka.TAG
 import fi.sabriina.urbanhuikka.TRUTH_DECK
@@ -18,7 +17,6 @@ import fi.sabriina.urbanhuikka.repository.GameStateRepository
 import fi.sabriina.urbanhuikka.repository.GameStateRepositoryInterface
 import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
-import kotlinx.coroutines.launch
 
 class GameStateViewModel (private val repository: GameStateRepositoryInterface): ViewModel() {
     private var truthCards = mutableListOf<Card>()
@@ -186,13 +184,13 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         return false
     }
 
-    suspend fun updateGameStatus(status: String) = viewModelScope.launch {
+    suspend fun updateGameStatus(status: String) {
         repository.updateGameState(status)
 
         Log.d(TAG, "Updated game status to: $status")
     }
 
-    suspend fun insertPlayerToScoreboard(scoreboardEntry: ScoreboardEntry) = viewModelScope.launch {
+    suspend fun insertPlayerToScoreboard(scoreboardEntry: ScoreboardEntry) {
         repository.insertPlayerToScoreboard(scoreboardEntry)
     }
 
