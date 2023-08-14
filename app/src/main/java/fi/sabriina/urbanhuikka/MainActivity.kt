@@ -229,6 +229,9 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
                 ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
                 selectionButtons.visibility = View.VISIBLE
             }
+            if (currentCard?.time != 0) {
+                splashScreenManager.showCountdownDialog()
+            }
         }
     }
 
