@@ -240,6 +240,11 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         return playerList[index]
     }
 
+    suspend fun getAssistingPlayer() : Player {
+        val assistingPlayerIndex = repository.getAssistingPlayerIndex()
+        return playerList[assistingPlayerIndex]
+    }
+
 }
 
 class GameStateViewModelFactory(private val repository: GameStateRepository): ViewModelProvider.Factory {
