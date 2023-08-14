@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 const val TAG = "Huikkasofta"
 const val TRUTH_DECK = "truth"
 const val DARE_DECK = "dare"
+const val DUAL_CARD_TYPE = "Sinä ja minä"
 
 class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
@@ -223,6 +224,11 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         CoroutineScope(Dispatchers.Main).launch {
             currentCard = gameStateViewModel.getNextCard(deck)
             if (currentCard != null) {
+
+                if (currentCard!!.category == DUAL_CARD_TYPE) {
+                    val assistingPlayer = gameStateViewModel.drawAssistingPlayer()
+                }
+
                 cardView.setCard(currentCard!!)
                 ObjectAnimator.ofFloat(titleText, View.ALPHA, 0f).start()
                 delay(250)

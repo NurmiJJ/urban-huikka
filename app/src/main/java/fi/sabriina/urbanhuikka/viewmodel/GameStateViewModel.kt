@@ -17,6 +17,7 @@ import fi.sabriina.urbanhuikka.repository.GameStateRepository
 import fi.sabriina.urbanhuikka.repository.GameStateRepositoryInterface
 import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
+import kotlin.random.Random
 
 class GameStateViewModel (private val repository: GameStateRepositoryInterface): ViewModel() {
     private var truthCards = mutableListOf<Card>()
@@ -226,6 +227,17 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
 
     suspend fun setPointsToWin(points: Int) {
         repository.setPointsToWin(points)
+    }
+
+    suspend fun drawAssistingPlayer() : Player {
+        var index =  Random.nextInt(playerList.size)
+
+        while (index == currentPlayerIndex) {
+            index =  Random.nextInt(playerList.size)
+        }
+
+        repository.updateAssistingPlayerIndex(index)
+        return playerList[index]
     }
 
 }

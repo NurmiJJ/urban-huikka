@@ -18,6 +18,7 @@ data class GameState (
     @PrimaryKey (autoGenerate = true) @ColumnInfo(name = "id") val id: Int,
     @ColumnInfo(name = "status") var status: String,
     @ColumnInfo(name = "currentPlayerIndex") var currentPlayerIndex: Int = 0,
+    @ColumnInfo(name = "assistingPlayerIndex") var assistingPlayerIndex: Int = 0,
     @ColumnInfo(name = "selectedCard") var selectedCard: Card? = null,
     @ColumnInfo(name = "pointsToWin") var pointsToWin: Int = 30
 )
