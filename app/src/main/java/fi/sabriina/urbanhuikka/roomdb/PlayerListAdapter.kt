@@ -1,5 +1,6 @@
 package fi.sabriina.urbanhuikka.roomdb
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +12,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import fi.sabriina.urbanhuikka.R
+import fi.sabriina.urbanhuikka.helpers.SfxPlayer
 
-class PlayerListAdapter(private val  listType : String,  private val button: Button) : ListAdapter<Player, PlayerViewHolder>(PlayersComparator()) {
+class PlayerListAdapter(context: Context, private val  listType : String, private val button: Button) : ListAdapter<Player, PlayerViewHolder>(PlayersComparator()) {
     private var selectedPlayers = mutableListOf<Player>()
     private var selecting = false
+    private val sfxPlayer = SfxPlayer(context)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
 
@@ -66,6 +69,7 @@ class PlayerListAdapter(private val  listType : String,  private val button: But
     }
 
     private fun clicked(player: Player, disableSize: Int) {
+        sfxPlayer.playButtonClickSound()
         if (!selectedPlayers.remove(player)){
             button.isEnabled = true
             selecting = true

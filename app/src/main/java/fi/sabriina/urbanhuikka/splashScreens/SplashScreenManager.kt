@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import fi.sabriina.urbanhuikka.R
+import fi.sabriina.urbanhuikka.helpers.SfxPlayer
 
 class SplashScreenManager(private val context: Context) {
     private val notificationQueue = ArrayDeque<Map<String, Any?>>()
@@ -17,6 +18,8 @@ class SplashScreenManager(private val context: Context) {
     private var isShowingNotification = false
     private var confirmed = false
     private var loadingDialog = LoadingDialog()
+
+    private val sfxPlayer = SfxPlayer(context)
 
     fun showSplashScreen(playerName: String, playerPicture: Drawable, dialogMessage: String, dialogIcon: Drawable, dialogDelay: Long = 5000) {
         val notification = mapOf(
@@ -112,6 +115,7 @@ class SplashScreenManager(private val context: Context) {
             icon.setImageDrawable(dialogIcon)
 
             dismissButton.setOnClickListener {
+                sfxPlayer.playButtonClickSound()
                 handleNextNotification()
             }
 
@@ -165,6 +169,7 @@ class SplashScreenManager(private val context: Context) {
             cancelButton = dialog.findViewById(R.id.continueButton)
 
             okButton.setOnClickListener {
+                sfxPlayer.playButtonClickSound()
                 notificationQueue.clear()
                 currentNotification = null
                 confirmed = true
@@ -172,6 +177,7 @@ class SplashScreenManager(private val context: Context) {
             }
 
             cancelButton.setOnClickListener {
+                sfxPlayer.playButtonClickSound()
                 confirmed = false
                 dialog.dismiss()
             }
@@ -209,6 +215,7 @@ class SplashScreenManager(private val context: Context) {
 
             okButton.text = okText
             okButton.setOnClickListener {
+                sfxPlayer.playButtonClickSound()
                 notificationQueue.clear()
                 currentNotification = null
                 confirmed = true
@@ -219,6 +226,7 @@ class SplashScreenManager(private val context: Context) {
                 cancelButton.visibility = View.VISIBLE
                 cancelButton.text = cancelText
                 cancelButton.setOnClickListener {
+                    sfxPlayer.playButtonClickSound()
                     confirmed = false
                     dialog.dismiss()
                 }

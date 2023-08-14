@@ -17,6 +17,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import fi.sabriina.urbanhuikka.card.Card
+import fi.sabriina.urbanhuikka.helpers.SfxPlayer
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.splashScreens.SplashScreenManager
@@ -56,6 +57,8 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     private lateinit var currentPlayer: Player
     private lateinit var currentPlayerPicture : Drawable
     private var currentCard: Card? = null
+
+    private val sfxPlayer = SfxPlayer(this)
 
     private val gameStateViewModel: GameStateViewModel by viewModels {
         GameStateViewModelFactory((application as HuikkaApplication).gameStateRepository)
@@ -212,10 +215,12 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     }
 
     override fun onSwipeRight() {
+        sfxPlayer.playCardDrawSound()
         drawCard(TRUTH_DECK)
     }
 
     override fun onSwipeLeft() {
+        sfxPlayer.playCardDrawSound()
         drawCard(DARE_DECK)
     }
 
@@ -233,22 +238,31 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     }
 
     private fun cardSkipped() {
+        sfxPlayer.playSkipCardSound()
         splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Ota ${currentCard!!.points} huikkaa!", drawableDrink)
         endTurn()
     }
 
     private fun cardCompleted() {
         CoroutineScope(Dispatchers.Main).launch {
+            sfxPlayer.playCompleteCardSound()
             gameStateViewModel.addPoints(amount=currentCard!!.points)
             val winner = gameStateViewModel.checkWinner()
             if (winner != null) {
+                sfxPlayer.playVictorySound()
                 currentPlayerPicture = ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
                 splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableDrink, "Poistu päävalikkoon", "") {
                     finish()
                 }
+            } else {
+                splashScreenManager.showSplashScreen(
+                    currentPlayer.name,
+                    currentPlayerPicture,
+                    "Sait ${currentCard!!.points} pistettä!",
+                    drawableDrink
+                )
+                endTurn()
             }
-            splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
-            endTurn()
         }
     }
 
