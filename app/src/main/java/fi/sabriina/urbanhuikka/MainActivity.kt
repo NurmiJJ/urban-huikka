@@ -242,8 +242,10 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
                 selectionButtons.visibility = View.VISIBLE
             }
             if (currentCard?.time != 0) {
+                sfxPlayer.playTimerTickingSound()
                 splashScreenManager.showCountdownDialog {
                     cardView.startCountdownTimer {
+                        sfxPlayer.playTimesUpSound()
                         splashScreenManager.showConfirmDialog(
                             getString(R.string.times_up),
                             drawableDrink,
