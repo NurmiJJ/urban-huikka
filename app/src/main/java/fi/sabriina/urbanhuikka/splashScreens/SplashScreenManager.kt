@@ -88,7 +88,7 @@ class SplashScreenManager(private val context: Context) {
         private val countdownTextView: TextView
 
         init {
-            val dialog = CustomDialog(context) { handleNextNotification() }
+            val dialog = DialogWithCustomBackButtonBehavior(context) { handleNextNotification() }
             dialog.setContentView(R.layout.splash_notification)
 
             playerName = dialog.findViewById(R.id.notifPlayerName)
@@ -157,12 +157,12 @@ class SplashScreenManager(private val context: Context) {
     }
 
     private inner class PauseDialog {
-        private var dialog: Dialog
+        private var dialog: CustomDialog
         private val okButton: Button
         private val cancelButton: Button
 
         init {
-            val dialog = Dialog(context, R.style.Theme_Huikka)
+            val dialog = CustomDialog(context)
             dialog.setContentView(R.layout.pause_dialog)
 
             okButton = dialog.findViewById(R.id.quitButton)
@@ -197,14 +197,14 @@ class SplashScreenManager(private val context: Context) {
     }
 
     private inner class ConfirmDialog(dialogMessage: String, dialogIcon: Drawable, okText: String, cancelText: String) {
-        private var dialog: Dialog
+        private var dialog: CustomDialog
         private val okButton: Button
         private val cancelButton: Button
         private val content: TextView
         private val icon: ImageView
 
         init {
-            val dialog = Dialog(context, R.style.Theme_Huikka)
+            val dialog = CustomDialog(context)
             dialog.setContentView(R.layout.confirm_dialog)
 
             okButton = dialog.findViewById(R.id.okButton)
@@ -245,7 +245,7 @@ class SplashScreenManager(private val context: Context) {
     }
 
     private inner class LoadingDialog {
-        private var dialog: Dialog
+        private var dialog: CustomDialog
 
         init {
             val dialog = NonDismissableDialog(context)

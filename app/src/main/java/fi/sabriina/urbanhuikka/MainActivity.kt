@@ -14,7 +14,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.helpers.SfxPlayer
@@ -33,7 +32,7 @@ const val TAG = "Huikkasofta"
 const val TRUTH_DECK = "truth"
 const val DARE_DECK = "dare"
 
-class MainActivity : AppCompatActivity(), OnCardSwipeListener {
+class MainActivity : BaseActivity(), OnCardSwipeListener {
 
     private lateinit var playerName : TextView
     private lateinit var playerPicture : ImageView
@@ -79,6 +78,7 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         splashScreenManager = SplashScreenManager(this)
 
         setContentView(R.layout.activity_main)
+
         playerName = findViewById(R.id.textViewPlayer)
         playerPicture = findViewById(R.id.playerPicture)
 

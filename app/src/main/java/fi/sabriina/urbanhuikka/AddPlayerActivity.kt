@@ -1,6 +1,5 @@
 package fi.sabriina.urbanhuikka
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,7 +17,7 @@ import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModel
 import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModelFactory
 
-class AddPlayerActivity : AppCompatActivity() {
+class AddPlayerActivity : BaseActivity() {
 
     private lateinit var addPlayerButton: Button
     private lateinit var playerInput: TextInputEditText
