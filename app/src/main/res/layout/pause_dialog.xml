@@ -8,14 +8,14 @@
 
     <Button
         android:id="@+id/continueButton"
+        style="@style/DefaultButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
         android:layout_marginEnd="48dp"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
+        android:layout_marginBottom="24dp"
         android:text="@string/continue_game"
-        app:icon="@drawable/play_solid"
+        app:icon="@drawable/play"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,17 +45,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/beer_mug_empty_solid" />
+        app:srcCompat="@drawable/glass_mug_variant" />
 
     <Button
         android:id="@+id/quitButton"
+        style="@style/DefaultButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
         android:text="@string/save_and_quit"
-        app:icon="@drawable/xmark_solid"
+        app:icon="@drawable/close_thick"
         app:layout_constraintEnd_toEndOf="@+id/continueButton"
         app:layout_constraintStart_toStartOf="@+id/continueButton"
         app:layout_constraintTop_toBottomOf="@+id/continueButton" />

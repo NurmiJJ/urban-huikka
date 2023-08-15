@@ -2,14 +2,18 @@ package fi.sabriina.urbanhuikka.splashScreens
 
 import android.app.Dialog
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.CountDownTimer
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import fi.sabriina.urbanhuikka.R
 import fi.sabriina.urbanhuikka.helpers.SfxPlayer
+
 
 class SplashScreenManager(private val context: Context) {
     private val notificationQueue = ArrayDeque<Map<String, Any?>>()
@@ -202,6 +206,7 @@ class SplashScreenManager(private val context: Context) {
         private val cancelButton: Button
         private val content: TextView
         private val icon: ImageView
+        private val mainLayout: ConstraintLayout
 
         init {
             val dialog = CustomDialog(context)
@@ -212,6 +217,7 @@ class SplashScreenManager(private val context: Context) {
             cancelButton.visibility = View.INVISIBLE
             content = dialog.findViewById(R.id.notifContent)
             icon = dialog.findViewById(R.id.notifIcon)
+            mainLayout = dialog.findViewById(R.id.mainLayout)
 
             okButton.text = okText
             okButton.setOnClickListener {
@@ -230,6 +236,11 @@ class SplashScreenManager(private val context: Context) {
                     confirmed = false
                     dialog.dismiss()
                 }
+            } else {
+                val constraintSet = ConstraintSet()
+                constraintSet.clone(mainLayout)
+                constraintSet.connect(R.id.okButton, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 32.toDp())
+                constraintSet.applyTo(mainLayout)
             }
 
             content.text = dialogMessage
@@ -261,5 +272,10 @@ class SplashScreenManager(private val context: Context) {
         fun hide() {
             dialog.dismiss()
         }
+    }
+
+    fun Int.toDp(): Int {
+        val density = Resources.getSystem().displayMetrics.density
+        return (this * density).toInt()
     }
 }

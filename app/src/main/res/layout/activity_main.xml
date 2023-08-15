@@ -58,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|center_vertical"
-            app:srcCompat="@drawable/check_solid"
+            app:srcCompat="@drawable/check_bold"
             app:tint="@color/confirm_color_end" />
 
         <ImageView
@@ -66,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
-            app:srcCompat="@drawable/xmark_solid"
+            app:srcCompat="@drawable/close_thick"
             app:tint="@color/cancel_color_end" />
 
         <SeekBar
@@ -128,12 +128,12 @@
     <ImageButton
         android:id="@+id/leaderboardButton"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="8dp"
         android:backgroundTint="#00FFFFFF"
-        android:src="@drawable/chart_simple_solid"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:src="@drawable/poll"
         app:layout_constraintBottom_toTopOf="@+id/dividerMiddle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

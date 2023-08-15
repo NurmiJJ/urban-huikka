@@ -15,7 +15,7 @@
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/drink" />
+        app:srcCompat="@drawable/beer" />
 
     <Button
         android:id="@+id/button2"

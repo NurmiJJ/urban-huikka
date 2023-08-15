@@ -51,11 +51,11 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
 
     private lateinit var leaderboardButton : ImageButton
 
-    private lateinit var drawableBeer : Drawable
-    private lateinit var drawableHand : Drawable
-    private lateinit var drawableCoins : Drawable
-    private lateinit var drawableCrown : Drawable
-    private lateinit var drawableWine: Drawable
+    private lateinit var drawablePint : Drawable
+    private lateinit var drawableNextPlayer : Drawable
+    private lateinit var drawableAddPoints : Drawable
+    private lateinit var drawableWin : Drawable
+    private lateinit var drawableBeer: Drawable
     private lateinit var splashScreenManager : SplashScreenManager
     private lateinit var currentPlayer: Player
     private lateinit var currentPlayerPicture : Drawable
@@ -70,11 +70,11 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        drawableBeer = ContextCompat.getDrawable(this, R.drawable.beer_mug_empty_solid)!!
-        drawableHand = ContextCompat.getDrawable(this, R.drawable.hand_point_right_solid)!!
-        drawableCoins = ContextCompat.getDrawable(this, R.drawable.coins_solid)!!
-        drawableCrown = ContextCompat.getDrawable(this, R.drawable.crown_solid)!!
-        drawableWine = ContextCompat.getDrawable(this, R.drawable.wine_bottle_solid)!!
+        drawablePint = ContextCompat.getDrawable(this, R.drawable.glass_mug_variant)!!
+        drawableNextPlayer = ContextCompat.getDrawable(this, R.drawable.account_arrow_right)!!
+        drawableAddPoints = ContextCompat.getDrawable(this, R.drawable.counter)!!
+        drawableWin = ContextCompat.getDrawable(this, R.drawable.podium_gold)!!
+        drawableBeer = ContextCompat.getDrawable(this, R.drawable.beer)!!
         splashScreenManager = SplashScreenManager(this)
 
         setContentView(R.layout.activity_main)
@@ -165,7 +165,6 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
             } else if (gameStatus == "SAVED") {
                 gameStateViewModel.continueGame()
             }
-            splashScreenManager.showLoadingDialog(false)
         }
 
         CoroutineScope(Dispatchers.Main).launch {
@@ -191,7 +190,7 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
             currentPlayerPicture = ContextCompat.getDrawable(this, currentPlayer.pictureResId)!!
             playerPicture.setImageDrawable(currentPlayerPicture)
 
-            splashScreenManager.showSplashScreen(currentPlayer.name,currentPlayerPicture,"Seuraavana vuorossa ${currentPlayer.name}", drawableHand)
+            splashScreenManager.showSplashScreen(currentPlayer.name,currentPlayerPicture,"Seuraavana vuorossa ${currentPlayer.name}", drawableNextPlayer)
         }
 
         onBackPressedDispatcher.addCallback(this) {
@@ -206,6 +205,13 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.updateGameStatus("ONGOING")
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -217,7 +223,9 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
     override fun onStop() {
         super.onStop()
         CoroutineScope(Dispatchers.Main).launch {
-            gameStateViewModel.updateGameStatus("SAVED")
+            if (gameStateViewModel.getCurrentGame().status != "ENDED") {
+                gameStateViewModel.updateGameStatus("SAVED")
+            }
         }
 
     }
@@ -247,7 +255,7 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
 
     private fun cardSkipped() {
         sfxPlayer.playSkipCardSound()
-        splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Ota ${currentCard!!.points} huikkaa!", drawableWine)
+        splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Ota ${currentCard!!.points} huikkaa!", drawableBeer)
         endTurn()
     }
 
@@ -259,15 +267,20 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
             if (winner != null) {
                 sfxPlayer.playVictorySound()
                 currentPlayerPicture = ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
-                splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableCrown, "Poistu päävalikkoon", "") {
+                splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableWin, "Poistu päävalikkoon", "") {
                     finish()
                 }
             } else {
+                val message : String = if (currentCard!!.points > 1) {
+                    "Sait ${currentCard!!.points} pistettä!"
+                } else {
+                    "Sait ${currentCard!!.points} pisteen!"
+                }
                 splashScreenManager.showSplashScreen(
                     currentPlayer.name,
                     currentPlayerPicture,
-                    "Sait ${currentCard!!.points} pistettä!",
-                    drawableCoins
+                    message,
+                    drawableAddPoints
                 )
                 endTurn()
             }

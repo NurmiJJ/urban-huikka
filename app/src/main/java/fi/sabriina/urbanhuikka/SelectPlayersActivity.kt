@@ -92,7 +92,7 @@ class SelectPlayersActivity : BaseActivity() {
             sfxPlayer.playButtonClickSound()
             val icon = ContextCompat.getDrawable(
                 this,
-                com.google.android.material.R.drawable.mtrl_ic_error
+                R.drawable.alert
             )!!
             CoroutineScope(Dispatchers.Main).launch {
                 if (gameStateViewModel.checkSavedGameExists()) {
@@ -130,7 +130,6 @@ class SelectPlayersActivity : BaseActivity() {
         var truthCount = 0
         var dareCount = 0
         for (category in gridItems) {
-            Log.d(TAG, "$truthCount $dareCount")
             if (category.name in DbConstants.TRUTH_CATEGORIES) {
                 if (category.isChecked) {
                     truthCount += 1
@@ -166,10 +165,11 @@ class SelectPlayersActivity : BaseActivity() {
             gameStateViewModel.updateGameStatus("PLAYER_SELECT")
             val selectedPlayers = adapter.getSelected()
             selectedPlayers.forEach { player ->
-                Log.w(TAG, "Inserting $player to scoreboard")
+                Log.d(TAG, "Inserting $player to scoreboard")
                 gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
             }
 
+            splashScreenManager.showLoadingDialog(false)
             finish()
         }
 

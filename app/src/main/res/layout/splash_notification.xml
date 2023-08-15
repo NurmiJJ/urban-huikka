@@ -12,13 +12,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/view"
         app:layout_constraintEnd_toStartOf="@+id/notifCountdown"
         app:layout_constraintStart_toEndOf="@+id/playerPicture"
-        app:layout_constraintTop_toTopOf="parent"
-        android:maxLines="1"
-        android:ellipsize="end" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/view"
@@ -53,19 +53,20 @@
         app:layout_constraintBottom_toTopOf="@+id/notifContent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/drink" />
+        app:srcCompat="@drawable/beer" />
 
     <Button
         android:id="@+id/notifDismissButton"
+        style="@style/DefaultButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="32dp"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
+        android:layout_marginBottom="80dp"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
         android:text="@string/continue_playing"
-        app:icon="@drawable/play_solid"
+        app:icon="@drawable/play"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

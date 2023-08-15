@@ -8,46 +8,43 @@
 
     <Button
         android:id="@+id/continueGameButton"
+        style="@style/TitleButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
         android:layout_marginTop="300dp"
         android:layout_marginEnd="48dp"
         android:enabled="false"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
         android:text="@string/continue_game"
-        app:icon="@drawable/play_solid"
+        app:icon="@drawable/play"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/newGameButton"
+        style="@style/TitleButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="48dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
         android:text="@string/new_game"
-        app:icon="@drawable/plus_solid"
+        app:icon="@drawable/plus"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/continueGameButton" />
 
     <Button
         android:id="@+id/playersButton"
+        style="@style/TitleButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="48dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
         android:text="@string/players"
-        app:icon="@drawable/users_solid"
+        app:icon="@drawable/account_group"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/newGameButton" />
