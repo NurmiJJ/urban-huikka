@@ -17,6 +17,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import fi.sabriina.urbanhuikka.card.Card
+import fi.sabriina.urbanhuikka.helpers.SfxPlayer
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.splashScreens.SplashScreenManager
@@ -60,6 +61,8 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     private lateinit var currentPlayer: Player
     private lateinit var currentPlayerPicture : Drawable
     private var currentCard: Card? = null
+
+    private val sfxPlayer = SfxPlayer(this)
 
     private val gameStateViewModel: GameStateViewModel by viewModels {
         GameStateViewModelFactory((application as HuikkaApplication).gameStateRepository)
@@ -157,8 +160,27 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
         CoroutineScope(Dispatchers.Main).launch {
             val gameStatus = gameStateViewModel.getCurrentGame().status
-            if (gameStatus in arrayOf("PLAYER_SELECT", "SAVED")) {
+            if (gameStatus == "PLAYER_SELECT") {
                 gameStateViewModel.startGame()
+            } else if (gameStatus == "SAVED") {
+                gameStateViewModel.continueGame()
+            }
+            splashScreenManager.showLoadingDialog(false)
+        }
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val selectedCard = gameStateViewModel.getSelectedCard()
+            if ( selectedCard != null) {
+                currentCard = selectedCard
+                cardView.setCard(selectedCard)
+                cardView.setCardSide(false)
+
+                ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
+                selectionButtons.visibility = View.VISIBLE
+
+            } else {
+                ObjectAnimator.ofFloat(titleText, View.ALPHA, 1f).start()
+                titleText.visibility = View.VISIBLE
             }
         }
 
@@ -175,8 +197,10 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         onBackPressedDispatcher.addCallback(this) {
             splashScreenManager.showPauseDialog { confirmed ->
                 if (confirmed) {
-                    gameStateViewModel.updateGameStatus("SAVED")
-                    finish()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        gameStateViewModel.updateGameStatus("SAVED")
+                        finish()
+                    }
                 }
             }
         }
@@ -192,23 +216,27 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         
     override fun onStop() {
         super.onStop()
-        gameStateViewModel.updateGameStatus("SAVED")
+        CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.updateGameStatus("SAVED")
+        }
 
     }
 
     override fun onSwipeRight() {
+        sfxPlayer.playCardDrawSound()
         drawCard(TRUTH_DECK)
     }
 
     override fun onSwipeLeft() {
+        sfxPlayer.playCardDrawSound()
         drawCard(DARE_DECK)
     }
 
     private fun drawCard(deck: String) {
-        currentCard = gameStateViewModel.getNextCard(deck)
-        if (currentCard != null) {
-            cardView.setCard(currentCard!!)
-            CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Main).launch {
+            currentCard = gameStateViewModel.getNextCard(deck)
+            if (currentCard != null) {
+                cardView.setCard(currentCard!!)
                 ObjectAnimator.ofFloat(titleText, View.ALPHA, 0f).start()
                 delay(250)
                 ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
@@ -218,34 +246,44 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     }
 
     private fun cardSkipped() {
+        sfxPlayer.playSkipCardSound()
         splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Ota ${currentCard!!.points} huikkaa!", drawableWine)
         endTurn()
     }
 
     private fun cardCompleted() {
         CoroutineScope(Dispatchers.Main).launch {
+            sfxPlayer.playCompleteCardSound()
             gameStateViewModel.addPoints(amount=currentCard!!.points)
             val winner = gameStateViewModel.checkWinner()
             if (winner != null) {
+                sfxPlayer.playVictorySound()
                 currentPlayerPicture = ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
                 splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableCrown, "Poistu päävalikkoon", "") {
                     finish()
                 }
+            } else {
+                splashScreenManager.showSplashScreen(
+                    currentPlayer.name,
+                    currentPlayerPicture,
+                    "Sait ${currentCard!!.points} pistettä!",
+                    drawableCoins
+                )
+                endTurn()
             }
-            splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Sait ${currentCard!!.points} pistettä!", drawableCoins)
-            endTurn()
         }
     }
 
     private fun endTurn()  {
-        gameStateViewModel.endTurn()
         CoroutineScope(Dispatchers.Main).launch {
+            gameStateViewModel.endTurn()
             // prevent view from updating before splash screen is showing
             delay(200)
             cardView.setCardSide(true)
             selectionButtons.visibility = View.INVISIBLE
             ObjectAnimator.ofFloat(titleText, View.ALPHA, 1f).start()
             ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 0f).start()
+            gameStateViewModel.updateSelectedCard(null)
         }
     }
 }

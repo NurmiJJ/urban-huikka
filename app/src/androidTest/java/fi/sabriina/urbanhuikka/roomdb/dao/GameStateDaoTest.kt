@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.helpers.DbConstants
 import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.GameState
@@ -130,5 +131,14 @@ class GameStateDaoTest {
         assertThat(dao.getPointsToWin()).isNotNull()
         dao.setPointsToWin(20)
         assertThat(dao.getPointsToWin()).isEqualTo(20)
+    }
+
+    @Test
+    fun getCurrentCard() = runTest {
+        dao.insertGameState(GameState(0,"INITIALIZED",0))
+        assertThat(dao.getSelectedCard()).isNull()
+        val card = Card("Haaveet ja unelmat","Milloin itkit viimeksi?",1)
+        dao.updateSelectedCard(card)
+        assertThat(dao.getSelectedCard()).isEqualTo(card)
     }
 }

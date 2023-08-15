@@ -5,8 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import fi.sabriina.urbanhuikka.DARE_DECK
 import fi.sabriina.urbanhuikka.TAG
+import fi.sabriina.urbanhuikka.TRUTH_DECK
 import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.helpers.DbConstants
 import fi.sabriina.urbanhuikka.roomdb.GameState
@@ -16,7 +17,6 @@ import fi.sabriina.urbanhuikka.repository.GameStateRepository
 import fi.sabriina.urbanhuikka.repository.GameStateRepositoryInterface
 import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
-import kotlinx.coroutines.launch
 
 class GameStateViewModel (private val repository: GameStateRepositoryInterface): ViewModel() {
     private var truthCards = mutableListOf<Card>()
@@ -34,7 +34,7 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     private var pointsToWin: Int = 30
 
     suspend fun initializeDatabase() {
-        startNewGame()
+        Log.d(TAG,"Initializing the database")
         for (category in DbConstants.DARE_CATEGORIES) {
             insertCardCategory(category)
         }
@@ -45,35 +45,39 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
 
     suspend fun checkInitialization() {
         val count = repository.getGameCount()
+        Log.d(TAG, count.toString())
         if (count != 1 || getCurrentGame().status !in arrayOf("INITIALIZED", "ONGOING", "SAVED"))  {
             initializeDatabase()
+            deleteAllGames()
+            insertGameState(GameState(0,"INITIALIZED"))
         }
     }
 
-    fun startNewGame() {
+    suspend fun startNewGame() {
         deleteAllGames()
         deleteAllPlayersFromScoreboard()
-        insertGameState(GameState(0,"INITIALIZED",0))
+        insertGameState(GameState(0,"PLAYER_SELECT"))
     }
 
     private suspend fun insertCardCategory(name: String) {
-        repository.insertCardCategory(CardCategory(0, name, true))
+        repository.insertCardCategory(CardCategory(name, true))
     }
 
-    fun startGame() = viewModelScope.launch {
-        updateDatabase()
-        playerList = getPlayers()
-        pointsToWin = repository.getPointsToWin()
-        updateGameStatus("ONGOING")
-        shuffleCards("truth")
-        shuffleCards("dare")
+    suspend fun startGame() {
+        playerList = repository.getPlayers()
         currentPlayerIndex = repository.getCurrentPlayerIndex()
         _currentPlayer.value = playerList[currentPlayerIndex]
-        Log.d("Huikkasofta", "startGame()")
+        updateDatabase()
+        Log.d(TAG, playerList.toString())
+        pointsToWin = repository.getPointsToWin()
+        updateGameStatus("ONGOING")
+
+        Log.d("Huikkasofta", "at the end of startGame()")
+
     }
 
-    private suspend fun getPlayers() : List<Player> {
-        return repository.getPlayers()
+    suspend fun continueGame() {
+        startGame()
     }
 
     private suspend fun updateDatabase() {
@@ -81,47 +85,60 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         val (truthCardList, dareCardList) = repository.updateDatabase(enabledCategories)
         truthCards = truthCardList
         dareCards = dareCardList
-
+        Log.d(TAG, "Truth cards: ${truthCards.size}")
+        Log.d(TAG, "Dare cards: ${dareCards.size}")
+        shuffleCards(TRUTH_DECK)
+        shuffleCards(DARE_DECK)
     }
 
     private fun checkRemainingCards() {
         if (truthCardIndex == truthCards.size) {
-            truthCardIndex = 0
-            truthCards.shuffle()
+            shuffleCards(TRUTH_DECK)
         }
 
         if (dareCardIndex == dareCards.size) {
-            dareCardIndex = 0
-            dareCards.shuffle()
+            shuffleCards(DARE_DECK)
         }
     }
 
     private fun shuffleCards(deck: String) {
-        if (deck == "truth") {
+        if (deck == TRUTH_DECK) {
+            if (truthCards.size < 1) {
+                Log.w(TAG, "No $deck cards to shuffle")
+                return
+            }
             truthCardIndex = 0
             truthCards.shuffle()
         }
-        else if (deck == "dare") {
+        else if (deck == DARE_DECK) {
+            if (dareCards.size < 1) {
+                Log.w(TAG, "No $deck cards to shuffle")
+                return
+            }
             dareCardIndex = 0
             dareCards.shuffle()
         }
+        Log.d(TAG, "Shuffled $deck deck")
     }
 
-    fun getNextCard(deck: String) : Card? {
-        if (deck == "truth") {
+    suspend fun getNextCard(deck: String) : Card? {
+        var selectedCard: Card? = null
+        if (deck == TRUTH_DECK) {
             truthCardIndex += 1
-            return truthCards[truthCardIndex-1]
+            selectedCard = truthCards[truthCardIndex-1]
         }
-        if (deck == "dare") {
+        else if (deck == DARE_DECK) {
             dareCardIndex += 1
-            return dareCards[dareCardIndex-1]
+            selectedCard = dareCards[dareCardIndex-1]
         }
-        return null
+        updateSelectedCard(selectedCard)
+        return selectedCard
     }
 
-    fun endTurn() {
+    suspend fun endTurn() {
         checkRemainingCards()
         updateCurrentPlayer()
+        updateSelectedCard(null)
     }
 
     suspend fun addPoints(playerId: Int = playerList[currentPlayerIndex].id, amount: Int) {
@@ -144,12 +161,20 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         return repository.getAllScores()
     }
 
-    private fun insertGameState(gameState: GameState) = viewModelScope.launch {
+    private suspend fun insertGameState(gameState: GameState) {
         repository.insertGameState(gameState)
     }
 
     suspend fun getCurrentGame() : GameState {
         return repository.getCurrentGame()
+    }
+
+    suspend fun getSelectedCard() : Card? {
+        return repository.getSelectedCard()
+    }
+
+    suspend fun updateSelectedCard(card: Card?) {
+        repository.updateSelectedCard(card)
     }
 
     suspend fun checkSavedGameExists(): Boolean {
@@ -159,17 +184,17 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         return false
     }
 
-    fun updateGameStatus(status: String) = viewModelScope.launch {
+    suspend fun updateGameStatus(status: String) {
         repository.updateGameState(status)
 
         Log.d(TAG, "Updated game status to: $status")
     }
 
-    fun insertPlayerToScoreboard(scoreboardEntry: ScoreboardEntry) = viewModelScope.launch {
+    suspend fun insertPlayerToScoreboard(scoreboardEntry: ScoreboardEntry) {
         repository.insertPlayerToScoreboard(scoreboardEntry)
     }
 
-    private fun updateCurrentPlayer() = viewModelScope.launch {
+    private suspend fun updateCurrentPlayer() {
         if (currentPlayerIndex < playerList.size - 1) {
             currentPlayerIndex += 1
         }
@@ -180,11 +205,11 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         _currentPlayer.value = playerList[currentPlayerIndex]
     }
 
-    private fun deleteAllGames() = viewModelScope.launch {
+    private suspend fun deleteAllGames() {
         repository.deleteAllGames()
     }
 
-    private fun deleteAllPlayersFromScoreboard() = viewModelScope.launch {
+    private suspend fun deleteAllPlayersFromScoreboard() {
         repository.deleteAllPlayersFromScoreboard()
     }
 
