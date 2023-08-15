@@ -209,7 +209,9 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
         super.onResume()
 
         CoroutineScope(Dispatchers.Main).launch {
-            gameStateViewModel.updateGameStatus("ONGOING")
+            if (gameStateViewModel.getCurrentGame().status == "SAVED") {
+                gameStateViewModel.updateGameStatus("ONGOING")
+            }
         }
     }
 
@@ -223,7 +225,7 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
     override fun onStop() {
         super.onStop()
         CoroutineScope(Dispatchers.Main).launch {
-            if (gameStateViewModel.getCurrentGame().status != "ENDED") {
+            if (gameStateViewModel.getCurrentGame().status == "ONGOING") {
                 gameStateViewModel.updateGameStatus("SAVED")
             }
         }
