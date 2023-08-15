@@ -34,7 +34,7 @@ class ManagePlayersActivity : AppCompatActivity() {
         splashScreenManager = SplashScreenManager(this)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview_leaderboard)
         deleteButton = findViewById(R.id.buttonDelete)
-        adapter = PlayerListAdapter("MANAGE", deleteButton)
+        adapter = PlayerListAdapter(this, "MANAGE", deleteButton)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         fab = findViewById(R.id.floatingActionButton)
