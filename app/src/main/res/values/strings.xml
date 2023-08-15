@@ -38,4 +38,5 @@
     <string name="select_categories">Valitse korttikategoriat</string>
     <string name="manage_players">Hallinnoi pelaajia</string>
     <string name="timed_card">Ajastettu tehtävä alkaa</string>
+    <string name="times_up">Aika loppui</string>
 </resources>

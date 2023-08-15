@@ -18,7 +18,13 @@ class SplashScreenManager(private val context: Context) {
     private var confirmed = false
     private var loadingDialog = LoadingDialog()
 
-    fun showSplashScreen(playerName: String, playerPicture: Drawable, dialogMessage: String, dialogIcon: Drawable, dialogDelay: Long = 6000) {
+    fun showSplashScreen(
+        playerName: String,
+        playerPicture: Drawable,
+        dialogMessage: String,
+        dialogIcon: Drawable,
+        dialogDelay: Long = 6000
+    ) {
         val notification = mapOf(
             "playerName" to playerName,
             "playerPicture" to playerPicture,
@@ -42,8 +48,7 @@ class SplashScreenManager(private val context: Context) {
             isShowingNotification = false
             currentNotification?.cancelTimer()
             currentNotification?.dismiss()
-        }
-        else {
+        } else {
             currentNotification?.cancelTimer()
             showNextNotification()
         }
@@ -58,8 +63,7 @@ class SplashScreenManager(private val context: Context) {
                 nextNotif["dialogMessage"] as String,
                 nextNotif["dialogIcon"] as Drawable,
             )
-        }
-        else {
+        } else {
             val nextNotif = notificationQueue.removeFirst()
             currentNotification = SplashNotification(
                 nextNotif["playerName"] as String,
@@ -74,7 +78,13 @@ class SplashScreenManager(private val context: Context) {
         currentNotification!!.show()
     }
 
-    private inner class SplashNotification(pName: String, pPicture: Drawable, dialogMessage: String, dialogIcon: Drawable, dialogDelay: Long) {
+    private inner class SplashNotification(
+        pName: String,
+        pPicture: Drawable,
+        dialogMessage: String,
+        dialogIcon: Drawable,
+        dialogDelay: Long
+    ) {
         private var dialog: Dialog
         private var countdownTimer: CountDownTimer
         private val playerName: TextView
@@ -123,7 +133,12 @@ class SplashScreenManager(private val context: Context) {
             countdownTimer.start()
         }
 
-        fun updateNotification(pName: String, pPicture: Drawable, dialogMessage: String, dialogIcon: Drawable) {
+        fun updateNotification(
+            pName: String,
+            pPicture: Drawable,
+            dialogMessage: String,
+            dialogIcon: Drawable
+        ) {
             playerName.text = pName
             playerPicture.setImageDrawable(pPicture)
             content.text = dialogMessage
@@ -177,12 +192,23 @@ class SplashScreenManager(private val context: Context) {
         }
     }
 
-    fun showConfirmDialog(message: String, icon: Drawable, okText: String, cancelText: String, callback: (Boolean) -> Unit) {
+    fun showConfirmDialog(
+        message: String,
+        icon: Drawable,
+        okText: String,
+        cancelText: String,
+        callback: (Boolean) -> Unit
+    ) {
         val dialog = ConfirmDialog(message, icon, okText, cancelText)
         dialog.show { callback(confirmed) }
     }
 
-    private inner class ConfirmDialog(dialogMessage: String, dialogIcon: Drawable, okText: String, cancelText: String) {
+    private inner class ConfirmDialog(
+        dialogMessage: String,
+        dialogIcon: Drawable,
+        okText: String,
+        cancelText: String
+    ) {
         private var dialog: Dialog
         private val okButton: Button
         private val cancelButton: Button
@@ -255,9 +281,13 @@ class SplashScreenManager(private val context: Context) {
         }
     }
 
-    fun showCountdownDialog(time: Long = 4000, title: String = context.getString(R.string.timed_card)) {
+    fun showCountdownDialog(
+        time: Long = 4000,
+        title: String = context.getString(R.string.timed_card),
+        callback: () -> Unit
+    ) {
         val dialog = CountdownDialog(time, title)
-        dialog.show()
+        dialog.show(callback)
     }
 
     private inner class CountdownDialog(time: Long, title: String) {
@@ -288,7 +318,8 @@ class SplashScreenManager(private val context: Context) {
             this.dialog = dialog
         }
 
-        fun show() {
+        fun show(onDismiss: () -> Unit) {
+            dialog.setOnDismissListener { onDismiss.invoke() }
             dialog.show()
             countdownTimer.start()
         }
