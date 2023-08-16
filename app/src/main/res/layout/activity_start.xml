@@ -7,8 +7,9 @@
     tools:context=".StartActivity">
 
     <Button
+        app:backgroundTint="@null"
         android:id="@+id/continueGameButton"
-        style="@style/TitleButton"
+        style="@style/InfoButtonAccent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
@@ -22,8 +23,9 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        app:backgroundTint="@null"
         android:id="@+id/newGameButton"
-        style="@style/TitleButton"
+        style="@style/InfoButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
@@ -36,8 +38,9 @@
         app:layout_constraintTop_toBottomOf="@+id/continueGameButton" />
 
     <Button
+        app:backgroundTint="@null"
         android:id="@+id/playersButton"
-        style="@style/TitleButton"
+        style="@style/InfoButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"

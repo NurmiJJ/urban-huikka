@@ -37,4 +37,5 @@
     <string name="points_to_win">Pisteitä voittoon</string>
     <string name="select_categories">Valitse korttikategoriat</string>
     <string name="manage_players">Hallinnoi pelaajia</string>
+    <string name="leaderboard">Pistetaulukko</string>
 </resources>

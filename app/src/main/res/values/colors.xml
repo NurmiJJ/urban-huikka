@@ -19,11 +19,13 @@
     <color name="dark_font">#0B132B</color>
     <color name="light_font">#1C2541</color>
 
+    <color name="main_font">@color/white</color>
+    <color name="disabled_font">#8A887D</color>
     <color name="cancel_color_start">#3CFF0000</color>
     <color name="cancel_color_end">#D80606</color>
     <color name="confirm_color_start">#3C0A980A</color>
-    <color name="confirm_color_end">#0FD10F</color>
-    <color name="info">#114171</color>
-    <color name="disabled">#6E6E6E</color>
+    <color name="confirm_color_end">#089308</color>
+    <color name="info">#114172</color>
     <color name="accent">#871313</color>
+    <color name="disabled">#D1CBC2</color>
 </resources>

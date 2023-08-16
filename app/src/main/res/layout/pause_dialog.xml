@@ -7,8 +7,9 @@
     tools:context=".MainActivity">
 
     <Button
+        app:backgroundTint="@null"
         android:id="@+id/continueButton"
-        style="@style/DefaultButton"
+        style="@style/InfoButtonAccent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
@@ -48,8 +49,9 @@
         app:srcCompat="@drawable/glass_mug_variant" />
 
     <Button
+        app:backgroundTint="@null"
         android:id="@+id/quitButton"
-        style="@style/DefaultButton"
+        style="@style/InfoButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
