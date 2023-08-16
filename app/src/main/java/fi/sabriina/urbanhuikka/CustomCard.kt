@@ -15,7 +15,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import fi.sabriina.urbanhuikka.card.Card
-import fi.sabriina.urbanhuikka.roomdb.Player
 
 const val ASSISTING_PLACEHOLDER = "[pelaaja]"
 
@@ -43,14 +42,13 @@ class CustomCard : ConstraintLayout {
         LayoutInflater.from(context).inflate(R.layout.custom_card, this, true)
         init()
     }
-     fun setCard(card: Card, assistingPlayer: Player){
+     fun setCard(card: Card, assistingPlayerName: String){
          val titleView = findViewById<TextView>(R.id.textViewHeader)
          val descriptionView = findViewById<TextView>(R.id.textViewDescription)
          val pointsView = findViewById<TextView>(R.id.textViewPoints)
 
-         val assistingName = assistingPlayer.name
          var cardDescription = card.description
-         cardDescription = cardDescription.replace(ASSISTING_PLACEHOLDER, "<b>$assistingName</b> ")
+         cardDescription = cardDescription.replace(ASSISTING_PLACEHOLDER, "<b>$assistingPlayerName</b> ")
 
          titleView.text = card.category
          descriptionView.text = Html.fromHtml(cardDescription, 0)

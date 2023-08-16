@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 const val TAG = "Huikkasofta"
 const val TRUTH_DECK = "truth"
 const val DARE_DECK = "dare"
+const val DUAL_CARD_TYPE = "Sinä ja minä"
 
 class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
@@ -161,7 +162,11 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             val selectedCard = gameStateViewModel.getSelectedCard()
             if ( selectedCard != null) {
                 currentCard = selectedCard
-                val assistingPlayer = gameStateViewModel.drawAssistingPlayer()
+
+                var assistingPlayer = ""
+                if (currentCard!!.category == DUAL_CARD_TYPE) {
+                    assistingPlayer = gameStateViewModel.drawAssistingPlayer().name
+                }
 
                 cardView.setCard(selectedCard, assistingPlayer)
                 cardView.setCardSide(false)
@@ -225,7 +230,11 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         CoroutineScope(Dispatchers.Main).launch {
             currentCard = gameStateViewModel.getNextCard(deck)
             if (currentCard != null) {
-                val assistingPlayer = gameStateViewModel.drawAssistingPlayer()
+
+                var assistingPlayer = ""
+                if (currentCard!!.category == DUAL_CARD_TYPE) {
+                    assistingPlayer = gameStateViewModel.drawAssistingPlayer().name
+                }
 
                 cardView.setCard(currentCard!!, assistingPlayer)
                 ObjectAnimator.ofFloat(titleText, View.ALPHA, 0f).start()
@@ -241,7 +250,16 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             val assistingPlayer = gameStateViewModel.getAssistingPlayer()
             val assistingPlayerPicture = ContextCompat.getDrawable(this@MainActivity, currentPlayer.pictureResId)!!
             splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Ota ${currentCard!!.points} huikkaa!", drawableDrink)
-            splashScreenManager.showSplashScreen(assistingPlayer.name, assistingPlayerPicture,"Ota ${currentCard!!.points} huikkaa!", drawableDrink)
+
+            if (currentCard!!.category == DUAL_CARD_TYPE) {
+                splashScreenManager.showSplashScreen(
+                    assistingPlayer.name,
+                    assistingPlayerPicture,
+                    "Ota ${currentCard!!.points} huikkaa!",
+                    drawableDrink
+                )
+            }
+
             endTurn()
         }
     }
@@ -251,7 +269,6 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             val assistingPlayer = gameStateViewModel.getAssistingPlayer()
             val assistingPlayerPicture = ContextCompat.getDrawable(this@MainActivity, currentPlayer.pictureResId)!!
             gameStateViewModel.addPoints(amount=currentCard!!.points)
-            gameStateViewModel.addPoints(assistingPlayer.id, currentCard!!.points)
 
             val winner = gameStateViewModel.checkWinner()
             if (winner != null) {
@@ -261,7 +278,17 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
                 }
             }
             splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
-            splashScreenManager.showSplashScreen(assistingPlayer.name,assistingPlayerPicture, "Sait ${currentCard!!.points} pistettä!", drawableDrink)
+
+            if (currentCard!!.category == DUAL_CARD_TYPE) {
+                gameStateViewModel.addPoints(assistingPlayer.id, currentCard!!.points)
+                splashScreenManager.showSplashScreen(
+                    assistingPlayer.name,
+                    assistingPlayerPicture,
+                    "Sait ${currentCard!!.points} pistettä!",
+                    drawableDrink
+                )
+            }
+
             endTurn()
         }
     }
