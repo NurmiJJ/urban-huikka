@@ -3,6 +3,7 @@ package fi.sabriina.urbanhuikka.splashScreens
 import android.app.Dialog
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.CountDownTimer
 import android.view.View
@@ -195,12 +196,12 @@ class SplashScreenManager(private val context: Context) {
         }
     }
 
-    fun showConfirmDialog(message: String, icon: Drawable, okText: String, cancelText: String, callback: (Boolean) -> Unit) {
-        val dialog = ConfirmDialog(message, icon, okText, cancelText)
+    fun showConfirmDialog(message: String, icon: Drawable, iconColor: Int = Color.BLACK, okText: String, cancelText: String, callback: (Boolean) -> Unit) {
+        val dialog = ConfirmDialog(message, icon, iconColor, okText, cancelText)
         dialog.show { callback(confirmed) }
     }
 
-    private inner class ConfirmDialog(dialogMessage: String, dialogIcon: Drawable, okText: String, cancelText: String) {
+    private inner class ConfirmDialog(dialogMessage: String, dialogIcon: Drawable, iconColor: Int, okText: String, cancelText: String) {
         private var dialog: CustomDialog
         private val okButton: Button
         private val cancelButton: Button
@@ -245,6 +246,7 @@ class SplashScreenManager(private val context: Context) {
 
             content.text = dialogMessage
             icon.setImageDrawable(dialogIcon)
+            icon.setColorFilter(iconColor)
 
             this.dialog = dialog
         }

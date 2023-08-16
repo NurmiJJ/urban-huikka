@@ -269,7 +269,7 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
             if (winner != null) {
                 sfxPlayer.playVictorySound()
                 currentPlayerPicture = ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
-                splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableWin, "Poistu päävalikkoon", "") {
+                splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableWin, okText = "Poistu päävalikkoon", cancelText = "") {
                     finish()
                 }
             } else {

@@ -28,4 +28,5 @@
     <color name="info">#114172</color>
     <color name="accent">#871313</color>
     <color name="disabled">#D1CBC2</color>
+    <color name="warning">#FF8400</color>
 </resources>

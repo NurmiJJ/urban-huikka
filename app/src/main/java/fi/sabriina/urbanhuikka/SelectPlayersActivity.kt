@@ -99,6 +99,7 @@ class SelectPlayersActivity : BaseActivity() {
                     splashScreenManager.showConfirmDialog(
                         "Uuden pelin aloittaminen korvaa edellisen keskeneräisen pelin",
                         icon,
+                        ContextCompat.getColor(applicationContext, R.color.warning),
                         getString(R.string.continue_),
                         getString(R.string.cancel)
                     ) { confirmed ->
