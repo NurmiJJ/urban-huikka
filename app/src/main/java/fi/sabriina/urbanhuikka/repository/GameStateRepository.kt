@@ -100,6 +100,10 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
         gameStateDao.updateCurrentPlayerIndex(index)
     }
 
+    override suspend fun updateAssistingPlayerIndex(index: Int) {
+        gameStateDao.updateAssistingPlayerIndex(index)
+    }
+
     override suspend fun updateSelectedCard(card: Card?) {
         gameStateDao.updateSelectedCard(card)
     }
@@ -129,6 +133,10 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
 
     override suspend fun getCurrentPlayerIndex(): Int {
         return gameStateDao.getCurrentPlayerIndex()
+    }
+
+    override suspend fun getAssistingPlayerIndex(): Int {
+        return gameStateDao.getAssistingPlayerIndex()
     }
 
     override suspend fun getSelectedCard(): Card? {

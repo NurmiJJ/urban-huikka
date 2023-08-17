@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 const val TAG = "Huikkasofta"
 const val TRUTH_DECK = "truth"
 const val DARE_DECK = "dare"
+const val DUAL_CARD_TYPE = "Sinä ja minä"
 
 class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
@@ -166,7 +167,13 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             val selectedCard = gameStateViewModel.getSelectedCard()
             if (selectedCard != null) {
                 currentCard = selectedCard
-                cardView.setCard(selectedCard)
+
+                var assistingPlayer = ""
+                if (currentCard!!.category == DUAL_CARD_TYPE) {
+                    assistingPlayer = gameStateViewModel.drawAssistingPlayer().name
+                }
+
+                cardView.setCard(selectedCard, assistingPlayer)
                 cardView.setCardSide(false)
 
                 ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
@@ -235,7 +242,13 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         CoroutineScope(Dispatchers.Main).launch {
             currentCard = gameStateViewModel.getNextCard(deck)
             if (currentCard != null) {
-                cardView.setCard(currentCard!!)
+
+                var assistingPlayer = ""
+                if (currentCard!!.category == DUAL_CARD_TYPE) {
+                    assistingPlayer = gameStateViewModel.drawAssistingPlayer().name
+                }
+
+                cardView.setCard(currentCard!!, assistingPlayer)
                 ObjectAnimator.ofFloat(titleText, View.ALPHA, 0f).start()
                 delay(250)
                 ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
@@ -259,20 +272,37 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     }
 
     private fun cardSkipped() {
-        sfxPlayer.playSkipCardSound()
-        splashScreenManager.showSplashScreen(
+        CoroutineScope(Dispatchers.Main).launch {
+            val assistingPlayer = gameStateViewModel.getAssistingPlayer()
+            val assistingPlayerPicture = ContextCompat.getDrawable(this@MainActivity, currentPlayer.pictureResId)!!
+            sfxPlayer.playSkipCardSound()
+            splashScreenManager.showSplashScreen(
             currentPlayer.name,
             currentPlayerPicture,
             "Ota ${currentCard!!.points} huikkaa!",
             drawableDrink
-        )
-        endTurn()
+            )
+
+            if (currentCard!!.category == DUAL_CARD_TYPE) {
+                splashScreenManager.showSplashScreen(
+                    assistingPlayer.name,
+                    assistingPlayerPicture,
+                    "Ota ${currentCard!!.points} huikkaa!",
+                    drawableDrink
+                )
+            }
+
+            endTurn()
+        }
     }
 
     private fun cardCompleted() {
         CoroutineScope(Dispatchers.Main).launch {
+            val assistingPlayer = gameStateViewModel.getAssistingPlayer()
+            val assistingPlayerPicture = ContextCompat.getDrawable(this@MainActivity, currentPlayer.pictureResId)!!
             sfxPlayer.playCompleteCardSound()
             gameStateViewModel.addPoints(amount = currentCard!!.points)
+
             val winner = gameStateViewModel.checkWinner()
             if (winner != null) {
                 sfxPlayer.playVictorySound()
@@ -293,6 +323,16 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
                     "Sait ${currentCard!!.points} pistettä!",
                     drawableDrink
                 )
+                
+                if (currentCard!!.category == DUAL_CARD_TYPE) {
+                gameStateViewModel.addPoints(assistingPlayer.id, currentCard!!.points)
+                splashScreenManager.showSplashScreen(
+                    assistingPlayer.name,
+                    assistingPlayerPicture,
+                    "Sait ${currentCard!!.points} pistettä!",
+                    drawableDrink
+                )
+                }
                 endTurn()
             }
         }

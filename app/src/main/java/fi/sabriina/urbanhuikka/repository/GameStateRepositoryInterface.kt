@@ -19,6 +19,8 @@ interface GameStateRepositoryInterface {
 
     suspend fun updateCurrentPlayerIndex(index: Int)
 
+    suspend fun updateAssistingPlayerIndex(index: Int)
+
     suspend fun updateSelectedCard(card: Card?)
 
     suspend fun getCurrentGame() : GameState
@@ -34,6 +36,8 @@ interface GameStateRepositoryInterface {
     suspend fun getAllScores() : List<PlayerAndScore>
 
     suspend fun getCurrentPlayerIndex(): Int
+
+    suspend fun getAssistingPlayerIndex(): Int
 
     suspend fun getSelectedCard() : Card?
 

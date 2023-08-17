@@ -225,6 +225,19 @@ class GameStateViewModel(private val repository: GameStateRepositoryInterface) :
         repository.setPointsToWin(points)
     }
 
+    suspend fun drawAssistingPlayer() : Player {
+        val availablePlayers = playerList.filter { it != currentPlayer.value }
+        val player = availablePlayers.random()
+
+        repository.updateAssistingPlayerIndex(playerList.indexOf(player))
+        return player
+    }
+
+    suspend fun getAssistingPlayer() : Player {
+        val assistingPlayerIndex = repository.getAssistingPlayerIndex()
+        return playerList[assistingPlayerIndex]
+    }
+
 }
 
 class GameStateViewModelFactory(private val repository: GameStateRepository) :
