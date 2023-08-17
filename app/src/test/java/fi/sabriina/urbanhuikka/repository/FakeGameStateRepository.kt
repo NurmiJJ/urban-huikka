@@ -50,6 +50,10 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
         repoGameState?.currentPlayerIndex = index
     }
 
+    override suspend fun updateAssistingPlayerIndex(index: Int) {
+        repoGameState?.assistingPlayerIndex = index
+    }
+
     override suspend fun updateSelectedCard(card: Card?) {
         repoGameState?.selectedCard = card
     }
@@ -100,6 +104,10 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
 
     override suspend fun getCurrentPlayerIndex(): Int {
         return repoGameState!!.currentPlayerIndex
+    }
+
+    override suspend fun getAssistingPlayerIndex(): Int {
+        return repoGameState!!.assistingPlayerIndex
     }
 
     override suspend fun getSelectedCard(): Card? {

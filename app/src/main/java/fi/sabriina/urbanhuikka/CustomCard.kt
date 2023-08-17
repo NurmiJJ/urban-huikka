@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.text.Html
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -14,6 +15,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import fi.sabriina.urbanhuikka.card.Card
+
+const val ASSISTING_PLACEHOLDER = "[pelaaja]"
 
 interface OnCardSwipeListener {
     fun onSwipeRight()
@@ -39,13 +42,16 @@ class CustomCard : ConstraintLayout {
         LayoutInflater.from(context).inflate(R.layout.custom_card, this, true)
         init()
     }
-     fun setCard(card: Card){
+     fun setCard(card: Card, assistingPlayerName: String){
          val titleView = findViewById<TextView>(R.id.textViewHeader)
          val descriptionView = findViewById<TextView>(R.id.textViewDescription)
          val pointsView = findViewById<TextView>(R.id.textViewPoints)
 
+         var cardDescription = card.description
+         cardDescription = cardDescription.replace(ASSISTING_PLACEHOLDER, "<b>$assistingPlayerName</b> ")
+
          titleView.text = card.category
-         descriptionView.text = card.description
+         descriptionView.text = Html.fromHtml(cardDescription, 0)
          val points = "Pisteet: ${card.points}"
          pointsView.text = points
      }
