@@ -36,11 +36,11 @@ const val DUAL_CARD_TYPE = "Sinä ja minä"
 
 class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
-    private lateinit var playerName : TextView
-    private lateinit var playerPicture : ImageView
-    private lateinit var cardView : CustomCard
+    private lateinit var playerName: TextView
+    private lateinit var playerPicture: ImageView
+    private lateinit var cardView: CustomCard
 
-    private lateinit var selectionButtons : FrameLayout
+    private lateinit var selectionButtons: FrameLayout
 
     private lateinit var swipeButton: SeekBar
     private lateinit var guideCheckmark: ImageView
@@ -51,12 +51,12 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
     private lateinit var titleText: TextView
 
-    private lateinit var leaderboardButton : ImageButton
+    private lateinit var leaderboardButton: ImageButton
 
-    private lateinit var drawableDrink : Drawable
-    private lateinit var splashScreenManager : SplashScreenManager
+    private lateinit var drawableDrink: Drawable
+    private lateinit var splashScreenManager: SplashScreenManager
     private lateinit var currentPlayer: Player
-    private lateinit var currentPlayerPicture : Drawable
+    private lateinit var currentPlayerPicture: Drawable
     private var currentCard: Card? = null
 
     private val sfxPlayer = SfxPlayer(this)
@@ -107,11 +107,13 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
                     feedbackGiven = false
                 }
                 if (progress < 50) {
-                    seekBar.progressDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.swipe_bar_red)
+                    seekBar.progressDrawable =
+                        ContextCompat.getDrawable(applicationContext, R.drawable.swipe_bar_red)
                     guideSkipText.visibility = View.VISIBLE
                     guideCompleteText.visibility = View.INVISIBLE
                 } else if (progress > 50) {
-                    seekBar.progressDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.swipe_bar_green)
+                    seekBar.progressDrawable =
+                        ContextCompat.getDrawable(applicationContext, R.drawable.swipe_bar_green)
                     guideCompleteText.visibility = View.VISIBLE
                     guideSkipText.visibility = View.INVISIBLE
                 }
@@ -163,7 +165,7 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
         CoroutineScope(Dispatchers.Main).launch {
             val selectedCard = gameStateViewModel.getSelectedCard()
-            if ( selectedCard != null) {
+            if (selectedCard != null) {
                 currentCard = selectedCard
 
                 var assistingPlayer = ""
@@ -190,7 +192,12 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             currentPlayerPicture = ContextCompat.getDrawable(this, currentPlayer.pictureResId)!!
             playerPicture.setImageDrawable(currentPlayerPicture)
 
-            splashScreenManager.showSplashScreen(currentPlayer.name,currentPlayerPicture,"Seuraavana vuorossa ${currentPlayer.name}", drawableDrink)
+            splashScreenManager.showSplashScreen(
+                currentPlayer.name,
+                currentPlayerPicture,
+                "Seuraavana vuorossa ${currentPlayer.name}",
+                drawableDrink
+            )
         }
 
         onBackPressedDispatcher.addCallback(this) {
@@ -210,9 +217,9 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         super.onDestroy()
 
         splashScreenManager.dismissAllSplashScreens()
-        
+
     }
-        
+
     override fun onStop() {
         super.onStop()
         CoroutineScope(Dispatchers.Main).launch {
@@ -247,6 +254,20 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
                 ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
                 selectionButtons.visibility = View.VISIBLE
             }
+            if (currentCard?.time != 0) {
+                sfxPlayer.playTimerTickingSound()
+                splashScreenManager.showCountdownDialog {
+                    cardView.startCountdownTimer {
+                        sfxPlayer.playTimesUpSound()
+                        splashScreenManager.showConfirmDialog(
+                            getString(R.string.times_up),
+                            drawableDrink,
+                            getString(R.string.continue_),
+                            ""
+                        ) {}
+                    }
+                }
+            }
         }
     }
 
@@ -255,7 +276,12 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             val assistingPlayer = gameStateViewModel.getAssistingPlayer()
             val assistingPlayerPicture = ContextCompat.getDrawable(this@MainActivity, currentPlayer.pictureResId)!!
             sfxPlayer.playSkipCardSound()
-            splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Ota ${currentCard!!.points} huikkaa!", drawableDrink)
+            splashScreenManager.showSplashScreen(
+            currentPlayer.name,
+            currentPlayerPicture,
+            "Ota ${currentCard!!.points} huikkaa!",
+            drawableDrink
+            )
 
             if (currentCard!!.category == DUAL_CARD_TYPE) {
                 splashScreenManager.showSplashScreen(
@@ -275,13 +301,19 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             val assistingPlayer = gameStateViewModel.getAssistingPlayer()
             val assistingPlayerPicture = ContextCompat.getDrawable(this@MainActivity, currentPlayer.pictureResId)!!
             sfxPlayer.playCompleteCardSound()
-            gameStateViewModel.addPoints(amount=currentCard!!.points)
+            gameStateViewModel.addPoints(amount = currentCard!!.points)
 
             val winner = gameStateViewModel.checkWinner()
             if (winner != null) {
                 sfxPlayer.playVictorySound()
-                currentPlayerPicture = ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
-                splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableDrink, "Poistu päävalikkoon", "") {
+                currentPlayerPicture =
+                    ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
+                splashScreenManager.showConfirmDialog(
+                    "${winner.name} voitti pelin!",
+                    drawableDrink,
+                    "Poistu päävalikkoon",
+                    ""
+                ) {
                     finish()
                 }
             } else {
@@ -306,7 +338,7 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         }
     }
 
-    private fun endTurn()  {
+    private fun endTurn() {
         CoroutineScope(Dispatchers.Main).launch {
             gameStateViewModel.endTurn()
             // prevent view from updating before splash screen is showing

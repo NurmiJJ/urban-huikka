@@ -51,6 +51,22 @@ class SfxPlayer(val context: Context) {
         mediaPlayer?.start()
     }
 
+    fun playTimerTickingSound() {
+        initPlayer()
+        val soundUri = Uri.parse("android.resource://${context.packageName}/${R.raw.timer_ticking}")
+        mediaPlayer?.setDataSource(context, soundUri)
+        mediaPlayer?.prepare()
+        mediaPlayer?.start()
+    }
+
+    fun playTimesUpSound() {
+        initPlayer()
+        val soundUri = Uri.parse("android.resource://${context.packageName}/${R.raw.times_up}")
+        mediaPlayer?.setDataSource(context, soundUri)
+        mediaPlayer?.prepare()
+        mediaPlayer?.start()
+    }
+
     private fun initPlayer() {
         if (mediaPlayer == null) {
             mediaPlayer = MediaPlayer()

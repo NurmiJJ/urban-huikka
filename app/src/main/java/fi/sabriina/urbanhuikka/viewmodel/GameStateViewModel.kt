@@ -18,7 +18,7 @@ import fi.sabriina.urbanhuikka.repository.GameStateRepositoryInterface
 import fi.sabriina.urbanhuikka.roomdb.CardCategory
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 
-class GameStateViewModel (private val repository: GameStateRepositoryInterface): ViewModel() {
+class GameStateViewModel(private val repository: GameStateRepositoryInterface) : ViewModel() {
     private var truthCards = mutableListOf<Card>()
     private var dareCards = mutableListOf<Card>()
     private var playerList = listOf<Player>()
@@ -34,7 +34,7 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     private var pointsToWin: Int = 30
 
     suspend fun initializeDatabase() {
-        Log.d(TAG,"Initializing the database")
+        Log.d(TAG, "Initializing the database")
         for (category in DbConstants.DARE_CATEGORIES) {
             insertCardCategory(category)
         }
@@ -46,17 +46,17 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     suspend fun checkInitialization() {
         val count = repository.getGameCount()
         Log.d(TAG, count.toString())
-        if (count != 1 || getCurrentGame().status !in arrayOf("INITIALIZED", "ONGOING", "SAVED"))  {
+        if (count != 1 || getCurrentGame().status !in arrayOf("INITIALIZED", "ONGOING", "SAVED")) {
             initializeDatabase()
             deleteAllGames()
-            insertGameState(GameState(0,"INITIALIZED"))
+            insertGameState(GameState(0, "INITIALIZED"))
         }
     }
 
     suspend fun startNewGame() {
         deleteAllGames()
         deleteAllPlayersFromScoreboard()
-        insertGameState(GameState(0,"PLAYER_SELECT"))
+        insertGameState(GameState(0, "PLAYER_SELECT"))
     }
 
     private suspend fun insertCardCategory(name: String) {
@@ -109,8 +109,7 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
             }
             truthCardIndex = 0
             truthCards.shuffle()
-        }
-        else if (deck == DARE_DECK) {
+        } else if (deck == DARE_DECK) {
             if (dareCards.size < 1) {
                 Log.w(TAG, "No $deck cards to shuffle")
                 return
@@ -121,15 +120,14 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         Log.d(TAG, "Shuffled $deck deck")
     }
 
-    suspend fun getNextCard(deck: String) : Card? {
+    suspend fun getNextCard(deck: String): Card? {
         var selectedCard: Card? = null
         if (deck == TRUTH_DECK) {
             truthCardIndex += 1
-            selectedCard = truthCards[truthCardIndex-1]
-        }
-        else if (deck == DARE_DECK) {
+            selectedCard = truthCards[truthCardIndex - 1]
+        } else if (deck == DARE_DECK) {
             dareCardIndex += 1
-            selectedCard = dareCards[dareCardIndex-1]
+            selectedCard = dareCards[dareCardIndex - 1]
         }
         updateSelectedCard(selectedCard)
         return selectedCard
@@ -157,7 +155,7 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         return null
     }
 
-    suspend fun getAllScores() : List<PlayerAndScore> {
+    suspend fun getAllScores(): List<PlayerAndScore> {
         return repository.getAllScores()
     }
 
@@ -165,11 +163,11 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
         repository.insertGameState(gameState)
     }
 
-    suspend fun getCurrentGame() : GameState {
+    suspend fun getCurrentGame(): GameState {
         return repository.getCurrentGame()
     }
 
-    suspend fun getSelectedCard() : Card? {
+    suspend fun getSelectedCard(): Card? {
         return repository.getSelectedCard()
     }
 
@@ -197,8 +195,7 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     private suspend fun updateCurrentPlayer() {
         if (currentPlayerIndex < playerList.size - 1) {
             currentPlayerIndex += 1
-        }
-        else {
+        } else {
             currentPlayerIndex = 0
         }
         repository.updateCurrentPlayerIndex(currentPlayerIndex)
@@ -243,7 +240,8 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
 
 }
 
-class GameStateViewModelFactory(private val repository: GameStateRepository): ViewModelProvider.Factory {
+class GameStateViewModelFactory(private val repository: GameStateRepository) :
+    ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GameStateViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
