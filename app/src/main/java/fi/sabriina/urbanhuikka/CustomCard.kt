@@ -53,11 +53,11 @@ class CustomCard : ConstraintLayout {
         init()
     }
 
-    fun setCard(card: Card) {
+    fun setCard(card: Card, assistingPlayerName: String) {
         val titleView = findViewById<TextView>(R.id.textViewHeader)
         val descriptionView = findViewById<TextView>(R.id.textViewDescription)
         val pointsView = findViewById<TextView>(R.id.textViewPoints)
-        
+
         var cardDescription = card.description
         cardDescription = cardDescription.replace(ASSISTING_PLACEHOLDER, "<b>$assistingPlayerName</b> ")
 
