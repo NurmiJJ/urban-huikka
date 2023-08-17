@@ -2,14 +2,18 @@ package fi.sabriina.urbanhuikka.splashScreens
 
 import android.app.Dialog
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.CountDownTimer
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import fi.sabriina.urbanhuikka.R
 import fi.sabriina.urbanhuikka.helpers.SfxPlayer
+
 
 class SplashScreenManager(private val context: Context) {
     private val notificationQueue = ArrayDeque<Map<String, Any?>>()
@@ -98,7 +102,7 @@ class SplashScreenManager(private val context: Context) {
         private val countdownTextView: TextView
 
         init {
-            val dialog = CustomDialog(context) { handleNextNotification() }
+            val dialog = DialogWithCustomBackButtonBehavior(context) { handleNextNotification() }
             dialog.setContentView(R.layout.splash_notification)
 
             playerName = dialog.findViewById(R.id.notifPlayerName)
@@ -164,12 +168,12 @@ class SplashScreenManager(private val context: Context) {
     }
 
     private inner class PauseDialog {
-        private var dialog: Dialog
+        private var dialog: CustomDialog
         private val okButton: Button
         private val cancelButton: Button
 
         init {
-            val dialog = Dialog(context, R.style.Theme_Huikka)
+            val dialog = CustomDialog(context)
             dialog.setContentView(R.layout.pause_dialog)
 
             okButton = dialog.findViewById(R.id.quitButton)
@@ -215,14 +219,15 @@ class SplashScreenManager(private val context: Context) {
         okText: String,
         cancelText: String
     ) {
-        private var dialog: Dialog
+        private var dialog: CustomDialog
         private val okButton: Button
         private val cancelButton: Button
         private val content: TextView
         private val icon: ImageView
+        private val mainLayout: ConstraintLayout
 
         init {
-            val dialog = Dialog(context, R.style.Theme_Huikka)
+            val dialog = CustomDialog(context)
             dialog.setContentView(R.layout.confirm_dialog)
 
             okButton = dialog.findViewById(R.id.okButton)
@@ -230,6 +235,7 @@ class SplashScreenManager(private val context: Context) {
             cancelButton.visibility = View.INVISIBLE
             content = dialog.findViewById(R.id.notifContent)
             icon = dialog.findViewById(R.id.notifIcon)
+            mainLayout = dialog.findViewById(R.id.mainLayout)
 
             okButton.text = okText
             okButton.setOnClickListener {
@@ -248,6 +254,11 @@ class SplashScreenManager(private val context: Context) {
                     confirmed = false
                     dialog.dismiss()
                 }
+            } else {
+                val constraintSet = ConstraintSet()
+                constraintSet.clone(mainLayout)
+                constraintSet.connect(R.id.okButton, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 32.toDp())
+                constraintSet.applyTo(mainLayout)
             }
 
             content.text = dialogMessage
@@ -271,7 +282,7 @@ class SplashScreenManager(private val context: Context) {
     }
 
     private inner class LoadingDialog {
-        private var dialog: Dialog
+        private var dialog: CustomDialog
 
         init {
             val dialog = NonDismissableDialog(context)
@@ -289,6 +300,12 @@ class SplashScreenManager(private val context: Context) {
         }
     }
 
+
+    fun Int.toDp(): Int {
+        val density = Resources.getSystem().displayMetrics.density
+        return (this * density).toInt()
+    }
+        
     fun showCountdownDialog(
         time: Long = 4000,
         title: String = context.getString(R.string.timed_card),

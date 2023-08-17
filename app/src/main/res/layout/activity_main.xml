@@ -46,9 +46,11 @@
 
         <ImageView
             android:id="@+id/guideBar"
-            android:layout_width="327dp"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginStart="27dp"
+            android:layout_marginEnd="27dp"
             app:srcCompat="@drawable/bar" />
 
         <ImageView
@@ -56,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|center_vertical"
-            app:srcCompat="@drawable/ic_check_white"
+            app:srcCompat="@drawable/check_bold"
             app:tint="@color/confirm_color_end" />
 
         <ImageView
@@ -64,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
-            app:srcCompat="@drawable/ic_round_x"
+            app:srcCompat="@drawable/close_thick"
             app:tint="@color/cancel_color_end" />
 
         <SeekBar
@@ -124,25 +126,17 @@
 
 
     <ImageButton
-        android:id="@+id/buttonSettings"
-        android:layout_width="36dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/ic_more_vert"
+        android:id="@+id/leaderboardButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:backgroundTint="#00FFFFFF"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:src="@drawable/poll"
         app:layout_constraintBottom_toTopOf="@+id/dividerMiddle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-
-    <ImageButton
-        android:id="@+id/leaderboardButton"
-        android:layout_width="36dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/ic_leaderboard"
-        app:layout_constraintBottom_toBottomOf="@+id/buttonSettings"
-        app:layout_constraintEnd_toStartOf="@+id/buttonSettings"
-        app:layout_constraintTop_toTopOf="@+id/buttonSettings" />
 
     <ImageView
         android:id="@+id/playerPicture"

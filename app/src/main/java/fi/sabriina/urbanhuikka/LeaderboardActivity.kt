@@ -1,6 +1,5 @@
 package fi.sabriina.urbanhuikka
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,7 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class LeaderboardActivity : AppCompatActivity() {
+class LeaderboardActivity : BaseActivity() {
 
     private lateinit var adapter: LeaderboardListAdapter
 

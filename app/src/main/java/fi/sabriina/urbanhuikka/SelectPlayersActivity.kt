@@ -14,7 +14,6 @@ import android.widget.GridView
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,7 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class SelectPlayersActivity : AppCompatActivity() {
+class SelectPlayersActivity : BaseActivity() {
     private lateinit var managePlayersButton: Button
     private lateinit var nextButton: Button
 
@@ -60,6 +59,7 @@ class SelectPlayersActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_players)
+
 
         splashScreenManager = SplashScreenManager(this)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview_leaderboard)
@@ -92,7 +92,7 @@ class SelectPlayersActivity : AppCompatActivity() {
             sfxPlayer.playButtonClickSound()
             val icon = ContextCompat.getDrawable(
                 this,
-                com.google.android.material.R.drawable.mtrl_ic_error
+                R.drawable.alert
             )!!
             CoroutineScope(Dispatchers.Main).launch {
                 if (gameStateViewModel.checkSavedGameExists()) {
@@ -119,8 +119,6 @@ class SelectPlayersActivity : AppCompatActivity() {
             players?.let { adapter.submitList(it) }
         }
 
-
-
         managePlayersButton.setOnClickListener {
             sfxPlayer.playButtonClickSound()
             val intent = Intent(this, ManagePlayersActivity::class.java)
@@ -132,7 +130,6 @@ class SelectPlayersActivity : AppCompatActivity() {
         var truthCount = 0
         var dareCount = 0
         for (category in gridItems) {
-            Log.d(TAG, "$truthCount $dareCount")
             if (category.name in DbConstants.TRUTH_CATEGORIES) {
                 if (category.isChecked) {
                     truthCount += 1
@@ -168,10 +165,11 @@ class SelectPlayersActivity : AppCompatActivity() {
             gameStateViewModel.updateGameStatus("PLAYER_SELECT")
             val selectedPlayers = adapter.getSelected()
             selectedPlayers.forEach { player ->
-                Log.w(TAG, "Inserting $player to scoreboard")
+                Log.d(TAG, "Inserting $player to scoreboard")
                 gameStateViewModel.insertPlayerToScoreboard(ScoreboardEntry(0, player.id))
             }
 
+            splashScreenManager.showLoadingDialog(false)
             finish()
         }
 

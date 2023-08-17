@@ -31,7 +31,7 @@ class GameStateViewModel(private val repository: GameStateRepositoryInterface) :
     var currentPlayer: LiveData<Player> = _currentPlayer
 
     // this hardcoded value is never used, but lateinit is not allowed
-    private var pointsToWin: Int = 30
+    private var pointsToWin: Int = 1
 
     suspend fun initializeDatabase() {
         Log.d(TAG, "Initializing the database")
@@ -45,8 +45,7 @@ class GameStateViewModel(private val repository: GameStateRepositoryInterface) :
 
     suspend fun checkInitialization() {
         val count = repository.getGameCount()
-        Log.d(TAG, count.toString())
-        if (count != 1 || getCurrentGame().status !in arrayOf("INITIALIZED", "ONGOING", "SAVED")) {
+        if (count != 1 || getCurrentGame().status !in arrayOf("INITIALIZED", "ONGOING", "SAVED", "PLAYER_SELECT"))  {
             initializeDatabase()
             deleteAllGames()
             insertGameState(GameState(0, "INITIALIZED"))
@@ -68,11 +67,12 @@ class GameStateViewModel(private val repository: GameStateRepositoryInterface) :
         currentPlayerIndex = repository.getCurrentPlayerIndex()
         _currentPlayer.value = playerList[currentPlayerIndex]
         updateDatabase()
-        Log.d(TAG, playerList.toString())
         pointsToWin = repository.getPointsToWin()
         updateGameStatus("ONGOING")
 
-        Log.d("Huikkasofta", "at the end of startGame()")
+        Log.i(TAG,"Game started")
+        Log.i(TAG, "Players: $playerList")
+        Log.i(TAG, "Points to win: $pointsToWin")
 
     }
 
@@ -203,10 +203,12 @@ class GameStateViewModel(private val repository: GameStateRepositoryInterface) :
     }
 
     private suspend fun deleteAllGames() {
+        Log.d(TAG, "Deleting all games")
         repository.deleteAllGames()
     }
 
     private suspend fun deleteAllPlayersFromScoreboard() {
+        Log.d(TAG, "Deleting all players from scoreboard")
         repository.deleteAllPlayersFromScoreboard()
     }
 
@@ -222,6 +224,7 @@ class GameStateViewModel(private val repository: GameStateRepositoryInterface) :
     }
 
     suspend fun setPointsToWin(points: Int) {
+        Log.d(TAG, "Updating points to win: $points")
         repository.setPointsToWin(points)
     }
 

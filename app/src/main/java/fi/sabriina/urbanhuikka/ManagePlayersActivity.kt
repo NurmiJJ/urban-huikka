@@ -1,6 +1,5 @@
 package fi.sabriina.urbanhuikka
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.content.Intent
 import android.widget.Button
@@ -15,7 +14,7 @@ import fi.sabriina.urbanhuikka.splashScreens.SplashScreenManager
 import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModel
 import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModelFactory
 
-class ManagePlayersActivity : AppCompatActivity() {
+class ManagePlayersActivity : BaseActivity() {
     private lateinit var fab: FloatingActionButton
     private lateinit var deleteButton: Button
     private lateinit var title: TextView

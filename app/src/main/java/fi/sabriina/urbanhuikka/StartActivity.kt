@@ -7,7 +7,6 @@ import android.widget.Button
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import fi.sabriina.urbanhuikka.helpers.SfxPlayer
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
@@ -18,7 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class StartActivity : AppCompatActivity() {
+class StartActivity : BaseActivity() {
 
     private lateinit var continueButton : Button
 
@@ -57,7 +56,7 @@ class StartActivity : AppCompatActivity() {
             resultLauncher.launch(intent)
         }
 
-        val icon = ContextCompat.getDrawable(this, R.drawable.ic_round_x)!!
+        val icon = ContextCompat.getDrawable(this, R.drawable.exit_to_app)!!
         onBackPressedDispatcher.addCallback(this) {
             splashScreenManager.showConfirmDialog(getString(R.string.quit_confirm), icon, getString(R.string.yes), getString(R.string.no)) { confirmed ->
                 if (confirmed) {

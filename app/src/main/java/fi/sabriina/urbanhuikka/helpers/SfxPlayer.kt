@@ -3,14 +3,12 @@ package fi.sabriina.urbanhuikka.helpers
 import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
-import android.util.Log
 import fi.sabriina.urbanhuikka.R
 
 class SfxPlayer(val context: Context) {
     private var mediaPlayer: MediaPlayer? = null
 
     fun playButtonClickSound() {
-        Log.d("Huikkasofta", "playing click sound")
         initPlayer()
         val soundUri =
             Uri.parse("android.resource://${context.packageName}/${R.raw.button_click}")

@@ -14,7 +14,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import fi.sabriina.urbanhuikka.card.Card
 import fi.sabriina.urbanhuikka.helpers.SfxPlayer
@@ -34,7 +33,7 @@ const val TRUTH_DECK = "truth"
 const val DARE_DECK = "dare"
 const val DUAL_CARD_TYPE = "Sinä ja minä"
 
-class MainActivity : AppCompatActivity(), OnCardSwipeListener {
+class MainActivity : BaseActivity(), OnCardSwipeListener {
 
     private lateinit var playerName: TextView
     private lateinit var playerPicture: ImageView
@@ -53,8 +52,12 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
 
     private lateinit var leaderboardButton: ImageButton
 
-    private lateinit var drawableDrink: Drawable
-    private lateinit var splashScreenManager: SplashScreenManager
+    private lateinit var drawablePint : Drawable
+    private lateinit var drawableNextPlayer : Drawable
+    private lateinit var drawableAddPoints : Drawable
+    private lateinit var drawableWin : Drawable
+    private lateinit var drawableBeer: Drawable
+    private lateinit var splashScreenManager : SplashScreenManager
     private lateinit var currentPlayer: Player
     private lateinit var currentPlayerPicture: Drawable
     private var currentCard: Card? = null
@@ -68,10 +71,15 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        drawableDrink = ContextCompat.getDrawable(this, R.drawable.drink)!!
+        drawablePint = ContextCompat.getDrawable(this, R.drawable.glass_mug_variant)!!
+        drawableNextPlayer = ContextCompat.getDrawable(this, R.drawable.account_arrow_right)!!
+        drawableAddPoints = ContextCompat.getDrawable(this, R.drawable.counter)!!
+        drawableWin = ContextCompat.getDrawable(this, R.drawable.podium_gold)!!
+        drawableBeer = ContextCompat.getDrawable(this, R.drawable.beer)!!
         splashScreenManager = SplashScreenManager(this)
 
         setContentView(R.layout.activity_main)
+
         playerName = findViewById(R.id.textViewPlayer)
         playerPicture = findViewById(R.id.playerPicture)
 
@@ -160,7 +168,6 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
             } else if (gameStatus == "SAVED") {
                 gameStateViewModel.continueGame()
             }
-            splashScreenManager.showLoadingDialog(false)
         }
 
         CoroutineScope(Dispatchers.Main).launch {
@@ -212,6 +219,15 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        CoroutineScope(Dispatchers.Main).launch {
+            if (gameStateViewModel.getCurrentGame().status == "SAVED") {
+                gameStateViewModel.updateGameStatus("ONGOING")
+            }
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -223,7 +239,9 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     override fun onStop() {
         super.onStop()
         CoroutineScope(Dispatchers.Main).launch {
-            gameStateViewModel.updateGameStatus("SAVED")
+            if (gameStateViewModel.getCurrentGame().status == "ONGOING") {
+                gameStateViewModel.updateGameStatus("SAVED")
+            }
         }
 
     }
@@ -317,11 +335,16 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
                     finish()
                 }
             } else {
+                val message : String = if (currentCard!!.points > 1) {
+                    "Sait ${currentCard!!.points} pistettä!"
+                } else {
+                    "Sait ${currentCard!!.points} pisteen!"
+                }
                 splashScreenManager.showSplashScreen(
                     currentPlayer.name,
                     currentPlayerPicture,
-                    "Sait ${currentCard!!.points} pistettä!",
-                    drawableDrink
+                    message,
+                    drawableAddPoints
                 )
                 
                 if (currentCard!!.category == DUAL_CARD_TYPE) {
