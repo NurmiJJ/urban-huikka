@@ -56,8 +56,9 @@
         app:srcCompat="@drawable/beer" />
 
     <Button
+        app:backgroundTint="@null"
         android:id="@+id/notifDismissButton"
-        style="@style/DefaultButton"
+        style="@style/InfoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"

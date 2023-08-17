@@ -18,11 +18,23 @@
     <style name="DefaultButton" parent="Widget.MaterialComponents.Button">
         <item name="android:paddingTop">8dp</item>
         <item name="android:paddingBottom">8dp</item>
+        <item name="android:textColor">@color/main_font</item>
     </style>
 
-    <style name="TitleButton" parent="Widget.MaterialComponents.Button">
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingBottom">16dp</item>
+    <style name="InfoButton" parent="DefaultButton">
+        <item name="android:background">@drawable/button_selector_info</item>
+    </style>
+
+    <style name="InfoButtonAccent" parent="DefaultButton">
+        <item name="android:background">@drawable/button_selector_info_accent</item>
+    </style>
+
+    <style name="ConfirmButton" parent="DefaultButton">
+        <item name="android:background">@drawable/button_selector_confirm</item>
+    </style>
+
+    <style name="CancelButton" parent="DefaultButton">
+        <item name="android:background">@drawable/button_selector_cancel</item>
     </style>
 
 

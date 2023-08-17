@@ -11,6 +11,7 @@ import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.textfield.TextInputEditText
+import fi.sabriina.urbanhuikka.helpers.DbConstants
 import fi.sabriina.urbanhuikka.helpers.SfxPlayer
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
 import fi.sabriina.urbanhuikka.roomdb.Player
@@ -26,18 +27,6 @@ class AddPlayerActivity : BaseActivity() {
 
     private val sfxPlayer = SfxPlayer(this)
 
-    private val imageOptions = arrayOf(
-        R.drawable.blue,
-        R.drawable.cyan,
-        R.drawable.grey,
-        R.drawable.lime,
-        R.drawable.orange,
-        R.drawable.pink,
-        R.drawable.red,
-        R.drawable.violet,
-        R.drawable.yellow
-    )
-
     private val playerViewModel: PlayerViewModel by viewModels {
         PlayerViewModelFactory((application as HuikkaApplication).playerRepository)
     }
@@ -48,7 +37,7 @@ class AddPlayerActivity : BaseActivity() {
 
         addPlayerButton = findViewById(R.id.addPlayerButton)
         playerInput = findViewById(R.id.textInputPlayer)
-        selectedImageResId = imageOptions[0]
+        selectedImageResId = DbConstants.AVATAR_ICONS[0]
 
         playerInput.doOnTextChanged { _, _, _, count ->
             addPlayerButton.isEnabled = count != 0
@@ -69,11 +58,11 @@ class AddPlayerActivity : BaseActivity() {
         private var selectedItemPosition = 0
 
         override fun getCount(): Int {
-            return imageOptions.size
+            return DbConstants.AVATAR_ICONS.size
         }
 
         override fun getItem(position: Int): Any {
-            return imageOptions[position]
+            return DbConstants.AVATAR_ICONS[position]
         }
 
         override fun getItemId(position: Int): Long {
@@ -97,12 +86,12 @@ class AddPlayerActivity : BaseActivity() {
                 imageView = view.findViewById(R.id.imageOptionView)
                 checkmarkView = view.findViewById(R.id.checkmarkImageView)
             }
-            imageView.setImageResource(imageOptions[position])
+            imageView.setImageResource(DbConstants.AVATAR_ICONS[position])
 
             imageView.setOnClickListener {
                 sfxPlayer.playButtonClickSound()
                 selectedItemPosition = position
-                selectedImageResId = imageOptions[position]
+                selectedImageResId = DbConstants.AVATAR_ICONS[position]
                 notifyDataSetChanged()
             }
 

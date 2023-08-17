@@ -324,14 +324,9 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
             val winner = gameStateViewModel.checkWinner()
             if (winner != null) {
                 sfxPlayer.playVictorySound()
-                currentPlayerPicture =
-                    ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
-                splashScreenManager.showConfirmDialog(
-                    "${winner.name} voitti pelin!",
-                    drawableWin,
-                    "Poistu päävalikkoon",
-                    ""
-                ) {
+                currentPlayerPicture = ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
+                splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableWin, okText = "Poistu päävalikkoon", cancelText = "") {
+
                     finish()
                 }
             } else {

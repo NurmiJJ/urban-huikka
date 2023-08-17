@@ -47,7 +47,7 @@
 
     <Button
         android:id="@+id/buttonDelete"
-        style="@style/DefaultButton"
+        style="@style/ConfirmButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -55,13 +55,14 @@
         android:layout_marginBottom="8dp"
         android:enabled="false"
         android:text="@string/start_game"
+        app:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/managePlayersButton"
-        style="@style/DefaultButton"
+        style="@style/InfoButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="90dp"
@@ -69,6 +70,7 @@
         android:layout_marginBottom="8dp"
         android:enabled="true"
         android:text="@string/manage_players"
+        app:backgroundTint="@null"
         app:layout_constraintBottom_toTopOf="@+id/dividerMiddle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -95,6 +97,8 @@
         android:max="60"
         android:min="10"
         android:progress="25"
+        android:progressTint="@color/info"
+        android:thumbTint="@color/info"
         app:layout_constraintBottom_toTopOf="@+id/buttonDelete"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
