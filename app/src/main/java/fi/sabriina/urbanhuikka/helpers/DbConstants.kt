@@ -11,7 +11,8 @@ object DbConstants {
         "Salaisuudet ja paljastukset",
         "Romantiikka ja ihmissuhteet",
         "Pelot ja epävarmuudet",
-        "Seksi"
+        "Seksi",
+        "Raha ja työ"
     )
     val AVATAR_ICONS = listOf(
         R.drawable.multiavatar1,

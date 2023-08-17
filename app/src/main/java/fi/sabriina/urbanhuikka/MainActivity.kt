@@ -280,8 +280,8 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
                         splashScreenManager.showConfirmDialog(
                             getString(R.string.times_up),
                             drawableBeer,
-                            getString(R.string.continue_),
-                            ""
+                            okText = getString(R.string.continue_),
+                            cancelText = ""
                         ) {}
                     }
                 }
