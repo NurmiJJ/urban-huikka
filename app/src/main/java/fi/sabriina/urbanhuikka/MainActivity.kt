@@ -31,14 +31,15 @@ import kotlinx.coroutines.launch
 const val TAG = "Huikkasofta"
 const val TRUTH_DECK = "truth"
 const val DARE_DECK = "dare"
+const val DUAL_CARD_TYPE = "Sinä ja minä"
 
 class MainActivity : BaseActivity(), OnCardSwipeListener {
 
-    private lateinit var playerName : TextView
-    private lateinit var playerPicture : ImageView
-    private lateinit var cardView : CustomCard
+    private lateinit var playerName: TextView
+    private lateinit var playerPicture: ImageView
+    private lateinit var cardView: CustomCard
 
-    private lateinit var selectionButtons : FrameLayout
+    private lateinit var selectionButtons: FrameLayout
 
     private lateinit var swipeButton: SeekBar
     private lateinit var guideCheckmark: ImageView
@@ -49,7 +50,7 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
 
     private lateinit var titleText: TextView
 
-    private lateinit var leaderboardButton : ImageButton
+    private lateinit var leaderboardButton: ImageButton
 
     private lateinit var drawablePint : Drawable
     private lateinit var drawableNextPlayer : Drawable
@@ -58,7 +59,7 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
     private lateinit var drawableBeer: Drawable
     private lateinit var splashScreenManager : SplashScreenManager
     private lateinit var currentPlayer: Player
-    private lateinit var currentPlayerPicture : Drawable
+    private lateinit var currentPlayerPicture: Drawable
     private var currentCard: Card? = null
 
     private val sfxPlayer = SfxPlayer(this)
@@ -114,11 +115,13 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
                     feedbackGiven = false
                 }
                 if (progress < 50) {
-                    seekBar.progressDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.swipe_bar_red)
+                    seekBar.progressDrawable =
+                        ContextCompat.getDrawable(applicationContext, R.drawable.swipe_bar_red)
                     guideSkipText.visibility = View.VISIBLE
                     guideCompleteText.visibility = View.INVISIBLE
                 } else if (progress > 50) {
-                    seekBar.progressDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.swipe_bar_green)
+                    seekBar.progressDrawable =
+                        ContextCompat.getDrawable(applicationContext, R.drawable.swipe_bar_green)
                     guideCompleteText.visibility = View.VISIBLE
                     guideSkipText.visibility = View.INVISIBLE
                 }
@@ -169,9 +172,15 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
 
         CoroutineScope(Dispatchers.Main).launch {
             val selectedCard = gameStateViewModel.getSelectedCard()
-            if ( selectedCard != null) {
+            if (selectedCard != null) {
                 currentCard = selectedCard
-                cardView.setCard(selectedCard)
+
+                var assistingPlayer = ""
+                if (currentCard!!.category == DUAL_CARD_TYPE) {
+                    assistingPlayer = gameStateViewModel.drawAssistingPlayer().name
+                }
+
+                cardView.setCard(selectedCard, assistingPlayer)
                 cardView.setCardSide(false)
 
                 ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
@@ -190,7 +199,12 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
             currentPlayerPicture = ContextCompat.getDrawable(this, currentPlayer.pictureResId)!!
             playerPicture.setImageDrawable(currentPlayerPicture)
 
-            splashScreenManager.showSplashScreen(currentPlayer.name,currentPlayerPicture,"Seuraavana vuorossa ${currentPlayer.name}", drawableNextPlayer)
+            splashScreenManager.showSplashScreen(
+                currentPlayer.name,
+                currentPlayerPicture,
+                "Seuraavana vuorossa ${currentPlayer.name}",
+                drawableNextPlayer
+            )
         }
 
         onBackPressedDispatcher.addCallback(this) {
@@ -219,9 +233,9 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
         super.onDestroy()
 
         splashScreenManager.dismissAllSplashScreens()
-        
+
     }
-        
+
     override fun onStop() {
         super.onStop()
         CoroutineScope(Dispatchers.Main).launch {
@@ -246,30 +260,73 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
         CoroutineScope(Dispatchers.Main).launch {
             currentCard = gameStateViewModel.getNextCard(deck)
             if (currentCard != null) {
-                cardView.setCard(currentCard!!)
+
+                var assistingPlayer = ""
+                if (currentCard!!.category == DUAL_CARD_TYPE) {
+                    assistingPlayer = gameStateViewModel.drawAssistingPlayer().name
+                }
+
+                cardView.setCard(currentCard!!, assistingPlayer)
                 ObjectAnimator.ofFloat(titleText, View.ALPHA, 0f).start()
                 delay(250)
                 ObjectAnimator.ofFloat(selectionButtons, View.ALPHA, 1f).start()
                 selectionButtons.visibility = View.VISIBLE
             }
+            if (currentCard?.time != 0) {
+                sfxPlayer.playTimerTickingSound()
+                splashScreenManager.showCountdownDialog {
+                    cardView.startCountdownTimer {
+                        sfxPlayer.playTimesUpSound()
+                        splashScreenManager.showConfirmDialog(
+                            getString(R.string.times_up),
+                            drawableBeer,
+                            getString(R.string.continue_),
+                            ""
+                        ) {}
+                    }
+                }
+            }
         }
     }
 
     private fun cardSkipped() {
-        sfxPlayer.playSkipCardSound()
-        splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Ota ${currentCard!!.points} huikkaa!", drawableBeer)
-        endTurn()
+        CoroutineScope(Dispatchers.Main).launch {
+            val assistingPlayer = gameStateViewModel.getAssistingPlayer()
+            val assistingPlayerPicture = ContextCompat.getDrawable(this@MainActivity, currentPlayer.pictureResId)!!
+            sfxPlayer.playSkipCardSound()
+            splashScreenManager.showSplashScreen(
+            currentPlayer.name,
+            currentPlayerPicture,
+            "Ota ${currentCard!!.points} huikkaa!",
+            drawableBeer
+            )
+
+            if (currentCard!!.category == DUAL_CARD_TYPE) {
+                splashScreenManager.showSplashScreen(
+                    assistingPlayer.name,
+                    assistingPlayerPicture,
+                    "Ota ${currentCard!!.points} huikkaa!",
+                    drawableBeer
+                )
+            }
+
+            endTurn()
+        }
     }
 
     private fun cardCompleted() {
         CoroutineScope(Dispatchers.Main).launch {
+            val assistingPlayer = gameStateViewModel.getAssistingPlayer()
+            val assistingPlayerPicture = ContextCompat.getDrawable(this@MainActivity, currentPlayer.pictureResId)!!
             sfxPlayer.playCompleteCardSound()
-            gameStateViewModel.addPoints(amount=currentCard!!.points)
+            gameStateViewModel.addPoints(amount = currentCard!!.points)
+
             val winner = gameStateViewModel.checkWinner()
             if (winner != null) {
                 sfxPlayer.playVictorySound()
                 currentPlayerPicture = ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
                 splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableWin, okText = "Poistu päävalikkoon", cancelText = "") {
+
                     finish()
                 }
             } else {
@@ -284,12 +341,22 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
                     message,
                     drawableAddPoints
                 )
+                
+                if (currentCard!!.category == DUAL_CARD_TYPE) {
+                gameStateViewModel.addPoints(assistingPlayer.id, currentCard!!.points)
+                splashScreenManager.showSplashScreen(
+                    assistingPlayer.name,
+                    assistingPlayerPicture,
+                    "Sait ${currentCard!!.points} pistettä!",
+                    drawableAddPoints
+                )
+                }
                 endTurn()
             }
         }
     }
 
-    private fun endTurn()  {
+    private fun endTurn() {
         CoroutineScope(Dispatchers.Main).launch {
             gameStateViewModel.endTurn()
             // prevent view from updating before splash screen is showing

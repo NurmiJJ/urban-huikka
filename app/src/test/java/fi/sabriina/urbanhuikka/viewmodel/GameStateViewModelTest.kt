@@ -173,4 +173,20 @@ class GameStateViewModelTest {
         assertThat(testCard).isEqualTo(card)
     }
 
+    @Test
+    fun `Draw random player`() = runTest {
+        viewModel.startGame()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val currentPlayer = viewModel.currentPlayer.value
+        var assistant = viewModel.drawAssistingPlayer()
+
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertThat(currentPlayer).isNotEqualTo(assistant)
+        assistant = viewModel.drawAssistingPlayer()
+
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertThat(currentPlayer).isNotEqualTo(assistant)
+    }
+
 }

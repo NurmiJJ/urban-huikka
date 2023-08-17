@@ -141,4 +141,13 @@ class GameStateDaoTest {
         dao.updateSelectedCard(card)
         assertThat(dao.getSelectedCard()).isEqualTo(card)
     }
+
+    @Test
+    fun updateAssistingPlayerIndex() = runTest {
+        dao.insertGameState(GameState(0,"INITIALIZED",0))
+        dao.updateAssistingPlayerIndex(1)
+        assertThat(dao.getAssistingPlayerIndex()).isEqualTo(1)
+        dao.updateAssistingPlayerIndex(2)
+        assertThat(dao.getAssistingPlayerIndex()).isEqualTo(2)
+    }
 }

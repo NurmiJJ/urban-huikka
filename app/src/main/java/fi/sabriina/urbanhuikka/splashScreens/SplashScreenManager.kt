@@ -26,7 +26,13 @@ class SplashScreenManager(private val context: Context) {
 
     private val sfxPlayer = SfxPlayer(context)
 
-    fun showSplashScreen(playerName: String, playerPicture: Drawable, dialogMessage: String, dialogIcon: Drawable, dialogDelay: Long = 5000) {
+    fun showSplashScreen(
+        playerName: String,
+        playerPicture: Drawable,
+        dialogMessage: String,
+        dialogIcon: Drawable,
+        dialogDelay: Long = 6000
+    ) {
         val notification = mapOf(
             "playerName" to playerName,
             "playerPicture" to playerPicture,
@@ -50,8 +56,7 @@ class SplashScreenManager(private val context: Context) {
             isShowingNotification = false
             currentNotification?.cancelTimer()
             currentNotification?.dismiss()
-        }
-        else {
+        } else {
             currentNotification?.cancelTimer()
             showNextNotification()
         }
@@ -66,8 +71,7 @@ class SplashScreenManager(private val context: Context) {
                 nextNotif["dialogMessage"] as String,
                 nextNotif["dialogIcon"] as Drawable,
             )
-        }
-        else {
+        } else {
             val nextNotif = notificationQueue.removeFirst()
             currentNotification = SplashNotification(
                 nextNotif["playerName"] as String,
@@ -82,7 +86,13 @@ class SplashScreenManager(private val context: Context) {
         currentNotification!!.show()
     }
 
-    private inner class SplashNotification(pName: String, pPicture: Drawable, dialogMessage: String, dialogIcon: Drawable, dialogDelay: Long) {
+    private inner class SplashNotification(
+        pName: String,
+        pPicture: Drawable,
+        dialogMessage: String,
+        dialogIcon: Drawable,
+        dialogDelay: Long
+    ) {
         private var dialog: Dialog
         private var countdownTimer: CountDownTimer
         private val playerName: TextView
@@ -128,11 +138,16 @@ class SplashScreenManager(private val context: Context) {
         }
 
         fun show() {
-            countdownTimer.start()
             dialog.show()
+            countdownTimer.start()
         }
 
-        fun updateNotification(pName: String, pPicture: Drawable, dialogMessage: String, dialogIcon: Drawable) {
+        fun updateNotification(
+            pName: String,
+            pPicture: Drawable,
+            dialogMessage: String,
+            dialogIcon: Drawable
+        ) {
             playerName.text = pName
             playerPicture.setImageDrawable(pPicture)
             content.text = dialogMessage
@@ -151,14 +166,6 @@ class SplashScreenManager(private val context: Context) {
     fun showPauseDialog(callback: (Boolean) -> Unit) {
         val dialog = PauseDialog()
         dialog.show { callback(confirmed) }
-    }
-
-    fun showLoadingDialog(visible: Boolean) {
-        if (visible) {
-            loadingDialog.show()
-        } else {
-            loadingDialog.hide()
-        }
     }
 
     private inner class PauseDialog {
@@ -196,12 +203,25 @@ class SplashScreenManager(private val context: Context) {
         }
     }
 
-    fun showConfirmDialog(message: String, icon: Drawable, iconColor: Int = Color.BLACK, okText: String, cancelText: String, callback: (Boolean) -> Unit) {
+    fun showConfirmDialog(
+        message: String,
+        icon: Drawable,
+        iconColor: Int = Color.BLACK,
+        okText: String,
+        cancelText: String,
+        callback: (Boolean) -> Unit
+    ) {
         val dialog = ConfirmDialog(message, icon, iconColor, okText, cancelText)
         dialog.show { callback(confirmed) }
     }
 
-    private inner class ConfirmDialog(dialogMessage: String, dialogIcon: Drawable, iconColor: Int, okText: String, cancelText: String) {
+    private inner class ConfirmDialog(
+        dialogMessage: String,
+        dialogIcon: Drawable,
+        iconColor: Int,
+        okText: String,
+        cancelText: String
+    ) {
         private var dialog: CustomDialog
         private val okButton: Button
         private val cancelButton: Button
@@ -257,6 +277,14 @@ class SplashScreenManager(private val context: Context) {
         }
     }
 
+    fun showLoadingDialog(visible: Boolean) {
+        if (visible) {
+            loadingDialog.show()
+        } else {
+            loadingDialog.hide()
+        }
+    }
+
     private inner class LoadingDialog {
         private var dialog: CustomDialog
 
@@ -276,8 +304,53 @@ class SplashScreenManager(private val context: Context) {
         }
     }
 
+
     fun Int.toDp(): Int {
         val density = Resources.getSystem().displayMetrics.density
         return (this * density).toInt()
+    }
+        
+    fun showCountdownDialog(
+        time: Long = 4000,
+        title: String = context.getString(R.string.timed_card),
+        callback: () -> Unit
+    ) {
+        val dialog = CountdownDialog(time, title)
+        dialog.show(callback)
+    }
+
+    private inner class CountdownDialog(time: Long, title: String) {
+        private var dialog: Dialog
+        private var countdownTime: TextView
+        private var countdownTitle: TextView
+        private var countdownTimer: CountDownTimer
+
+        init {
+            val dialog = NonDismissableDialog(context)
+            dialog.setContentView(R.layout.countdown_dialog)
+            countdownTime = dialog.findViewById(R.id.countdownTime)
+            countdownTitle = dialog.findViewById(R.id.countdownTitle)
+
+            countdownTitle.text = title
+
+            countdownTimer = object : CountDownTimer(time, 1000) {
+                override fun onTick(millisUntilFinished: Long) {
+                    val secondsRemaining = millisUntilFinished / 1000
+                    countdownTime.text = "$secondsRemaining"
+                }
+
+                override fun onFinish() {
+                    dialog.dismiss()
+                }
+            }
+
+            this.dialog = dialog
+        }
+
+        fun show(onDismiss: () -> Unit) {
+            dialog.setOnDismissListener { onDismiss.invoke() }
+            dialog.show()
+            countdownTimer.start()
+        }
     }
 }
