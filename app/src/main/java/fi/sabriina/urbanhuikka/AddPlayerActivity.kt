@@ -12,6 +12,7 @@ import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.textfield.TextInputEditText
+import fi.sabriina.urbanhuikka.helpers.SfxPlayer
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.viewmodel.PlayerViewModel
@@ -23,6 +24,8 @@ class AddPlayerActivity : AppCompatActivity() {
     private lateinit var playerInput: TextInputEditText
 
     private var selectedImageResId = 0
+
+    private val sfxPlayer = SfxPlayer(this)
 
     private val imageOptions = arrayOf(
         R.drawable.blue,
@@ -53,6 +56,7 @@ class AddPlayerActivity : AppCompatActivity() {
         }
 
         addPlayerButton.setOnClickListener {
+            sfxPlayer.playButtonClickSound()
             val name = playerInput.text.toString().replaceFirstChar { it.uppercase() }
             playerViewModel.insert(Player(0, name, selectedImageResId))
             finish()
@@ -97,6 +101,7 @@ class AddPlayerActivity : AppCompatActivity() {
             imageView.setImageResource(imageOptions[position])
 
             imageView.setOnClickListener {
+                sfxPlayer.playButtonClickSound()
                 selectedItemPosition = position
                 selectedImageResId = imageOptions[position]
                 notifyDataSetChanged()

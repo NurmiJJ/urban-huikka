@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fi.sabriina.urbanhuikka.helpers.DbConstants
+import fi.sabriina.urbanhuikka.helpers.SfxPlayer
 import fi.sabriina.urbanhuikka.roomdb.*
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
 import fi.sabriina.urbanhuikka.splashScreens.SplashScreenManager
@@ -34,6 +35,8 @@ import kotlinx.coroutines.launch
 class SelectPlayersActivity : AppCompatActivity() {
     private lateinit var managePlayersButton: Button
     private lateinit var nextButton: Button
+
+    private val sfxPlayer = SfxPlayer(this)
 
     private val gameStateViewModel: GameStateViewModel by viewModels {
         GameStateViewModelFactory((application as HuikkaApplication).gameStateRepository)
@@ -61,7 +64,7 @@ class SelectPlayersActivity : AppCompatActivity() {
         splashScreenManager = SplashScreenManager(this)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview_leaderboard)
         nextButton = findViewById(R.id.buttonDelete)
-        adapter = PlayerListAdapter("SELECT", nextButton)
+        adapter = PlayerListAdapter(this, "SELECT", nextButton)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         managePlayersButton = findViewById(R.id.managePlayersButton)
@@ -86,6 +89,7 @@ class SelectPlayersActivity : AppCompatActivity() {
         })
 
         nextButton.setOnClickListener {
+            sfxPlayer.playButtonClickSound()
             val icon = ContextCompat.getDrawable(
                 this,
                 com.google.android.material.R.drawable.mtrl_ic_error
@@ -118,6 +122,7 @@ class SelectPlayersActivity : AppCompatActivity() {
 
 
         managePlayersButton.setOnClickListener {
+            sfxPlayer.playButtonClickSound()
             val intent = Intent(this, ManagePlayersActivity::class.java)
             startActivity(intent)
         }

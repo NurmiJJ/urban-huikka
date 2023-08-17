@@ -25,8 +25,7 @@ data class GameState (
 
 @Entity(tableName = "card_category")
 data class CardCategory (
-    @PrimaryKey (autoGenerate = true) @ColumnInfo(name = "id") val id: Int,
-    @ColumnInfo(name = "name") val name: String,
+    @PrimaryKey @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "enabled") var enabled: Boolean
 )
 

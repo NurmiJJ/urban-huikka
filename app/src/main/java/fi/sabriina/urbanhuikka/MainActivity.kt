@@ -17,6 +17,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import fi.sabriina.urbanhuikka.card.Card
+import fi.sabriina.urbanhuikka.helpers.SfxPlayer
 import fi.sabriina.urbanhuikka.roomdb.HuikkaApplication
 import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.splashScreens.SplashScreenManager
@@ -57,6 +58,8 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     private lateinit var currentPlayer: Player
     private lateinit var currentPlayerPicture : Drawable
     private var currentCard: Card? = null
+
+    private val sfxPlayer = SfxPlayer(this)
 
     private val gameStateViewModel: GameStateViewModel by viewModels {
         GameStateViewModelFactory((application as HuikkaApplication).gameStateRepository)
@@ -219,10 +222,12 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
     }
 
     override fun onSwipeRight() {
+        sfxPlayer.playCardDrawSound()
         drawCard(TRUTH_DECK)
     }
 
     override fun onSwipeLeft() {
+        sfxPlayer.playCardDrawSound()
         drawCard(DARE_DECK)
     }
 
@@ -249,6 +254,7 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         CoroutineScope(Dispatchers.Main).launch {
             val assistingPlayer = gameStateViewModel.getAssistingPlayer()
             val assistingPlayerPicture = ContextCompat.getDrawable(this@MainActivity, currentPlayer.pictureResId)!!
+            sfxPlayer.playSkipCardSound()
             splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Ota ${currentCard!!.points} huikkaa!", drawableDrink)
 
             if (currentCard!!.category == DUAL_CARD_TYPE) {
@@ -268,18 +274,25 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
         CoroutineScope(Dispatchers.Main).launch {
             val assistingPlayer = gameStateViewModel.getAssistingPlayer()
             val assistingPlayerPicture = ContextCompat.getDrawable(this@MainActivity, currentPlayer.pictureResId)!!
+            sfxPlayer.playCompleteCardSound()
             gameStateViewModel.addPoints(amount=currentCard!!.points)
 
             val winner = gameStateViewModel.checkWinner()
             if (winner != null) {
+                sfxPlayer.playVictorySound()
                 currentPlayerPicture = ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
                 splashScreenManager.showConfirmDialog("${winner.name} voitti pelin!", drawableDrink, "Poistu päävalikkoon", "") {
                     finish()
                 }
-            }
-            splashScreenManager.showSplashScreen(currentPlayer.name, currentPlayerPicture,"Sait ${currentCard!!.points} pistettä!", drawableDrink)
-
-            if (currentCard!!.category == DUAL_CARD_TYPE) {
+            } else {
+                splashScreenManager.showSplashScreen(
+                    currentPlayer.name,
+                    currentPlayerPicture,
+                    "Sait ${currentCard!!.points} pistettä!",
+                    drawableDrink
+                )
+                
+                if (currentCard!!.category == DUAL_CARD_TYPE) {
                 gameStateViewModel.addPoints(assistingPlayer.id, currentCard!!.points)
                 splashScreenManager.showSplashScreen(
                     assistingPlayer.name,
@@ -287,9 +300,9 @@ class MainActivity : AppCompatActivity(), OnCardSwipeListener {
                     "Sait ${currentCard!!.points} pistettä!",
                     drawableDrink
                 )
+                }
+                endTurn()
             }
-
-            endTurn()
         }
     }
 

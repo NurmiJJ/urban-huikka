@@ -60,7 +60,7 @@ class GameStateViewModel (private val repository: GameStateRepositoryInterface):
     }
 
     private suspend fun insertCardCategory(name: String) {
-        repository.insertCardCategory(CardCategory(0, name, true))
+        repository.insertCardCategory(CardCategory(name, true))
     }
 
     suspend fun startGame() {
