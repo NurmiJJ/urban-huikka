@@ -22,6 +22,9 @@ interface GameStateDao {
     @Query("UPDATE game_state SET currentPlayerIndex = :index")
     suspend fun updateCurrentPlayerIndex(index: Int)
 
+    @Query("UPDATE game_state SET assistingPlayerIndex = :index")
+    suspend fun updateAssistingPlayerIndex(index: Int)
+
     @Query("UPDATE game_state SET selectedCard = :card")
     suspend fun updateSelectedCard(card: Card?)
 
@@ -48,6 +51,9 @@ interface GameStateDao {
 
     @Query("SELECT currentPlayerIndex FROM game_state")
     suspend fun getCurrentPlayerIndex() : Int
+
+    @Query("SELECT assistingPlayerIndex FROM game_state")
+    suspend fun getAssistingPlayerIndex() : Int
 
     @Query("SELECT selectedCard FROM game_state")
     suspend fun getSelectedCard() : Card?

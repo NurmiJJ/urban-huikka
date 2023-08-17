@@ -4,6 +4,8 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.CountDownTimer
+import android.text.Html
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -15,6 +17,8 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import fi.sabriina.urbanhuikka.card.Card
 
+const val ASSISTING_PLACEHOLDER = "[pelaaja]"
+
 interface OnCardSwipeListener {
     fun onSwipeRight()
     fun onSwipeLeft()
@@ -24,7 +28,11 @@ class CustomCard : ConstraintLayout {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attr: AttributeSet) : super(context, attr)
-    constructor(context: Context, attr: AttributeSet, defStyleAttr : Int) : super(context, attr, defStyleAttr )
+    constructor(context: Context, attr: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attr,
+        defStyleAttr
+    )
 
     private var initialX = 0f
     private var cardX = 0f
@@ -34,21 +42,45 @@ class CustomCard : ConstraintLayout {
 
     private var backside = true
     private var feedbackGiven = false
+    private var time = 0L
+    private var timeView: TextView
+    private lateinit var countdownTimer: CountDownTimer
+    private lateinit var timerCallback: () -> Unit
 
     init {
         LayoutInflater.from(context).inflate(R.layout.custom_card, this, true)
+        timeView = findViewById(R.id.textViewTimer)
         init()
     }
-     fun setCard(card: Card){
-         val titleView = findViewById<TextView>(R.id.textViewHeader)
-         val descriptionView = findViewById<TextView>(R.id.textViewDescription)
-         val pointsView = findViewById<TextView>(R.id.textViewPoints)
 
-         titleView.text = card.category
-         descriptionView.text = card.description
-         val points = "Pisteet: ${card.points}"
-         pointsView.text = points
-     }
+    fun setCard(card: Card) {
+        val titleView = findViewById<TextView>(R.id.textViewHeader)
+        val descriptionView = findViewById<TextView>(R.id.textViewDescription)
+        val pointsView = findViewById<TextView>(R.id.textViewPoints)
+        
+        var cardDescription = card.description
+        cardDescription = cardDescription.replace(ASSISTING_PLACEHOLDER, "<b>$assistingPlayerName</b> ")
+
+        titleView.text = card.category
+        descriptionView.text = Html.fromHtml(cardDescription, 0)
+        val points = "Pisteet: ${card.points}"
+        pointsView.text = points
+        time = card.time.toLong() * 1000
+        timeView.text = ""
+
+        countdownTimer = object : CountDownTimer(time, 1000) {
+
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsRemaining = millisUntilFinished / 1000
+                timeView.text = "$secondsRemaining"
+            }
+
+            override fun onFinish() {
+                timeView.text = context.getString(R.string.times_up)
+                timerCallback.invoke()
+            }
+        }
+    }
 
     // Setup views
     private fun init() {
@@ -64,6 +96,11 @@ class CustomCard : ConstraintLayout {
         backView.visibility = if (backside) View.VISIBLE else View.GONE
     }
 
+    fun startCountdownTimer(callback: () -> Unit) {
+        timerCallback = callback
+        countdownTimer.start()
+    }
+
     fun setOnCardSwipeListener(listener: OnCardSwipeListener) {
         this.swipeListener = listener
     }
@@ -76,14 +113,13 @@ class CustomCard : ConstraintLayout {
         val scale = context.resources.displayMetrics.density
         val cameraDistance = 8000 * scale
 
-        val flipInAnimator : Animator
-        val flipOutAnimator : Animator
+        val flipInAnimator: Animator
+        val flipOutAnimator: Animator
 
         if (direction == "left") {
             flipOutAnimator = ObjectAnimator.ofFloat(this, "rotationY", 90f)
             flipInAnimator = ObjectAnimator.ofFloat(this, "rotationY", -90f, 0f)
-        }
-        else {
+        } else {
             flipOutAnimator = ObjectAnimator.ofFloat(this, "rotationY", -90f)
             flipInAnimator = ObjectAnimator.ofFloat(this, "rotationY", 90f, 0f)
         }
@@ -104,6 +140,7 @@ class CustomCard : ConstraintLayout {
                 flipInAnimator.start()
                 returnAnimator.start()
             }
+
             override fun onAnimationCancel(animation: Animator) {}
             override fun onAnimationRepeat(animation: Animator) {}
         })
@@ -122,6 +159,7 @@ class CustomCard : ConstraintLayout {
                 returnAnimator.start()
                 flipInAnimator.start()
             }
+
             override fun onAnimationCancel(animation: Animator) {}
             override fun onAnimationRepeat(animation: Animator) {}
         })
@@ -178,7 +216,8 @@ class CustomCard : ConstraintLayout {
                     } else {
                         // If the card was not moved enough, animate it back to the original position
                         val returnAnimator = ObjectAnimator.ofFloat(this, "translationX", 0f)
-                        returnAnimator.interpolator = DecelerateInterpolator() // Add a decelerate effect
+                        returnAnimator.interpolator =
+                            DecelerateInterpolator() // Add a decelerate effect
                         returnAnimator.start()
                     }
                     isMoving = false
