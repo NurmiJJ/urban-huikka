@@ -203,7 +203,7 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
                 currentPlayer.name,
                 currentPlayerPicture,
                 "Seuraavana vuorossa ${currentPlayer.name}",
-                drawableDrink
+                drawableNextPlayer
             )
         }
 
@@ -279,7 +279,7 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
                         sfxPlayer.playTimesUpSound()
                         splashScreenManager.showConfirmDialog(
                             getString(R.string.times_up),
-                            drawableDrink,
+                            drawableBeer,
                             getString(R.string.continue_),
                             ""
                         ) {}
@@ -298,7 +298,7 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
             currentPlayer.name,
             currentPlayerPicture,
             "Ota ${currentCard!!.points} huikkaa!",
-            drawableDrink
+            drawableBeer
             )
 
             if (currentCard!!.category == DUAL_CARD_TYPE) {
@@ -306,7 +306,7 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
                     assistingPlayer.name,
                     assistingPlayerPicture,
                     "Ota ${currentCard!!.points} huikkaa!",
-                    drawableDrink
+                    drawableBeer
                 )
             }
 
@@ -328,7 +328,7 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
                     ContextCompat.getDrawable(applicationContext, winner.pictureResId)!!
                 splashScreenManager.showConfirmDialog(
                     "${winner.name} voitti pelin!",
-                    drawableDrink,
+                    drawableWin,
                     "Poistu päävalikkoon",
                     ""
                 ) {
@@ -353,7 +353,7 @@ class MainActivity : BaseActivity(), OnCardSwipeListener {
                     assistingPlayer.name,
                     assistingPlayerPicture,
                     "Sait ${currentCard!!.points} pistettä!",
-                    drawableDrink
+                    drawableAddPoints
                 )
                 }
                 endTurn()
