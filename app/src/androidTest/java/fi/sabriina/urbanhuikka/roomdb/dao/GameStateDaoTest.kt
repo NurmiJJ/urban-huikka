@@ -109,16 +109,16 @@ class GameStateDaoTest {
 
     @Test
     fun insertCardCategory() = runTest {
-        dao.insertCardCategory(CardCategory(0, DbConstants.DARE_CATEGORIES[0], true))
-        dao.insertCardCategory(CardCategory(0, DbConstants.TRUTH_CATEGORIES[1], true))
+        dao.insertCardCategory(CardCategory(DbConstants.DARE_CATEGORIES[0], true))
+        dao.insertCardCategory(CardCategory(DbConstants.TRUTH_CATEGORIES[1], true))
         val expectedList = listOf(DbConstants.DARE_CATEGORIES[0], DbConstants.TRUTH_CATEGORIES[1])
         assertThat(dao.getEnabledCardCategories()).containsExactlyElementsIn(expectedList)
     }
 
     @Test
     fun disableCardCategories() = runTest {
-        dao.insertCardCategory(CardCategory(0, DbConstants.DARE_CATEGORIES[0], true))
-        dao.insertCardCategory(CardCategory(0, DbConstants.TRUTH_CATEGORIES[1], true))
+        dao.insertCardCategory(CardCategory(DbConstants.DARE_CATEGORIES[0], true))
+        dao.insertCardCategory(CardCategory(DbConstants.TRUTH_CATEGORIES[1], true))
         dao.setCardCategoryEnabled(DbConstants.TRUTH_CATEGORIES[1], false)
         val expectedList = listOf(DbConstants.DARE_CATEGORIES[0])
         assertThat(dao.getEnabledCardCategories()).containsExactlyElementsIn(expectedList)
