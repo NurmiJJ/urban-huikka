@@ -59,7 +59,8 @@ class CustomCard : ConstraintLayout {
         val pointsView = findViewById<TextView>(R.id.textViewPoints)
 
         var cardDescription = card.description
-        cardDescription = cardDescription.replace(ASSISTING_PLACEHOLDER, "<b>$assistingPlayerName</b> ")
+        cardDescription =
+            cardDescription.replace(ASSISTING_PLACEHOLDER, "<b>$assistingPlayerName</b> ")
 
         titleView.text = card.category
         descriptionView.text = Html.fromHtml(cardDescription, 0)

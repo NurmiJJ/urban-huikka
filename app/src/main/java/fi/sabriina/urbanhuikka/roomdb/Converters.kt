@@ -15,7 +15,7 @@ class Converters {
     }
 
     @TypeConverter
-    fun cardToString(card : Card?): String {
+    fun cardToString(card: Card?): String {
         val gson = Gson()
         return gson.toJson(card)
     }

@@ -29,16 +29,16 @@ interface GameStateDao {
     suspend fun updateSelectedCard(card: Card?)
 
     @Query("SELECT score FROM scoreboard WHERE playerId = :playerId")
-    suspend fun getPlayerScore(playerId: Int) : Int
+    suspend fun getPlayerScore(playerId: Int): Int
 
     @Query("SELECT player_table.*, scoreboard.score FROM scoreboard INNER JOIN player_table ON player_table.id = scoreboard.playerId")
-    suspend fun getAllScores() : List<PlayerAndScore>
+    suspend fun getAllScores(): List<PlayerAndScore>
 
     @Query("UPDATE scoreboard SET score = :score WHERE playerId = :playerId")
     suspend fun updatePlayerScore(playerId: Int, score: Int)
 
     @Query("SELECT COUNT(id) FROM game_state")
-    suspend fun getGameCount() : Int
+    suspend fun getGameCount(): Int
 
     @Query("DELETE FROM game_state")
     suspend fun deleteAllGames()
@@ -47,16 +47,16 @@ interface GameStateDao {
     suspend fun deleteAllPlayersFromScoreboard()
 
     @Query("SELECT * FROM game_state LIMIT 1")
-    suspend fun getCurrentGame() : GameState
+    suspend fun getCurrentGame(): GameState
 
     @Query("SELECT currentPlayerIndex FROM game_state")
-    suspend fun getCurrentPlayerIndex() : Int
+    suspend fun getCurrentPlayerIndex(): Int
 
     @Query("SELECT assistingPlayerIndex FROM game_state")
-    suspend fun getAssistingPlayerIndex() : Int
+    suspend fun getAssistingPlayerIndex(): Int
 
     @Query("SELECT selectedCard FROM game_state")
-    suspend fun getSelectedCard() : Card?
+    suspend fun getSelectedCard(): Card?
 
     @Query("SELECT player_table.* FROM player_table INNER JOIN scoreboard ON player_table.id = scoreboard.playerId")
     suspend fun getPlayers(): List<Player>

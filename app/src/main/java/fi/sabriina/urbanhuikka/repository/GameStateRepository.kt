@@ -25,7 +25,7 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
 
     private val database = Firebase.firestore
 
-    override suspend fun updateDatabase(enabledCategories: List<String>) : Pair<MutableList<Card>, MutableList<Card>> {
+    override suspend fun updateDatabase(enabledCategories: List<String>): Pair<MutableList<Card>, MutableList<Card>> {
         return suspendCoroutine { continuation ->
             val truthCardList = mutableListOf<Card>()
             val dareCardList = mutableListOf<Card>()
@@ -108,10 +108,11 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
         gameStateDao.updateSelectedCard(card)
     }
 
-    override suspend fun getCurrentGame() : GameState {
+    override suspend fun getCurrentGame(): GameState {
         return gameStateDao.getCurrentGame()
     }
-    override suspend fun getGameCount() : Int {
+
+    override suspend fun getGameCount(): Int {
         return gameStateDao.getGameCount()
     }
 
@@ -119,7 +120,7 @@ class GameStateRepository(private val gameStateDao: GameStateDao) : GameStateRep
         return gameStateDao.getPlayers()
     }
 
-    override suspend fun getPlayerScore(playerId: Int) : Int {
+    override suspend fun getPlayerScore(playerId: Int): Int {
         return gameStateDao.getPlayerScore(playerId)
     }
 

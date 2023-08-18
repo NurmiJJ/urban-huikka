@@ -31,7 +31,8 @@ class LeaderboardActivity : BaseActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             val scores = gameStateViewModel.getAllScores()
-            val sortedList: List<PlayerAndScore> = scores.sortedWith(compareBy({it.score}, {it.player.name})).reversed()
+            val sortedList: List<PlayerAndScore> =
+                scores.sortedWith(compareBy({ it.score }, { it.player.name })).reversed()
             adapter.submitList(sortedList)
         }
     }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.SupervisorJob
 
 class HuikkaApplication : Application() {
     private val applicationScope = CoroutineScope(SupervisorJob())
+
     // Using by lazy so the database and the repository are only created when they're needed
     // rather than when the application starts
     private val database by lazy { HuikkaDb.getDatabase(this, applicationScope) }

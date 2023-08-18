@@ -26,7 +26,7 @@ import org.junit.runner.RunWith
 @ExperimentalCoroutinesApi
 class GameStateViewModelTest {
 
-    private lateinit var viewModel : GameStateViewModel
+    private lateinit var viewModel: GameStateViewModel
     private lateinit var repository: GameStateRepositoryInterface
 
     private val testDispatcher = StandardTestDispatcher()
@@ -50,8 +50,8 @@ class GameStateViewModelTest {
     private fun initGameWithTestDefaults() = runTest {
         viewModel.initializeDatabase()
         viewModel.startNewGame()
-        for (i in 1 .. repository.getPlayers().size) {
-            viewModel.insertPlayerToScoreboard(ScoreboardEntry(0,i))
+        for (i in 1..repository.getPlayers().size) {
+            viewModel.insertPlayerToScoreboard(ScoreboardEntry(0, i))
         }
         testDispatcher.scheduler.advanceUntilIdle()
     }
@@ -65,7 +65,7 @@ class GameStateViewModelTest {
         assertThat(truthCard).isNotNull()
         assertThat(dareCard).isNotNull()
         val currentPlayer = viewModel.currentPlayer.getOrAwaitValue()
-        assertThat(currentPlayer).isEqualTo(Player(1,"Eetu",123))
+        assertThat(currentPlayer).isEqualTo(Player(1, "Eetu", 123))
     }
 
     @Test
@@ -163,7 +163,7 @@ class GameStateViewModelTest {
     fun `player card selection`() = runTest {
         viewModel.startGame()
         testDispatcher.scheduler.advanceUntilIdle()
-        val card = Card("Haaveet ja unelmat","Milloin itkit viimeksi?",1)
+        val card = Card("Haaveet ja unelmat", "Milloin itkit viimeksi?", 1)
         viewModel.updateSelectedCard(card)
 
         testDispatcher.scheduler.advanceUntilIdle()
