@@ -3,7 +3,8 @@ package fi.sabriina.urbanhuikka.splashScreens
 import android.content.Context
 import android.view.KeyEvent
 
-class DialogWithCustomBackButtonBehavior(context: Context, onBackButton: () -> Unit) : CustomDialog(context) {
+class DialogWithCustomBackButtonBehavior(context: Context, onBackButton: () -> Unit) :
+    CustomDialog(context) {
     init {
 
         // Set a custom OnKeyListener for the dialog

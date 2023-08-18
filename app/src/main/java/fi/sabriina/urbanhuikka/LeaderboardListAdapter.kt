@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 
-class LeaderboardListAdapter : ListAdapter<PlayerAndScore, PlayerViewHolder>(PlayerScoreComparator()) {
+class LeaderboardListAdapter :
+    ListAdapter<PlayerAndScore, PlayerViewHolder>(PlayerScoreComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
         return PlayerViewHolder.create(parent)
@@ -19,7 +20,7 @@ class LeaderboardListAdapter : ListAdapter<PlayerAndScore, PlayerViewHolder>(Pla
         val result = getItem(position)
         holder.bind(result)
 
-        holder.itemView.setOnClickListener{
+        holder.itemView.setOnClickListener {
         }
 
     }

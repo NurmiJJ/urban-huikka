@@ -19,13 +19,13 @@ import kotlinx.coroutines.launch
 
 class StartActivity : BaseActivity() {
 
-    private lateinit var continueButton : Button
+    private lateinit var continueButton: Button
 
     private val gameStateViewModel: GameStateViewModel by viewModels {
         GameStateViewModelFactory((application as HuikkaApplication).gameStateRepository)
     }
 
-    private lateinit var splashScreenManager : SplashScreenManager
+    private lateinit var splashScreenManager: SplashScreenManager
 
     private val sfxPlayer = SfxPlayer(this)
 
@@ -58,7 +58,12 @@ class StartActivity : BaseActivity() {
 
         val icon = ContextCompat.getDrawable(this, R.drawable.exit_to_app)!!
         onBackPressedDispatcher.addCallback(this) {
-            splashScreenManager.showConfirmDialog(getString(R.string.quit_confirm), icon, okText = getString(R.string.yes), cancelText = getString(R.string.no)) { confirmed ->
+            splashScreenManager.showConfirmDialog(
+                getString(R.string.quit_confirm),
+                icon,
+                okText = getString(R.string.yes),
+                cancelText = getString(R.string.no)
+            ) { confirmed ->
                 if (confirmed) {
                     finish()
                 }

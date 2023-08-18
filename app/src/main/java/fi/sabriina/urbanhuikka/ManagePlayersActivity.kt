@@ -25,7 +25,7 @@ class ManagePlayersActivity : BaseActivity() {
         PlayerViewModelFactory((application as HuikkaApplication).playerRepository)
     }
 
-    private lateinit var splashScreenManager : SplashScreenManager
+    private lateinit var splashScreenManager: SplashScreenManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manage_players)

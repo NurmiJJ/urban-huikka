@@ -47,7 +47,7 @@ class GameStateDaoTest {
 
     @Test
     fun insertGameState() = runTest {
-        dao.insertGameState(GameState(0,"INITIALIZED",0))
+        dao.insertGameState(GameState(0, "INITIALIZED", 0))
         val currentGame = dao.getCurrentGame()
         assertThat(currentGame.status).isEqualTo("INITIALIZED")
 
@@ -55,7 +55,7 @@ class GameStateDaoTest {
 
     @Test
     fun updateGameState() = runTest {
-        dao.insertGameState(GameState(0,"INITIALIZED",0))
+        dao.insertGameState(GameState(0, "INITIALIZED", 0))
         dao.updateGameStatus("ONGOING")
         val currentGame = dao.getCurrentGame()
         assertThat(currentGame.status).isEqualTo("ONGOING")
@@ -63,14 +63,14 @@ class GameStateDaoTest {
 
     @Test
     fun checkInitialization() = runTest {
-        dao.insertGameState(GameState(0,"INITIALIZED",0))
+        dao.insertGameState(GameState(0, "INITIALIZED", 0))
         val gameCount = dao.getGameCount()
         assertThat(gameCount).isEqualTo(1)
     }
 
     @Test
     fun deleteAllGames() = runTest {
-        dao.insertGameState(GameState(0,"INITIALIZED",0))
+        dao.insertGameState(GameState(0, "INITIALIZED", 0))
         dao.deleteAllGames()
         val gameCount = dao.getGameCount()
         assertThat(gameCount).isEqualTo(0)
@@ -78,7 +78,7 @@ class GameStateDaoTest {
 
     @Test
     fun insertPlayerToScoreboard() = runTest {
-        dao.insertPlayerToScoreboard(ScoreboardEntry(0,1,3))
+        dao.insertPlayerToScoreboard(ScoreboardEntry(0, 1, 3))
         assertThat(dao.getPlayerScore(1)).isEqualTo(3)
     }
 
@@ -90,7 +90,7 @@ class GameStateDaoTest {
 
     @Test
     fun updateCurrentPlayerIndex() = runTest {
-        dao.insertGameState(GameState(0,"INITIALIZED",0))
+        dao.insertGameState(GameState(0, "INITIALIZED", 0))
         dao.updateCurrentPlayerIndex(1)
         assertThat(dao.getCurrentPlayerIndex()).isEqualTo(1)
         dao.updateCurrentPlayerIndex(2)
@@ -99,10 +99,10 @@ class GameStateDaoTest {
 
     @Test
     fun updatePlayerScore() = runTest {
-        dao.insertPlayerToScoreboard(ScoreboardEntry(0,3,0))
-        dao.insertPlayerToScoreboard(ScoreboardEntry(0,2,14))
+        dao.insertPlayerToScoreboard(ScoreboardEntry(0, 3, 0))
+        dao.insertPlayerToScoreboard(ScoreboardEntry(0, 2, 14))
         assertThat(dao.getPlayerScore(3)).isEqualTo(0)
-        dao.updatePlayerScore(3,5)
+        dao.updatePlayerScore(3, 5)
         assertThat(dao.getPlayerScore(3)).isEqualTo(5)
         assertThat(dao.getPlayerScore(2)).isEqualTo(14)
     }
@@ -127,7 +127,7 @@ class GameStateDaoTest {
 
     @Test
     fun getPointsToWin() = runTest {
-        dao.insertGameState(GameState(0,"INITIALIZED",0))
+        dao.insertGameState(GameState(0, "INITIALIZED", 0))
         assertThat(dao.getPointsToWin()).isNotNull()
         dao.setPointsToWin(20)
         assertThat(dao.getPointsToWin()).isEqualTo(20)
@@ -135,16 +135,16 @@ class GameStateDaoTest {
 
     @Test
     fun getCurrentCard() = runTest {
-        dao.insertGameState(GameState(0,"INITIALIZED",0))
+        dao.insertGameState(GameState(0, "INITIALIZED", 0))
         assertThat(dao.getSelectedCard()).isNull()
-        val card = Card("Haaveet ja unelmat","Milloin itkit viimeksi?",1)
+        val card = Card("Haaveet ja unelmat", "Milloin itkit viimeksi?", 1)
         dao.updateSelectedCard(card)
         assertThat(dao.getSelectedCard()).isEqualTo(card)
     }
 
     @Test
     fun updateAssistingPlayerIndex() = runTest {
-        dao.insertGameState(GameState(0,"INITIALIZED",0))
+        dao.insertGameState(GameState(0, "INITIALIZED", 0))
         dao.updateAssistingPlayerIndex(1)
         assertThat(dao.getAssistingPlayerIndex()).isEqualTo(1)
         dao.updateAssistingPlayerIndex(2)

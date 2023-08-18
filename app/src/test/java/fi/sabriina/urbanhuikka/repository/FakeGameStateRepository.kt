@@ -7,18 +7,31 @@ import fi.sabriina.urbanhuikka.roomdb.Player
 import fi.sabriina.urbanhuikka.roomdb.PlayerAndScore
 import fi.sabriina.urbanhuikka.roomdb.ScoreboardEntry
 
-class FakeGameStateRepository: GameStateRepositoryInterface {
+class FakeGameStateRepository : GameStateRepositoryInterface {
 
-    private var repoGameState : GameState? = null
+    private var repoGameState: GameState? = null
     private var scoreboard = mutableListOf<ScoreboardEntry>()
-    private var playerList = mutableListOf(Player(1,"Eetu",123), Player(2,"Matias", 1234), Player(3,"Krista", 123), Player(4, "Mikko", 123))
+    private var playerList = mutableListOf(
+        Player(1, "Eetu", 123),
+        Player(2, "Matias", 1234),
+        Player(3, "Krista", 123),
+        Player(4, "Mikko", 123)
+    )
     private var cardCategories = mutableListOf<CardCategory>()
     private var pointsToWin = 30
 
 
     override suspend fun updateDatabase(enabledCategories: List<String>): Pair<MutableList<Card>, MutableList<Card>> {
-        val truthCards = mutableListOf(Card("Haaveet ja unelmat","Milloin itkit viimeksi?",1), Card("Seksi","Miten vanhemmat otti kukkaset ja mehiläiset puheeksi?",1), Card("Salaisuudet ja paljastukset", "Kuka on paras ystäväsi?", 1), Card("Pelot ja epävarmuudet", "Mikä on huonoin kouluarvosanasi?", 3))
-        val dareCards = mutableListOf(Card("Ruoka ja juoma","Ota huikka!",1), Card("Onks pakko?","Ole lankku-asennossa yksi minuutti!",2,60))
+        val truthCards = mutableListOf(
+            Card("Haaveet ja unelmat", "Milloin itkit viimeksi?", 1),
+            Card("Seksi", "Miten vanhemmat otti kukkaset ja mehiläiset puheeksi?", 1),
+            Card("Salaisuudet ja paljastukset", "Kuka on paras ystäväsi?", 1),
+            Card("Pelot ja epävarmuudet", "Mikä on huonoin kouluarvosanasi?", 3)
+        )
+        val dareCards = mutableListOf(
+            Card("Ruoka ja juoma", "Ota huikka!", 1),
+            Card("Onks pakko?", "Ole lankku-asennossa yksi minuutti!", 2, 60)
+        )
         val filteredTruthCards = mutableListOf<Card>()
         val filteredDareCards = mutableListOf<Card>()
         for (card in truthCards) {
@@ -58,11 +71,11 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
         repoGameState?.selectedCard = card
     }
 
-    override suspend fun getCurrentGame() : GameState {
+    override suspend fun getCurrentGame(): GameState {
         return repoGameState!!
     }
 
-    override suspend fun getGameCount() : Int {
+    override suspend fun getGameCount(): Int {
         if (repoGameState != null) {
             return 1
         }
@@ -73,7 +86,7 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
         return playerList
     }
 
-    override suspend fun getPlayerScore(playerId: Int) : Int {
+    override suspend fun getPlayerScore(playerId: Int): Int {
         for (player in scoreboard) {
             if (player.playerId == playerId) {
                 return player.score
@@ -90,7 +103,7 @@ class FakeGameStateRepository: GameStateRepositoryInterface {
         }
     }
 
-    override suspend fun getAllScores() : List<PlayerAndScore> {
+    override suspend fun getAllScores(): List<PlayerAndScore> {
         val leaderboardList = mutableListOf<PlayerAndScore>()
         for (score in scoreboard) {
             for (player in playerList) {

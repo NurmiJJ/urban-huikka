@@ -45,7 +45,13 @@ class GameStateViewModel(private val repository: GameStateRepositoryInterface) :
 
     suspend fun checkInitialization() {
         val count = repository.getGameCount()
-        if (count != 1 || getCurrentGame().status !in arrayOf("INITIALIZED", "ONGOING", "SAVED", "PLAYER_SELECT"))  {
+        if (count != 1 || getCurrentGame().status !in arrayOf(
+                "INITIALIZED",
+                "ONGOING",
+                "SAVED",
+                "PLAYER_SELECT"
+            )
+        ) {
             initializeDatabase()
             deleteAllGames()
             insertGameState(GameState(0, "INITIALIZED"))
@@ -70,7 +76,7 @@ class GameStateViewModel(private val repository: GameStateRepositoryInterface) :
         pointsToWin = repository.getPointsToWin()
         updateGameStatus("ONGOING")
 
-        Log.i(TAG,"Game started")
+        Log.i(TAG, "Game started")
         Log.i(TAG, "Players: $playerList")
         Log.i(TAG, "Points to win: $pointsToWin")
 
@@ -228,7 +234,7 @@ class GameStateViewModel(private val repository: GameStateRepositoryInterface) :
         repository.setPointsToWin(points)
     }
 
-    suspend fun drawAssistingPlayer() : Player {
+    suspend fun drawAssistingPlayer(): Player {
         val availablePlayers = playerList.filter { it != currentPlayer.value }
         val player = availablePlayers.random()
 
@@ -236,7 +242,7 @@ class GameStateViewModel(private val repository: GameStateRepositoryInterface) :
         return player
     }
 
-    suspend fun getAssistingPlayer() : Player {
+    suspend fun getAssistingPlayer(): Player {
         val assistingPlayerIndex = repository.getAssistingPlayerIndex()
         return playerList[assistingPlayerIndex]
     }

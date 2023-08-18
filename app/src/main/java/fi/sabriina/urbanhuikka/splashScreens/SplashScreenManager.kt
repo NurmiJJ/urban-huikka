@@ -260,7 +260,13 @@ class SplashScreenManager(private val context: Context) {
             } else {
                 val constraintSet = ConstraintSet()
                 constraintSet.clone(mainLayout)
-                constraintSet.connect(R.id.okButton, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 32.toDp())
+                constraintSet.connect(
+                    R.id.okButton,
+                    ConstraintSet.START,
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.START,
+                    32.toDp()
+                )
                 constraintSet.applyTo(mainLayout)
             }
 
@@ -309,7 +315,7 @@ class SplashScreenManager(private val context: Context) {
         val density = Resources.getSystem().displayMetrics.density
         return (this * density).toInt()
     }
-        
+
     fun showCountdownDialog(
         time: Long = 4000,
         title: String = context.getString(R.string.timed_card),

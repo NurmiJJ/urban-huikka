@@ -190,7 +190,8 @@ class SelectPlayersActivity : BaseActivity() {
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val view = convertView ?: LayoutInflater.from(applicationContext).inflate(R.layout.category_selector, parent, false)
+            val view = convertView ?: LayoutInflater.from(applicationContext)
+                .inflate(R.layout.category_selector, parent, false)
             val categorySelector: CheckBox = view.findViewById(R.id.checkBox)
             val item = gridItems[position]
 
