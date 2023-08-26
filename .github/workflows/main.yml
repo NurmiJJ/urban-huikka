@@ -4,43 +4,31 @@ on:
   push:
 
 jobs:
-  build:
-      name: Build
-      runs-on: self-hosted
-      steps:
-        - uses: actions/checkout@v3
-          name: Checkout the code
-        - name: Run init script
-          run: bash ~/actions-data/init.sh
-        - uses: actions/setup-java@v3
-          name: Set up JDK 17
-          with:
-            distribution: 'temurin'
-            java-version: '17'
-        - name: Build with gradle
-          run: ./gradlew build
-
   lint:
     name: Lint
-    needs: [build]
     runs-on: self-hosted
     steps:
+      - uses: actions/checkout@v3
+        name: Checkout the code
+      - name: Run init script
+        run: bash ~/actions-data/init.sh
       - uses: actions/setup-java@v3
         name: Set up JDK 17
         with:
           distribution: 'temurin'
           java-version: '17'
       - name: Run Lint
-        run: ./gradlew lintDebug
+        run: ./gradlew lint
         continue-on-error: true
       - name: Upload test report
         uses: actions/upload-artifact@v3
+        if: ${{ !cancelled() }}
         with:
           name: lint_report
           path: app/build/reports/lint-results-debug.html
 
   unit-test:
-    needs: [build]
+    needs: [ lint ]
     name: Unit tests
     runs-on: self-hosted
     steps:
@@ -54,12 +42,13 @@ jobs:
         continue-on-error: true
       - name: Upload test report
         uses: actions/upload-artifact@v3
+        if: ${{ !cancelled() }}
         with:
           name: unit_test_report
           path: app/build/reports/tests/testDebugUnitTest/
 
   instrumentation-test:
-    needs: [unit-test, lint]
+    needs: [ unit-test ]
     name: Instrumentation tests
     runs-on: macos-latest
     steps:
@@ -84,12 +73,13 @@ jobs:
         continue-on-error: true
       - name: Upload test report
         uses: actions/upload-artifact@v3
+        if: ${{ !cancelled() }}
         with:
           name: instrumentation_test_report
           path: app/build/reports/androidTests/connected/
-          
+
   package:
-    needs: [instrumentation-test]
+    needs: [ unit-test ]
     name: Generate APK
     runs-on: self-hosted
     steps:
